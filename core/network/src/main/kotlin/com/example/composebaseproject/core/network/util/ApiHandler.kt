@@ -18,6 +18,9 @@ suspend fun <T> runRemote(block: suspend() -> Response<T>): ApiResponse<T> {
             if (body != null) {
                 ApiResponse.Success(body)
             } else {
+
+                Log.e("RetrofitError", "${response.code()} : ${response.message()}")
+
                 ApiResponse.Failure.HttpError(
                     code = response.code(),
                     message = "응답 본문이 비어 있습니다.",
