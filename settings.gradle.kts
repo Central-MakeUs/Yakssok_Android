@@ -13,15 +13,17 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         google()
         mavenCentral()
     }
 }
 
-rootProject.name = "ComposeBaseProject"
+rootProject.name = "Yakssok"
 include(":app")
 include(":feature:main")
 include(":core:designsystem")

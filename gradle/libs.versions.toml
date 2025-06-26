@@ -138,8 +138,8 @@ android-test = { id = "com.android.test", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 ## precompiled plugins
-composebaseproject-android-application = { id = "composebaseproject.android.application", version = "unspecified" }
-composebaseproject-android-compose = { id = "composebaseproject.android.compose", version = "unspecified" }
-composebaseproject-android-feature = { id = "composebaseproject.android.feature", version = "unspecified" }
-composebaseproject-android-library = { id = "composebaseproject.android.library", version = "unspecified" }
-composebaseproject-kotlin-library = { id = "composebaseproject.kotlin.library", version = "unspecified" }
+yakssok-android-application = { id = "yakssok.android.application", version = "unspecified" }
+yakssok-android-compose = { id = "yakssok.android.compose", version = "unspecified" }
+yakssok-android-feature = { id = "yakssok.android.feature", version = "unspecified" }
+yakssok-android-library = { id = "yakssok.android.library", version = "unspecified" }
+yakssok-kotlin-library = { id = "yakssok.kotlin.library", version = "unspecified" }

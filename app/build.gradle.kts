@@ -1,14 +1,14 @@
 
 plugins {
-    alias(libs.plugins.composebaseproject.android.application)
-    alias(libs.plugins.composebaseproject.android.compose)
+    alias(libs.plugins.yakssok.android.application)
+    alias(libs.plugins.yakssok.android.compose)
 }
 
 android {
-    namespace = "com.example.composebaseproject"
+    namespace = "com.pillsquad.yakssok"
 
     defaultConfig {
-        applicationId = "com.example.composebaseproject"
+        applicationId = "com.pillsquad.yakssok"
         versionCode = 1
         versionName = "1.0"
     }

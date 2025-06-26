@@ -4,7 +4,7 @@
 
     <application>
         <activity
-            android:name=".MainActivity"
+            android:name="com.pillsquad.yakssok.feature.main.MainActivity"
             android:configChanges="uiMode"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing"

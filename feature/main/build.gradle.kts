@@ -1,7 +1,7 @@
-import com.example.composebaseproject.setNamespace
+import com.pillsquad.yakssok.setNamespace
 
 plugins {
-    alias(libs.plugins.composebaseproject.android.feature)
+    alias(libs.plugins.yakssok.android.feature)
 }
 
 setNamespace("feature.main")

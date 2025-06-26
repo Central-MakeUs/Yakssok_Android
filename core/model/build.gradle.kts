@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.composebaseproject.kotlin.library)
+    alias(libs.plugins.yakssok.kotlin.library)
     alias(libs.plugins.kotlin.serialization)
 }
 

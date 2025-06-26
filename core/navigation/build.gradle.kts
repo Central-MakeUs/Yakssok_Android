@@ -1,8 +1,7 @@
-import com.example.composebaseproject.setNamespace
-
+import com.pillsquad.yakssok.setNamespace
 plugins {
-    alias(libs.plugins.composebaseproject.android.library)
-    alias(libs.plugins.composebaseproject.android.compose)
+    alias(libs.plugins.yakssok.android.library)
+    alias(libs.plugins.yakssok.android.compose)
     alias(libs.plugins.kotlin.serialization)
 }
 

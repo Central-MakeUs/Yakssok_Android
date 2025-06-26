@@ -1,0 +1,3 @@
+import com.pillsquad.yakssok.configureComposeAndroid
+
+configureComposeAndroid()
