@@ -5,7 +5,3 @@ plugins {
 }
 
 setNamespace("core.designsystem")
-
-dependencies {
-
-}

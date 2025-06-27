@@ -1,4 +1,4 @@
-package com.example.composebaseproject
+package com.pillsquad.yakssok
 
 import org.junit.Assert.*
 import org.junit.Test
