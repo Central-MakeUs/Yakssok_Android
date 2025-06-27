@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.datasource_api.model
+package com.pillsquad.yakssok.core.network.model
 
 import kotlinx.serialization.Serializable
 

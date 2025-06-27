@@ -24,8 +24,6 @@ fun getProperty(key: String): String {
 }
 
 dependencies {
-    implementation(projects.core.datasourceApi)
-
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)

@@ -1,14 +1,13 @@
 package com.pillsquad.yakssok.core.network.di
 
+import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.retrofit.FakeUserDataSource
 import com.pillsquad.yakssok.core.network.retrofit.RetrofitUserDataSource
-import com.pillsquad.yakssok.datasource_api.remote.UserDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Named
-import javax.inject.Qualifier
 
 // 단순히 구현체 - interface 연결이면 Binds 사용
 @Module

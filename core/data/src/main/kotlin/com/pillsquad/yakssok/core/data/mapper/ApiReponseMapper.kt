@@ -1,7 +1,6 @@
 package com.pillsquad.yakssok.core.data.mapper
 
-import com.pillsquad.yakssok.datasource_api.model.ApiResponse
-
+import com.pillsquad.yakssok.core.network.model.ApiResponse
 
 inline fun <T, R> ApiResponse<T>.toResult(
     transform: (T) -> R,

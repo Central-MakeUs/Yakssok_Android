@@ -1,7 +1,7 @@
 package com.pillsquad.yakssok.core.data.di
 
-import com.pillsquad.yakssok.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.data.UserRepositoryImpl
+import com.pillsquad.yakssok.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
