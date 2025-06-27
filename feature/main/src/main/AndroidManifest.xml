@@ -8,7 +8,7 @@
             android:configChanges="uiMode"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.ComposeBaseProject.TransparentSystemBar">
+            android:theme="@style/Theme.Yakssok.TransparentSystemBar">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

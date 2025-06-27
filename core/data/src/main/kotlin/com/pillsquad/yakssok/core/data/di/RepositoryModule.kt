@@ -1,6 +1,6 @@
 package com.pillsquad.yakssok.core.data.di
 
-import com.pillsquad.yakssok.core.data.UserRepository
+import com.pillsquad.yakssok.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.data.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class RepositoryModule {
+abstract class RepositoryModule {
 
     @Binds
     abstract fun bindUserRepository(

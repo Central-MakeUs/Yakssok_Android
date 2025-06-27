@@ -1,4 +1,4 @@
-package com.example.composebaseproject.feature.main
+package com.pillsquad.yakssok.feature.main
 
 import org.junit.Test
 

@@ -1,9 +1,9 @@
 package com.pillsquad.yakssok.core.data.mapper
 
 import com.pillsquad.yakssok.core.model.User
-import com.pillsquad.yakssok.core.network.model.response.UserResponse
+import com.pillsquad.yakssok.datasource_api.model.UserData
 
-internal fun UserResponse.toUser(): User =
+internal fun UserData.toUser(): User =
     User(
         id = id,
         name = name

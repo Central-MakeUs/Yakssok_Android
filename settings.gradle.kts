@@ -25,10 +25,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "Yakssok"
 include(":app")
-include(":feature:main")
-include(":core:designsystem")
-include(":core:navigation")
-include(":feature:home")
-include(":core:network")
+
+include(":core:domain")
 include(":core:model")
 include(":core:data")
+include(":core:network")
+include(":core:designsystem")
+include(":core:navigation")
+
+include(":feature:main")
+include(":feature:home")
+include(":core:datasource-api")

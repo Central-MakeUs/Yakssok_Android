@@ -1,18 +1,18 @@
 package com.pillsquad.yakssok.core.network.retrofit
 
-import com.pillsquad.yakssok.core.network.datasource.UserDataSource
-import com.pillsquad.yakssok.core.network.model.ApiResponse
-import com.pillsquad.yakssok.core.network.model.response.UserResponse
+import com.pillsquad.yakssok.datasource_api.model.ApiResponse
+import com.pillsquad.yakssok.datasource_api.model.UserData
+import com.pillsquad.yakssok.datasource_api.remote.UserDataSource
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class FakeUserDataSource @Inject constructor(
+class FakeUserDataSource @Inject constructor(
 
 ) : UserDataSource {
-    override suspend fun searchUser(userName: String): ApiResponse<UserResponse> {
+    override suspend fun searchUser(userName: String): ApiResponse<UserData> {
         delay(5000)
-        return ApiResponse.Failure.HttpError(404, "Not Found", "")
+        return ApiResponse.Success(UserData(1, userName))
     }
 }

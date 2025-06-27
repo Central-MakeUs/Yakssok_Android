@@ -1,20 +1,24 @@
 package com.pillsquad.yakssok.core.network.retrofit
 
 import com.pillsquad.yakssok.core.network.UserApi
-import com.pillsquad.yakssok.core.network.datasource.UserDataSource
+import com.pillsquad.yakssok.core.network.mapper.toUserData
 import com.pillsquad.yakssok.core.network.util.runRemote
-import com.pillsquad.yakssok.core.network.model.ApiResponse
-import com.pillsquad.yakssok.core.network.model.response.UserResponse
+import com.pillsquad.yakssok.datasource_api.model.ApiResponse
+import com.pillsquad.yakssok.datasource_api.model.map
+import com.pillsquad.yakssok.datasource_api.model.UserData
+import com.pillsquad.yakssok.datasource_api.remote.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class RetrofitUserDataSource @Inject constructor(
+class RetrofitUserDataSource @Inject constructor(
     private val userApi: UserApi
 ) : UserDataSource {
     override suspend fun searchUser(
         userName: String
-    ): ApiResponse<UserResponse> = runRemote {
-        userApi.searchUser(userName)
+    ): ApiResponse<UserData> {
+        return runRemote {
+            userApi.searchUser(userName)
+        }.map { it.toUserData() }
     }
 }

@@ -1,8 +1,8 @@
 package com.pillsquad.yakssok.core.network.util
 
 import android.util.Log
-import com.pillsquad.yakssok.core.network.model.ApiResponse
-import com.pillsquad.yakssok.core.network.model.ErrorResponse
+import com.pillsquad.yakssok.datasource_api.model.ApiResponse
+import com.pillsquad.yakssok.datasource_api.model.ErrorResponse
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import retrofit2.Response

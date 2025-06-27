@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.network.model
+package com.pillsquad.yakssok.datasource_api.model
 
 sealed interface ApiResponse<out T> {
     data class Success<T>(val data: T) : ApiResponse<T>
@@ -9,3 +9,9 @@ sealed interface ApiResponse<out T> {
         data class UnknownApiError(val throwable: Throwable) : Failure
     }
 }
+
+inline fun <A, B> ApiResponse<A>.map(transform: (A) -> B): ApiResponse<B> =
+    when (this) {
+        is ApiResponse.Success -> ApiResponse.Success(transform(data))
+        is ApiResponse.Failure -> this
+    }
