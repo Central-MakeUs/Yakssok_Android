@@ -53,7 +53,7 @@ private fun <T> parseSuccessResponse(
         println("base is null despite successful response")
     }
 
-    println("✅ base: $base")
+    println("base: $base")
 
     if (base?.code == 0L) {
         return if (base.body != null) {
