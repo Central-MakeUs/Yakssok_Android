@@ -1,7 +1,7 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.BuildConfig
-import com.pillsquad.yakssok.core.network.UserApi
+import com.pillsquad.yakssok.core.network.api.UserApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
