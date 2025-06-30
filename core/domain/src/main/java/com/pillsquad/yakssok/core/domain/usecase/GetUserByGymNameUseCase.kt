@@ -1,7 +1,7 @@
-package com.pillsquad.yakssok.domain.usecase
+package com.pillsquad.yakssok.core.domain.usecase
 
 import com.pillsquad.yakssok.core.model.User
-import com.pillsquad.yakssok.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import javax.inject.Inject
 
 class GetUserByGymNameUseCase @Inject constructor(

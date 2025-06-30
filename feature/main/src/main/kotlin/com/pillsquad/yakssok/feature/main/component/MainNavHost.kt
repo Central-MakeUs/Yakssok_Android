@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
+import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
 import com.pillsquad.yakssok.feature.main.MainNavigator
 
 @Composable
@@ -28,6 +29,10 @@ internal fun MainNavHost(
             startDestination = navigator.startDestination,
         ) {
             homeNavGraph(
+                padding = padding
+            )
+
+            introNavGraph(
                 padding = padding
             )
         }

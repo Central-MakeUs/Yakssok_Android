@@ -4,7 +4,7 @@ import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUser
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
-import com.pillsquad.yakssok.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import javax.inject.Inject
 import javax.inject.Named
 

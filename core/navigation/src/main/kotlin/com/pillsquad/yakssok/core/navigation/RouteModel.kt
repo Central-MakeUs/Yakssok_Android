@@ -3,8 +3,8 @@ package com.pillsquad.yakssok.core.navigation
 import kotlinx.serialization.Serializable
 
 sealed interface Route {
-//    @Serializable
-//    data object Setting : Route
+    @Serializable
+    data object Intro : Route
 //
 //    @Serializable
 //    data class Detail(val id: String) : Route
