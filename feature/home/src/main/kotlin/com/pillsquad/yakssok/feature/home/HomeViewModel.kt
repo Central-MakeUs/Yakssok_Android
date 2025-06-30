@@ -2,7 +2,7 @@ package com.pillsquad.yakssok.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pillsquad.yakssok.domain.usecase.GetUserByGymNameUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetUserByGymNameUseCase
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

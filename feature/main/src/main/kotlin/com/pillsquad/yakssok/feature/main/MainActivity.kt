@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
             YakssokTheme {
                 MainScreen(
                     navigator = navigator,
+                    viewModel = viewModel
                 )
             }
         }

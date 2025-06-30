@@ -12,6 +12,7 @@ import androidx.navigation.navOptions
 import com.pillsquad.yakssok.core.navigation.MainTabRoute
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.home.navigation.navigateHome
+import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
 
 internal class MainNavigator(
     val navController: NavHostController
@@ -19,29 +20,39 @@ internal class MainNavigator(
     private val currentDestination : NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
-    val startDestination = MainTab.HOME.route
+    val startDestination = Route.Intro
 
     val currentTab: MainTab?
         @Composable get() = MainTab.find { tab ->
             currentDestination?.hasRoute(tab::class) == true
         }
 
+    val singleTopNavOptions = navOptions {
+        popUpTo(navController.graph.findStartDestination().id) {
+            inclusive = true
+        }
+        launchSingleTop = true
+        restoreState = false
+    }
+
     fun navigate(tab: MainTab) {
         val navOptions = navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
-                // 홈 -> 검색 -> 홈 다시 눌렀을 때, 홈 탭의 스크롤 상태 등을 유지
+                inclusive = true
                 saveState = true
-                // 목적지 자체는 제거하지 않음
-//                inclusive = false
             }
-            // 현재 화면이 같은 목적지면 다시 push하지 않음
             launchSingleTop = true
-            // 백스택에서 제거했던 화면의 상태를 복원할지 여부
             restoreState = true
         }
 
         when(tab) {
-            MainTab.HOME -> navController.navigateHome(navOptions)
+            MainTab.HOME -> {
+                val homeNavOptions = navOptions {
+                    popUpTo(Route.Intro) { inclusive = true }
+                    launchSingleTop = true
+                }
+                navController.navigateHome(navOptions)
+            }
         }
     }
 
@@ -53,6 +64,10 @@ internal class MainNavigator(
         if(!isSameCurrentDestination<MainTabRoute.Home>()) {
             popBackStack()
         }
+    }
+
+    fun navigateIntro() {
+        navController.navigateIntro()
     }
 
     private inline fun <reified T : Route> isSameCurrentDestination(): Boolean {

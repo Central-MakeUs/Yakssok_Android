@@ -35,3 +35,4 @@ include(":core:navigation")
 
 include(":feature:main")
 include(":feature:home")
+include(":feature:intro")

@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.domain.repository
+package com.pillsquad.yakssok.core.domain.repository
 
 import com.pillsquad.yakssok.core.model.User
 
