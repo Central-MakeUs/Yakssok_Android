@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -24,26 +25,24 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
 @Composable
 internal fun IntroRoute(
-    padding: PaddingValues = PaddingValues(),
     viewModel: IntroViewModel = hiltViewModel()
 ) {
     val loadingState by viewModel.isLoading.collectAsStateWithLifecycle()
-    val modifier = Modifier.padding(padding)
 
     if (loadingState) {
-        SplashScreen(modifier)
+        SplashScreen()
     } else {
-        IntroScreen(modifier)
+        IntroScreen()
     }
 }
 
 @Composable
 private fun IntroScreen(
-    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .background(YakssokTheme.color.grey50)
+            .navigationBarsPadding()
             .padding(horizontal = 16.dp)
             .padding(bottom = 48.dp),
     ) {
@@ -53,12 +52,12 @@ private fun IntroScreen(
 
 @Composable
 private fun SplashScreen(
-    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(YakssokTheme.color.primary400),
+            .background(YakssokTheme.color.primary400)
+            .navigationBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         Icon(

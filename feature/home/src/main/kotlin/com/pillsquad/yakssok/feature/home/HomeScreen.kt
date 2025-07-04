@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -28,14 +29,12 @@ import com.pillsquad.yakssok.feature.home.model.HomeUiState
 
 @Composable
 internal fun HomeRoute(
-    padding: PaddingValues,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
 
     HomeScreen(
-        padding = padding,
         uiState = uiState.value,
         searchUser = viewModel::searchUser,
         userName = userName,
@@ -45,7 +44,6 @@ internal fun HomeRoute(
 
 @Composable
 private fun HomeScreen(
-    padding: PaddingValues,
     uiState: HomeUiState,
     userName: String,
     changeUserName: (String) -> Unit,
@@ -53,7 +51,7 @@ private fun HomeScreen(
 ) {
     Column(
         modifier = Modifier
-            .padding(padding)
+            .statusBarsPadding()
             .padding(16.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
