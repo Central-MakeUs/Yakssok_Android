@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.intro.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -18,11 +17,8 @@ fun NavController.navigateIntro() {
 }
 
 fun NavGraphBuilder.introNavGraph(
-    padding: PaddingValues
 ) {
     composable<Route.Intro> {
-        IntroRoute(
-            padding = padding
-        )
+        IntroRoute()
     }
 }

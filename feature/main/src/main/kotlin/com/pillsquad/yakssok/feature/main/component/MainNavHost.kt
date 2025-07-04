@@ -28,13 +28,9 @@ internal fun MainNavHost(
             navController = navigator.navController,
             startDestination = navigator.startDestination,
         ) {
-            homeNavGraph(
-                padding = padding
-            )
+            homeNavGraph()
 
-            introNavGraph(
-                padding = padding
-            )
+            introNavGraph()
         }
     }
 }
