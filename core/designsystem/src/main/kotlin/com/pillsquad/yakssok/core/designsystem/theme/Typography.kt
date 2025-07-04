@@ -43,9 +43,17 @@ object YakssokTypography {
 
     val subtitle2 = TextStyle(
         fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
+        letterSpacing = (-0.025).em
+    )
+
+    val body0 = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        lineHeight = 27.sp,
         letterSpacing = (-0.025).em
     )
 
