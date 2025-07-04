@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 interface YakssokColor {
     val grey50: Color
     val grey100: Color
+    val grey150: Color
     val grey200: Color
     val grey300: Color
     val grey400: Color
@@ -30,12 +31,14 @@ interface YakssokColor {
     val subYellow: Color
     val subGreen: Color
     val subBlue: Color
+    val subPink: Color
 }
 
 @Stable
 object YakssokLightColor : YakssokColor {
     override val grey50 = Color(0xFFF8F8F8)
     override val grey100 = Color(0xFFEFEFEF)
+    override val grey150 = Color(0xFFE9E9E9)
     override val grey200 = Color(0xFFDCDCDC)
     override val grey300 = Color(0xFFBDBDBD)
     override val grey400 = Color(0xFF989898)
@@ -57,7 +60,8 @@ object YakssokLightColor : YakssokColor {
     override val primary900 = Color(0xFF7B1313)
     override val primary950 = Color(0xFF42080B)
     override val subPurple = Color(0xFF7C24DB)
-    override val subYellow = Color(0xFFE1CF33)
+    override val subYellow = Color(0xFFFFB012)
     override val subGreen = Color(0xFF3ADE4D)
     override val subBlue = Color(0xFF3C99D7)
+    override val subPink = Color(0xFFD224DB)
 }
