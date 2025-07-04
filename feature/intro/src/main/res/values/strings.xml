@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="kakao">카카오로 계속하기</string>
+    <string name="signup_title_header">약쏙에서 사용할\n</string>
+    <string name="signup_title_body">닉네임</string>
+    <string name="signup_title_tail">을 작성해보아요!</string>
 </resources>

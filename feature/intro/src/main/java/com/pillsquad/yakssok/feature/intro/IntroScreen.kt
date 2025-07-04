@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.feature.intro
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -30,7 +31,7 @@ internal fun IntroRoute(
     if (loadingState) {
         SplashScreen()
     } else {
-        LoginScreen()
+        SignupScreen()
     }
 }
 
@@ -39,6 +40,7 @@ private fun LoginScreen(
 ) {
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .background(YakssokTheme.color.grey50)
             .systemBarsPadding()
             .padding(horizontal = 16.dp),
