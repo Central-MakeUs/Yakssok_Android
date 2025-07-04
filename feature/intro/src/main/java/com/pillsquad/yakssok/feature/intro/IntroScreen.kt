@@ -1,27 +1,25 @@
 package com.pillsquad.yakssok.feature.intro
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.feature.intro.component.LoginButton
 
 @Composable
 internal fun IntroRoute(
@@ -32,44 +30,39 @@ internal fun IntroRoute(
     if (loadingState) {
         SplashScreen()
     } else {
-        IntroScreen()
+        LoginScreen()
     }
 }
 
 @Composable
-private fun IntroScreen(
+private fun LoginScreen(
 ) {
     Column(
         modifier = Modifier
             .background(YakssokTheme.color.grey50)
-            .navigationBarsPadding()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 48.dp),
+            .systemBarsPadding()
+            .padding(horizontal = 16.dp),
     ) {
-
-    }
-}
-
-@Composable
-private fun SplashScreen(
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(YakssokTheme.color.primary400)
-            .navigationBarsPadding(),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.img_splash_logo),
-            contentDescription = "yakssok logo",
-            tint = Color.Unspecified
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.width(92.dp),
+                painter = painterResource(R.drawable.img_login_logo),
+                contentDescription = "yakssok logo",
+                tint = Color.Unspecified
+            )
+        }
+        LoginButton(
+            text = stringResource(R.string.kakao),
+            icon = R.drawable.ic_kakao,
+            backgroundColor = Color(0xFFFDDC3F),
+            contentColor = YakssokTheme.color.grey950,
+            onClick = {}
         )
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun SplashPreview() {
-    SplashScreen()
-}
