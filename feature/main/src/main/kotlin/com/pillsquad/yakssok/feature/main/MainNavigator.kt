@@ -27,14 +27,6 @@ internal class MainNavigator(
             currentDestination?.hasRoute(tab::class) == true
         }
 
-    val singleTopNavOptions = navOptions {
-        popUpTo(navController.graph.findStartDestination().id) {
-            inclusive = true
-        }
-        launchSingleTop = true
-        restoreState = false
-    }
-
     fun navigate(tab: MainTab) {
         val navOptions = navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
