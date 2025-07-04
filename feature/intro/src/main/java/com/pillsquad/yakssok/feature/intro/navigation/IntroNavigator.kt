@@ -9,7 +9,7 @@ import com.pillsquad.yakssok.feature.intro.IntroRoute
 
 fun NavController.navigateIntro() {
     val navOptions = navOptions {
-        popUpTo(0) { inclusive = true }
+        popUpTo(graph.startDestinationId) { inclusive = true }
         launchSingleTop = true
     }
 
