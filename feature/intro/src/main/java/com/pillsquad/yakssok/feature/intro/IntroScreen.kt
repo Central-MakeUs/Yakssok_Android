@@ -19,8 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.feature.intro.component.LoginButton
 
 @Composable
 internal fun IntroRoute(
@@ -31,7 +31,7 @@ internal fun IntroRoute(
     if (loadingState) {
         SplashScreen()
     } else {
-        SignupScreen()
+        LoginScreen()
     }
 }
 
@@ -58,9 +58,11 @@ private fun LoginScreen(
                 tint = Color.Unspecified
             )
         }
-        LoginButton(
-            text = stringResource(R.string.kakao),
+        YakssokButton(
+            modifier = Modifier.fillMaxWidth(),
             icon = R.drawable.ic_kakao,
+            text = stringResource(R.string.kakao),
+            round = 12.dp,
             backgroundColor = Color(0xFFFDDC3F),
             contentColor = YakssokTheme.color.grey950,
             onClick = {}
