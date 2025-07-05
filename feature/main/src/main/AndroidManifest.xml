@@ -7,7 +7,7 @@
             android:name="com.pillsquad.yakssok.feature.main.MainActivity"
             android:configChanges="uiMode"
             android:exported="true"
-            android:windowSoftInputMode="adjustNothing"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Yakssok.TransparentSystemBar">
 
             <intent-filter>
