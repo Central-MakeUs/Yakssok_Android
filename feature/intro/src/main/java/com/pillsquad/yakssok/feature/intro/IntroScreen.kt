@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.intro
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,18 +29,37 @@ internal fun IntroRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.isLoading) {
-        SplashScreen()
-    } else {
-        if (uiState.isLogin) {
+    BackHandler {
+        if (uiState.isLogin && !uiState.isLoading) {
+            viewModel.deleteLoginInfo()
+        }
+    }
+
+    when {
+        uiState.isLoading -> {
+            val (loadingBackground, loadingIcon) = if (uiState.nickName.isEmpty()) {
+                YakssokTheme.color.primary400 to R.drawable.img_splash_logo
+            } else {
+                YakssokTheme.color.grey50 to R.drawable.img_signup_loading
+            }
+
+            LoadingScreen(
+                backgroundColor = loadingBackground,
+                iconId = loadingIcon
+            )
+        }
+
+        uiState.isLogin -> {
             SignupScreen(
                 nickName = uiState.nickName,
                 onValueChange = viewModel::changeNickName,
                 enabled = uiState.isEnabled,
-                onBackClick = {},
-                onSignupClick = {}
+                onBackClick = viewModel::deleteLoginInfo,
+                onSignupClick = viewModel::fetchNickName
             )
-        } else {
+        }
+
+        else -> {
             LoginScreen(
                 onClick = viewModel::handleSignIn
             )
