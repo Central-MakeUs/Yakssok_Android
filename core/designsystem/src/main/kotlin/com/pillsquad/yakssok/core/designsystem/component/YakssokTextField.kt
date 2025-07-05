@@ -103,7 +103,7 @@ fun YakssokTextField(
                         onClick = { onValueChange("") }
                     ) {
                         Icon(
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             imageVector = Icons.Default.Close,
                             contentDescription = "clear",
                             tint = YakssokTheme.color.grey500
@@ -129,5 +129,4 @@ fun YakssokTextField(
             }
         }
     )
-
 }
