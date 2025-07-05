@@ -26,24 +26,38 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 internal fun IntroRoute(
     viewModel: IntroViewModel = hiltViewModel()
 ) {
-    val loadingState by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (loadingState) {
+    if (uiState.isLoading) {
         SplashScreen()
     } else {
-        LoginScreen()
+        if (uiState.isLogin) {
+            SignupScreen(
+                nickName = uiState.nickName,
+                onValueChange = viewModel::changeNickName,
+                enabled = uiState.isEnabled,
+                onBackClick = {},
+                onSignupClick = {}
+            )
+        } else {
+            LoginScreen(
+                onClick = viewModel::handleSignIn
+            )
+        }
     }
 }
 
 @Composable
 private fun LoginScreen(
+    onClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(YakssokTheme.color.grey50)
             .systemBarsPadding()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
     ) {
         Box(
             modifier = Modifier
@@ -65,7 +79,7 @@ private fun LoginScreen(
             round = 12.dp,
             backgroundColor = Color(0xFFFDDC3F),
             contentColor = YakssokTheme.color.grey950,
-            onClick = {}
+            onClick = onClick
         )
     }
 }

@@ -38,17 +38,12 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
 @Composable
 internal fun SignupScreen(
+    nickName: String = "",
+    onValueChange: (String) -> Unit = {},
+    enabled: Boolean = false,
     onBackClick: () -> Unit = {},
     onSignupClick: (String) -> Unit = { _ -> }
 ) {
-    var nickName by remember { mutableStateOf("") }
-    var enabled by remember { mutableStateOf(false) }
-
-    LaunchedEffect(nickName) {
-        val trimmed = nickName.trim()
-        enabled = trimmed.isNotEmpty() && trimmed.length <= 5
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +59,7 @@ internal fun SignupScreen(
             modifier = Modifier.fillMaxWidth(),
             backgroundColor = YakssokTheme.color.grey50,
             value = nickName,
-            onValueChange = { nickName = it },
+            onValueChange = onValueChange,
             hint = stringResource(R.string.signup_hint),
             isShowClear = true,
             isShowCounter = true,
@@ -105,6 +100,7 @@ private fun SignupTopAppBar(
             onClick = onClick
         ) {
             Icon(
+                modifier = Modifier.size(24.dp),
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 contentDescription = "back"
             )
