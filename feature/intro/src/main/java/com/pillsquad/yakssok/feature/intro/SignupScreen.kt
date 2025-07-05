@@ -19,11 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,11 +67,13 @@ internal fun SignupScreen(
             contentAlignment = Alignment.BottomCenter
         ) {
             YakssokButton(
-                modifier = Modifier.fillMaxWidth().imePadding(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding(),
                 text = stringResource(R.string.signup),
                 enabled = enabled,
-                backgroundColor = if(enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
-                contentColor = if(enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
+                backgroundColor = if (enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
+                contentColor = if (enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
                 onClick = onSignupClick,
             )
         }
