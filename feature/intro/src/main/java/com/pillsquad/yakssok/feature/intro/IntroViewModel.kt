@@ -22,14 +22,22 @@ class IntroViewModel @Inject constructor(
         checkToken()
     }
 
-    fun handleSignIn() {
-        _uiState.update { it.copy(isLogin = true) }
+    fun deleteLoginInfo() {
+        _uiState.update { it.copy(isLogin = false, nickName = "", isEnabled = false) }
     }
 
     fun changeNickName(nickName: String) {
         _uiState.update {
             it.copy(nickName = nickName, isEnabled = validateNickName(nickName))
         }
+    }
+
+    fun fetchNickName() {
+        _uiState.update { it.copy(isLoading = true) }
+    }
+
+    fun handleSignIn() {
+        _uiState.update { it.copy(isLogin = true) }
     }
 
     private fun validateNickName(nickName: String): Boolean {

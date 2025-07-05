@@ -42,7 +42,7 @@ internal fun SignupScreen(
     onValueChange: (String) -> Unit = {},
     enabled: Boolean = false,
     onBackClick: () -> Unit = {},
-    onSignupClick: (String) -> Unit = { _ -> }
+    onSignupClick: () -> Unit = { }
 ) {
     Column(
         modifier = Modifier
@@ -77,7 +77,7 @@ internal fun SignupScreen(
                 enabled = enabled,
                 backgroundColor = if(enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
                 contentColor = if(enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
-                onClick = { onSignupClick(nickName) },
+                onClick = onSignupClick,
             )
         }
     }
