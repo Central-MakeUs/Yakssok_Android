@@ -15,6 +15,7 @@ androidxLifecycle = "2.9.1"
 
 ## Kotlin
 # https://github.com/JetBrains/kotlin
+coilNetworkOkhttp = "3.2.0"
 kotlin = "2.2.0"
 # https://github.com/Kotlin/kotlinx.serialization
 kotlinxSerializationJson = "1.9.0"
@@ -34,6 +35,10 @@ androidxComposeBom = "2025.06.01"
 androidxComposeNavigation = "2.9.0"
 # https://developer.android.com/jetpack/androidx/releases/compose-material3
 androidxComposeMaterial3 = "1.3.2"
+
+## Coil
+# https://github.com/coil-kt/coil
+coil = "3.2.0"
 
 ## Hilt
 # https://github.com/google/dagger/releases
@@ -91,6 +96,9 @@ androidx-compose-navigation = { group = "androidx.navigation", name = "navigatio
 androidx-compose-navigation-test = { group = "androidx.navigation", name = "navigation-testing", version.ref = "androidxComposeNavigation" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
 compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }

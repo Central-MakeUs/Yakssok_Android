@@ -5,3 +5,8 @@ plugins {
 }
 
 setNamespace("core.designsystem")
+
+dependencies {
+    implementation(libs.coil.compose)
+    implementation(libs.coil.okhttp)
+}
