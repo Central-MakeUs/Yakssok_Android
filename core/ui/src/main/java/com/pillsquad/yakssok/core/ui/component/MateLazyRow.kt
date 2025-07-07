@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
@@ -38,7 +36,9 @@ fun MateLazyRow(
     onMateClick: (Mate) -> Unit
 ) {
     LazyRow(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(YakssokTheme.color.grey50),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -52,7 +52,10 @@ fun MateLazyRow(
             )
         }
         item {
-            AddIconButton(onClick = onNavigateMate)
+            Column {
+                AddIconButton(onClick = onNavigateMate)
+                Spacer(modifier = Modifier.height(29.dp))
+            }
         }
     }
 }
@@ -77,6 +80,7 @@ private fun MateItem(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
+            modifier = Modifier.height(21.dp),
             text = mate.name,
             style = YakssokTheme.typography.body2,
             color = YakssokTheme.color.grey600
