@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.core.designsystem.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +27,7 @@ fun YakssokTopAppBar(
     isLogo: Boolean = false,
     onBackClick: (() -> Unit)? = null,
     onNavigateAlarm: (() -> Unit)? = null,
-    onNavigateSetting: (() -> Unit)? = null
+    onNavigateMy: (() -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -55,7 +53,6 @@ fun YakssokTopAppBar(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.img_topbar_logo),
                     contentDescription = "yakssok logo",
                     tint = Color.Unspecified
@@ -76,7 +73,7 @@ fun YakssokTopAppBar(
             }
         }
 
-        if (onNavigateAlarm != null && onNavigateSetting != null) {
+        if (onNavigateAlarm != null && onNavigateMy != null) {
             Row(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
@@ -88,7 +85,7 @@ fun YakssokTopAppBar(
                 Spacer(modifier = Modifier.size(16.dp))
                 YakssokIconButton(
                     iconId = R.drawable.ic_dehaze,
-                    onClick = onNavigateSetting,
+                    onClick = onNavigateMy,
                 )
             }
         }

@@ -69,7 +69,7 @@ internal class MainNavigator(
     }
 
     fun navigateHome() {
-        navController.navigateHome(closeOptions())
+        navController.navigateHome(navOptions {  })
     }
 
     fun navigateIntro() {
