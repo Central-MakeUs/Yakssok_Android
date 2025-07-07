@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -13,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.pillsquad.yakssok.core.designsystem.R
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.designsystem.util.shadow
 
 @Composable
 fun YakssokImage(
@@ -26,11 +28,19 @@ fun YakssokImage(
     AsyncImage(
         modifier = modifier
             .then(
-                if (isStroke) Modifier.border(
-                    2.dp,
-                    YakssokTheme.color.primary600,
-                    shape
-                ) else Modifier
+                if (isStroke) Modifier
+                    .border(
+                        2.dp,
+                        YakssokTheme.color.primary600,
+                        shape
+                    )
+                    .shadow(
+                        offsetX = 0.dp,
+                        offsetY = 2.dp,
+                        blur = 4.dp,
+                        color = Color.Black.copy(alpha = 0.15f),
+                        shape = shape,
+                    ) else Modifier
             )
             .clip(shape)
             .background(YakssokTheme.color.grey200),

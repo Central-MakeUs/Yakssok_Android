@@ -26,7 +26,8 @@ fun YakssokIconButton(
         Icon(
             modifier = Modifier.size(24.dp),
             painter = painterResource(iconId),
-            contentDescription = "back"
+            contentDescription = "back",
+            tint = Color.Unspecified
         )
     }
 }
@@ -45,7 +46,8 @@ fun YakssokIconButton(
         Icon(
             modifier = Modifier.size(24.dp),
             imageVector = imageVector,
-            contentDescription = "back"
+            contentDescription = "back",
+            tint = Color.Unspecified
         )
     }
 }
