@@ -1,7 +1,5 @@
 package com.pillsquad.yakssok.feature.main
 
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -10,11 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pillsquad.yakssok.feature.main.component.MainBottomBar
 import com.pillsquad.yakssok.feature.main.component.MainNavHost
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
@@ -40,7 +35,6 @@ internal fun MainScreen(
 
     MainScreenContent(
         navigator = navigator,
-        onShowErrorSnackBar = onShowErrorSnackBar,
         snackBarHostState = snackBarHostState
     )
 }
@@ -49,7 +43,6 @@ internal fun MainScreen(
 private fun MainScreenContent(
     modifier: Modifier = Modifier,
     navigator: MainNavigator,
-    onShowErrorSnackBar: (throwable: Throwable?) -> Unit,
     snackBarHostState: SnackbarHostState,
 ) {
     Scaffold(
@@ -57,19 +50,7 @@ private fun MainScreenContent(
         content = { padding ->
             MainNavHost(
                 navigator = navigator,
-                padding = padding,
-                onShowErrorSnackBar = onShowErrorSnackBar,
-            )
-        },
-        bottomBar = {
-            MainBottomBar(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(start = 8.dp, end = 8.dp, bottom = 28.dp),
-                visible = navigator.shouldShowBottomBar(),
-                tabs = MainTab.entries.toPersistentList(),
-                currentTab = navigator.currentTab,
-                onTabSelected = { navigator.navigate(it) }
+                padding = padding
             )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) }

@@ -14,10 +14,8 @@ import com.pillsquad.yakssok.feature.main.MainNavigator
 
 @Composable
 internal fun MainNavHost(
-    modifier: Modifier = Modifier,
     navigator: MainNavigator,
-    padding: PaddingValues,
-    onShowErrorSnackBar: (throwable: Throwable?) -> Unit,
+    padding: PaddingValues
 ) {
     Box(
         modifier = Modifier
@@ -30,7 +28,7 @@ internal fun MainNavHost(
         ) {
             homeNavGraph()
 
-            introNavGraph()
+            introNavGraph(onNavigateHome = navigator::navigateHome)
         }
     }
 }

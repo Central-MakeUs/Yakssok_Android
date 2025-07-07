@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 
 @Composable
@@ -51,59 +53,11 @@ private fun HomeScreen(
 ) {
     Column(
         modifier = Modifier
-            .statusBarsPadding()
+            .background(YakssokTheme.color.primary400)
             .padding(16.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        Text(
-            text = "유저 검색",
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        OutlinedTextField(
-            value = userName,
-            onValueChange = changeUserName,
-            label = { Text("이름 입력") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(
-            onClick = { searchUser(userName) },
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("검색")
-        }
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        when (uiState) {
-            HomeUiState.Init ->{
-                Box(modifier = Modifier.fillMaxSize())
-            }
-
-            is HomeUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(modifier = Modifier.size(40.dp))
-                }
-            }
-
-            is HomeUiState.Success -> {
-                Text(
-                    text = "이름: ${uiState.user.name}\nID: ${uiState.user.id}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-
-            is HomeUiState.Failure -> {
-                Text(
-                    text = "유저 정보를 불러오지 못했습니다.",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
     }
 }
