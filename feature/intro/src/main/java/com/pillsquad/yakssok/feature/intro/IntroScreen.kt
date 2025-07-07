@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.yakssokDefault
 
 @Composable
 internal fun IntroRoute(
@@ -73,12 +74,7 @@ private fun LoginScreen(
     onClick: () -> Unit = {}
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(YakssokTheme.color.grey50)
-            .systemBarsPadding()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp),
+        modifier = Modifier.yakssokDefault(YakssokTheme.color.grey50)
     ) {
         Box(
             modifier = Modifier

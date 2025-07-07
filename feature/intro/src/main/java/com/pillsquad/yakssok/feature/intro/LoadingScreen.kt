@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.yakssokDefault
 
 @Composable
 internal fun LoadingScreen(
@@ -19,10 +20,7 @@ internal fun LoadingScreen(
     iconId: Int = R.drawable.img_splash_logo
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .systemBarsPadding(),
+        modifier = Modifier.yakssokDefault(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Icon(
