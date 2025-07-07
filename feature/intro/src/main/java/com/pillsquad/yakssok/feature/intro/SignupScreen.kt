@@ -29,6 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
+import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.yakssokDefault
 
@@ -43,7 +44,7 @@ internal fun SignupScreen(
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100),
     ) {
-        SignupTopAppBar { onBackClick() }
+        YakssokTopAppBar(onBackClick = onBackClick)
         Spacer(modifier = Modifier.height(16.dp))
         TitleText()
         Spacer(modifier = Modifier.height(60.dp))
@@ -71,30 +72,6 @@ internal fun SignupScreen(
                 backgroundColor = if (enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
                 contentColor = if (enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
                 onClick = onSignupClick,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SignupTopAppBar(
-    onClick: () -> Unit = {}
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-    ) {
-        IconButton(
-            modifier = Modifier
-                .size(24.dp)
-                .background(Color.Transparent),
-            onClick = onClick
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = "back"
             )
         }
     }
