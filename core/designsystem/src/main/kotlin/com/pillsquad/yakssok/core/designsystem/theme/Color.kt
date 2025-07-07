@@ -54,7 +54,7 @@ object YakssokLightColor : YakssokColor {
     override val primary300 = Color(0xFFFB9876)
     override val primary400 = Color(0xFFF9623E)
     override val primary500 = Color(0xFFF63A18)
-    override val primary600 = Color(0xFF37220F)
+    override val primary600 = Color(0xFFE7220F)
     override val primary700 = Color(0xFFC0140E)
     override val primary800 = Color(0xFF981415)
     override val primary900 = Color(0xFF7B1313)

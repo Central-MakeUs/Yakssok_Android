@@ -67,7 +67,8 @@ private fun MateItem(
         modifier = Modifier
             .width(52.dp)
             .height(81.dp)
-            .clickable { onMateClick(mate) }
+            .clickable { onMateClick(mate) },
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(
             modifier = Modifier.size(52.dp),

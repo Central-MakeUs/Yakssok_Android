@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -27,12 +28,19 @@ fun YakssokImage(
 
     AsyncImage(
         modifier = modifier
+            .clip(shape)
+            .background(YakssokTheme.color.grey200)
             .then(
                 if (isStroke) Modifier
                     .border(
-                        2.dp,
-                        YakssokTheme.color.primary600,
-                        shape
+                        width = 2.dp,
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                YakssokTheme.color.primary300,
+                                YakssokTheme.color.primary600
+                            )
+                        ),
+                        shape = shape
                     )
                     .shadow(
                         offsetX = 0.dp,
@@ -41,9 +49,7 @@ fun YakssokImage(
                         color = Color.Black.copy(alpha = 0.15f),
                         shape = shape,
                     ) else Modifier
-            )
-            .clip(shape)
-            .background(YakssokTheme.color.grey200),
+            ),
         model = imageUrl,
         contentScale = ContentScale.Crop,
         contentDescription = contentDescription ?: stringResource(R.string.yakssok_image),
