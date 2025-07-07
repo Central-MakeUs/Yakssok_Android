@@ -11,11 +11,13 @@ internal enum class MainTab(
     internal val contentDescription: String,
     val route: MainTabRoute
 ) {
-    HOME(
-        iconResId = R.drawable.ic_home,
-        contentDescription = "Home",
-        route = MainTabRoute.Home,
-    );
+
+    ;
+//    HOME(
+//        iconResId = R.drawable.ic_home,
+//        contentDescription = "Home",
+//        route = MainTabRoute.Home,
+//    );
 
     companion object {
         @Composable

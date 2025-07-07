@@ -25,7 +25,8 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
 @Composable
 internal fun IntroRoute(
-    viewModel: IntroViewModel = hiltViewModel()
+    viewModel: IntroViewModel = hiltViewModel(),
+    onNavigateHome: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

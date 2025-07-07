@@ -6,6 +6,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
@@ -20,12 +21,21 @@ internal class MainNavigator(
     private val currentDestination : NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
-    val startDestination = Route.Intro
+    val startDestination = Route.Home
 
     val currentTab: MainTab?
         @Composable get() = MainTab.find { tab ->
             currentDestination?.hasRoute(tab::class) == true
         }
+
+    fun closeOptions(): NavOptions {
+        return navOptions {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
 
     fun navigate(tab: MainTab) {
         val navOptions = navOptions {
@@ -37,15 +47,15 @@ internal class MainNavigator(
             restoreState = true
         }
 
-        when(tab) {
-            MainTab.HOME -> {
-                val homeNavOptions = navOptions {
-                    popUpTo(Route.Intro) { inclusive = true }
-                    launchSingleTop = true
-                }
-                navController.navigateHome(navOptions)
-            }
-        }
+//        when(tab) {
+//            MainTab.HOME -> {
+//                val homeNavOptions = navOptions {
+//                    popUpTo(Route.Intro) { inclusive = true }
+//                    launchSingleTop = true
+//                }
+//                navController.navigateHome(navOptions)
+//            }
+//        }
     }
 
     private fun popBackStack() {
@@ -53,13 +63,17 @@ internal class MainNavigator(
     }
 
     fun popBackStackIfNotHome() {
-        if(!isSameCurrentDestination<MainTabRoute.Home>()) {
+        if(!isSameCurrentDestination<Route.Home>()) {
             popBackStack()
         }
     }
 
+    fun navigateHome() {
+        navController.navigateHome(closeOptions())
+    }
+
     fun navigateIntro() {
-        navController.navigateIntro()
+        navController.navigateIntro(closeOptions())
     }
 
     private inline fun <reified T : Route> isSameCurrentDestination(): Boolean {
