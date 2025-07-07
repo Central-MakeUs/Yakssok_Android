@@ -12,19 +12,16 @@ internal fun Project.configureKotlinAndroid() {
     pluginManager.apply("org.jetbrains.kotlin.android")
 
     androidExtension.apply {
-        compileSdk = 35
+        compileSdk = 36
 
         defaultConfig {
-            minSdk = 30
+            minSdk = 28
         }
 
         compileOptions {
             // Kotlin 1.9 & AGP 8.x => Java 11 or higher
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
-
-            // if(minSdk <= 24) Useful
-            isCoreLibraryDesugaringEnabled = true
         }
 
         buildTypes {
