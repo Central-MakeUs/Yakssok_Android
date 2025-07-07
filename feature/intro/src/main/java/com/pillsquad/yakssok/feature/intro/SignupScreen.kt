@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.yakssokDefault
 
 @Composable
 internal fun SignupScreen(
@@ -40,11 +41,7 @@ internal fun SignupScreen(
     onSignupClick: () -> Unit = { }
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(YakssokTheme.color.grey100)
-            .padding(horizontal = 16.dp)
-            .systemBarsPadding(),
+        modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100),
     ) {
         SignupTopAppBar { onBackClick() }
         Spacer(modifier = Modifier.height(16.dp))
@@ -62,8 +59,7 @@ internal fun SignupScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(bottom = 16.dp),
+                .weight(1f),
             contentAlignment = Alignment.BottomCenter
         ) {
             YakssokButton(
@@ -80,7 +76,6 @@ internal fun SignupScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SignupTopAppBar(
     onClick: () -> Unit = {}
