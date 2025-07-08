@@ -10,11 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -90,13 +87,13 @@ private fun AddButton(
 ) {
     IconButton(
         modifier = Modifier
-            .size(28.dp)
             .clip(CircleShape)
-            .background(YakssokTheme.color.grey100),
+            .background(YakssokTheme.color.grey100)
+            .size(28.dp),
         onClick = onClick
     ) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(20.dp),
             painter = painterResource(R.drawable.ic_add),
             contentDescription = stringResource(R.string.add_mate),
             tint = Color.Unspecified
