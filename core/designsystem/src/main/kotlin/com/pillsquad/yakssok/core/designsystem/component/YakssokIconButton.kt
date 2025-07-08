@@ -15,16 +15,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun YakssokIconButton(
     @DrawableRes iconId: Int,
+    size: Int = 24,
     onClick: () -> Unit,
 ) {
     IconButton(
         modifier = Modifier
-            .size(24.dp)
+            .size(size.dp)
             .background(Color.Transparent),
         onClick = onClick
     ) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(size.dp),
             painter = painterResource(iconId),
             contentDescription = "back",
             tint = Color.Unspecified
@@ -35,16 +36,17 @@ fun YakssokIconButton(
 @Composable
 fun YakssokIconButton(
     imageVector: ImageVector,
+    size: Int = 24,
     onClick: () -> Unit,
 ) {
     IconButton(
         modifier = Modifier
-            .size(24.dp)
+            .size(size.dp)
             .background(Color.Transparent),
         onClick = onClick
     ) {
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(size.dp),
             imageVector = imageVector,
             contentDescription = "back",
             tint = Color.Unspecified

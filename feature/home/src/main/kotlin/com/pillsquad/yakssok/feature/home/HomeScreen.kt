@@ -1,11 +1,14 @@
 package com.pillsquad.yakssok.feature.home
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,21 +36,25 @@ internal fun HomeRoute(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
-
+    val scrollState = rememberScrollState()
 
     HomeScreen(
-
+        scrollState = scrollState
     )
 }
 
 @Composable
 private fun HomeScreen(
     isRounded: Boolean = false,
+    mateList: List<Mate> = emptyList(),
+    clickedMateId: Int = 0,
+    scrollState: ScrollState = rememberScrollState(),
     onClickMate: (Mate) -> Unit = {},
     onNavigateMy: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
     onNavigateAlarm: () -> Unit = {},
     onNavigateRoutine: () -> Unit = {},
+    onNavigateCalendar: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey50)
@@ -58,22 +66,29 @@ private fun HomeScreen(
         )
         HomeContent(
             modifier = Modifier.weight(1f),
+            scrollState = scrollState,
+            mateList = mateList,
+            clickedMateId = clickedMateId,
             isRounded = isRounded,
+            onClickMate = onClickMate,
             onNavigateMate = onNavigateMate,
-            onClickMate = onClickMate
+            onNavigateRoutine = onNavigateRoutine,
+            onNavigateCalendar = onNavigateCalendar
         )
     }
 }
 
 @Composable
 private fun HomeContent(
-    modifier: Modifier = Modifier,
-    mateList: List<Mate> = emptyList(),
-    clickedMateId: Int = 0,
-    isRounded: Boolean = false,
-    onClickMate: (Mate) -> Unit = {},
-    onNavigateMate: () -> Unit = {},
-    onNavigateCalendar: () -> Unit = {},
+    modifier: Modifier,
+    scrollState: ScrollState,
+    mateList: List<Mate>,
+    clickedMateId: Int,
+    isRounded: Boolean,
+    onClickMate: (Mate) -> Unit,
+    onNavigateMate: () -> Unit,
+    onNavigateRoutine: () -> Unit,
+    onNavigateCalendar: () -> Unit,
 ) {
     val shape =
         if (isRounded) RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp) else RectangleShape
@@ -89,28 +104,26 @@ private fun HomeContent(
     )
     var selectedDate by remember { mutableStateOf(weekDates[2]) }
 
-    Surface(
-        shape = shape
+    Column(
+        modifier = modifier
+            .clip(shape)
+            .background(YakssokTheme.color.grey50)
+            .verticalScroll(scrollState)
+            .padding(top = topPadding),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .background(YakssokTheme.color.grey50)
-                .padding(top = topPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MateLazyRow(
-                mateList = mateList,
-                clickedMateId = clickedMateId,
-                onNavigateMate = onNavigateMate,
-                onMateClick = onClickMate
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            WeekDataSelector(
-                weekDates = weekDates,
-                selectedDate = selectedDate,
-                onDateSelected = { selectedDate = it },
-                onNavigateCalendar = onNavigateCalendar
-            )
-        }
+        MateLazyRow(
+            mateList = mateList,
+            clickedMateId = clickedMateId,
+            onNavigateMate = onNavigateMate,
+            onMateClick = onClickMate
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        WeekDataSelector(
+            weekDates = weekDates,
+            selectedDate = selectedDate,
+            onDateSelected = { selectedDate = it },
+            onNavigateCalendar = onNavigateCalendar
+        )
     }
 }
