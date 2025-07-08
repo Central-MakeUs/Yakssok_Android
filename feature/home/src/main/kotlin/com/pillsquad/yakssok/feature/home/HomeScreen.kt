@@ -30,6 +30,7 @@ import com.pillsquad.yakssok.core.model.Mate
 import com.pillsquad.yakssok.core.model.Medicine
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
+import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import java.time.LocalDate
@@ -52,6 +53,7 @@ internal fun HomeRoute(
 private fun HomeScreen(
     isRounded: Boolean = false,
     mateList: List<Mate> = emptyList(),
+    medicineList: List<Medicine> = emptyList(),
     clickedMateId: Int = 0,
     scrollState: ScrollState = rememberScrollState(),
     onClickMate: (Mate) -> Unit = {},
@@ -76,6 +78,7 @@ private fun HomeScreen(
             modifier = Modifier.weight(1f),
             scrollState = scrollState,
             mateList = mateList,
+            medicineList = medicineList,
             clickedMateId = clickedMateId,
             isRounded = isRounded,
             onClickMate = onClickMate,
@@ -91,6 +94,7 @@ private fun HomeContent(
     modifier: Modifier,
     scrollState: ScrollState,
     mateList: List<Mate>,
+    medicineList: List<Medicine>,
     clickedMateId: Int,
     isRounded: Boolean,
     onClickMate: (Mate) -> Unit,
@@ -109,38 +113,6 @@ private fun HomeContent(
         LocalDate.now().plusDays(4),
         LocalDate.now().plusDays(5),
         LocalDate.now().plusDays(6)
-    )
-    val medicineList = mutableListOf(
-        Medicine(
-            name = "종합 비타민 오쏘몰",
-            time = LocalTime.now(),
-            isTaken = true
-        ),
-        Medicine(
-            name = "종합 비타민 오쏘몰",
-            time = LocalTime.now(),
-            isTaken = true
-        ),
-        Medicine(
-            name = "종합 비타민 오쏘몰",
-            time = LocalTime.now(),
-            isTaken = true
-        ),
-        Medicine(
-            name = "종합 비타민 오쏘몰",
-            time = LocalTime.now(),
-            isTaken = true
-        ),
-        Medicine(
-            name = "피부약",
-            time = LocalTime.now(),
-            isTaken = false
-        ),
-        Medicine(
-            name = "현대백화점에서산알약입니다이오",
-            time = LocalTime.now(),
-            isTaken = false
-        )
     )
     var selectedDate by remember { mutableStateOf(weekDates[2]) }
 
@@ -166,11 +138,19 @@ private fun HomeContent(
             onNavigateCalendar = onNavigateCalendar
         )
         Spacer(modifier = Modifier.height(32.dp))
-        DailyMedicineList(
-            medicineList = medicineList,
-            onItemClick = {},
-            onNavigateToRoute = onNavigateRoutine
-        )
+        if (medicineList.isEmpty()) {
+            NoMedicineColumn(
+                modifier = Modifier.weight(1f),
+                isNeverAlarm = false,
+                onNavigateToRoutine = onNavigateRoutine
+            )
+        } else {
+            DailyMedicineList(
+                medicineList = medicineList,
+                onItemClick = {},
+                onNavigateToRoute = onNavigateRoutine
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
