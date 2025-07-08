@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
@@ -41,10 +42,11 @@ fun DailyMedicineRow(
     medicine: Medicine,
     onClick: () -> Unit = {}
 ) {
+    val textColor = if (medicine.isTaken) YakssokTheme.color.grey600 else YakssokTheme.color.grey950
     val rightColor =
-        if (medicine.isTaken) YakssokTheme.color.primary400 else YakssokTheme.color.grey200
+        if (medicine.isTaken) YakssokTheme.color.grey200 else YakssokTheme.color.primary400
     val checkIcon =
-        if (medicine.isTaken) R.drawable.ic_checkbox_true else R.drawable.ic_checkbox_false
+        if (medicine.isTaken) R.drawable.ic_checkbox_false else R.drawable.ic_checkbox_true
     val formattedTime = medicine.time.format(
         DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH)
     )
@@ -75,7 +77,8 @@ fun DailyMedicineRow(
                 modifier = Modifier.weight(1f),
                 text = medicine.name,
                 style = YakssokTheme.typography.subtitle2,
-                color = YakssokTheme.color.grey950
+                color = textColor,
+                textDecoration = if(medicine.isTaken) TextDecoration.LineThrough else null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
