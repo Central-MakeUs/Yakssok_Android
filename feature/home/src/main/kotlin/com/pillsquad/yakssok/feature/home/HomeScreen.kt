@@ -4,8 +4,10 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,10 +27,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Mate
+import com.pillsquad.yakssok.core.model.Medicine
+import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import java.time.LocalDate
+import java.time.LocalTime
 
 @Composable
 internal fun HomeRoute(
@@ -57,7 +62,10 @@ private fun HomeScreen(
     onNavigateCalendar: () -> Unit = {},
 ) {
     Column(
-        modifier = Modifier.yakssokDefault(YakssokTheme.color.grey50)
+        modifier = Modifier.fillMaxSize()
+            .background(YakssokTheme.color.grey50)
+            .systemBarsPadding()
+            .padding(horizontal = 16.dp)
     ) {
         YakssokTopAppBar(
             isLogo = true,
@@ -102,6 +110,38 @@ private fun HomeContent(
         LocalDate.now().plusDays(5),
         LocalDate.now().plusDays(6)
     )
+    val medicineList = mutableListOf(
+        Medicine(
+            name = "종합 비타민 오쏘몰",
+            time = LocalTime.now(),
+            isTaken = true
+        ),
+        Medicine(
+            name = "종합 비타민 오쏘몰",
+            time = LocalTime.now(),
+            isTaken = true
+        ),
+        Medicine(
+            name = "종합 비타민 오쏘몰",
+            time = LocalTime.now(),
+            isTaken = true
+        ),
+        Medicine(
+            name = "종합 비타민 오쏘몰",
+            time = LocalTime.now(),
+            isTaken = true
+        ),
+        Medicine(
+            name = "피부약",
+            time = LocalTime.now(),
+            isTaken = false
+        ),
+        Medicine(
+            name = "현대백화점에서산알약입니다이오",
+            time = LocalTime.now(),
+            isTaken = false
+        )
+    )
     var selectedDate by remember { mutableStateOf(weekDates[2]) }
 
     Column(
@@ -125,5 +165,12 @@ private fun HomeContent(
             onDateSelected = { selectedDate = it },
             onNavigateCalendar = onNavigateCalendar
         )
+        Spacer(modifier = Modifier.height(32.dp))
+        DailyMedicineList(
+            medicineList = medicineList,
+            onItemClick = {},
+            onNavigateToRoute = onNavigateRoutine
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

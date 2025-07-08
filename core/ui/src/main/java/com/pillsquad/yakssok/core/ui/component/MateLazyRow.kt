@@ -103,7 +103,7 @@ private fun AddIconButton(
             modifier = Modifier.size(20.dp),
             imageVector = Icons.Default.Add,
             contentDescription = stringResource(R.string.add_mate),
-            tint = Color.Unspecified
+            tint = YakssokTheme.color.grey400
         )
     }
 }
