@@ -211,7 +211,7 @@ private fun HomeContent(
         Spacer(modifier = Modifier.height(32.dp))
         if (medicineList.isEmpty()) {
             NoMedicineColumn(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier,
                 isNeverAlarm = false,
                 onNavigateToRoutine = onNavigateRoutine
             )
