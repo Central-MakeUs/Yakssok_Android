@@ -49,7 +49,7 @@ fun DailyMedicineList(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "먹을 약",
+                text = stringResource(R.string.have_to_take),
                 style = YakssokTheme.typography.body2,
                 color = YakssokTheme.color.grey600
             )
@@ -66,7 +66,7 @@ fun DailyMedicineList(
         }
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "복용 완료",
+            text = stringResource(R.string.taked_medicine),
             style = YakssokTheme.typography.body2,
             color = YakssokTheme.color.grey600
         )

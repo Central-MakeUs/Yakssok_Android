@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="no_alarm">복약 까먹지 않게\n알림을 드려요!</string>
+    <string name="have_to_take">먹을 약</string>
     <string name="add_mate">add mate</string>
+    <string name="pill_image">pill image</string>
+    <string name="taked_medicine">복용 완료</string>
+    <string name="divider">divider</string>
+    <string name="no_medicine_today">먹을 약이 없어요.\n오늘은 쉬어가는 날!</string>
+    <string name="add_medicine">복약추가하기</string>
 </resources>
