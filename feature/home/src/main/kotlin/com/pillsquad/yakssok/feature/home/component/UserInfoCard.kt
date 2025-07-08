@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.feature.home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -106,17 +107,22 @@ internal fun UserInfoCard(
         Spacer(modifier = Modifier.height(8.dp))
         if (remainedMedicine > 0) {
             YakssokButton(
+                modifier = Modifier.height(40.dp),
                 text = "잔소리 보내기",
                 round = 8.dp,
+                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
                 backgroundColor = YakssokTheme.color.grey900,
                 contentColor = YakssokTheme.color.grey50,
                 onClick = onClick
             )
         } else {
             YakssokButton(
-                modifier = Modifier.width(120.dp),
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(40.dp),
                 text = "칭찬 보내기",
                 round = 8.dp,
+                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
                 backgroundColor = YakssokTheme.color.subBlue,
                 contentColor = YakssokTheme.color.grey50,
                 onClick = onClick

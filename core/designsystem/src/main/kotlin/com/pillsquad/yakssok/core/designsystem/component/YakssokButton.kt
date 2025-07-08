@@ -28,6 +28,7 @@ fun YakssokButton(
     text: String,
     enabled: Boolean = true,
     round: Dp = 16.dp,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     textStyle: TextStyle = YakssokTheme.typography.subtitle2,
     backgroundColor: Color = YakssokTheme.color.primary400,
     contentColor: Color = YakssokTheme.color.grey500,
@@ -39,7 +40,7 @@ fun YakssokButton(
             containerColor = backgroundColor,
             contentColor = contentColor
         ),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = contentPadding,
         shape = RoundedCornerShape(round),
         enabled = enabled,
         onClick = onClick
