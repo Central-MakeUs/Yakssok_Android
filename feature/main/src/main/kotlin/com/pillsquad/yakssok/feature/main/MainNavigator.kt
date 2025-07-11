@@ -39,8 +39,8 @@ internal class MainNavigator(
         navController.navigateIntro(closeOptions())
     }
 
-    fun navigateRoutine() {
-        navController.navigateRoutine()
+    fun navigateRoutine(name: String) {
+        navController.navigateRoutine(name)
     }
 }
 

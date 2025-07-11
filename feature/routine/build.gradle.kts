@@ -5,3 +5,7 @@ plugins {
 }
 
 setNamespace("feature.routine")
+
+dependencies {
+    implementation(libs.kotlinx.datetime)
+}

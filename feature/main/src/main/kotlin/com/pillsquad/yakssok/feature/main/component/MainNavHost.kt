@@ -27,7 +27,7 @@ internal fun MainNavHost(
             navController = navigator.navController,
             startDestination = navigator.startDestination,
         ) {
-            homeNavGraph(onNavigateRoutine = navigator::navigateRoutine)
+            homeNavGraph(onNavigateRoutine = {navigator.navigateRoutine("")})
 
             introNavGraph(onNavigateHome = navigator::navigateHome)
 
