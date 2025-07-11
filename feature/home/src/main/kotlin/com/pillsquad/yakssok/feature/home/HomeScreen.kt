@@ -44,7 +44,8 @@ import java.time.LocalTime
 
 @Composable
 internal fun HomeRoute(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateRoutine: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -81,7 +82,8 @@ internal fun HomeRoute(
                 profileImage = "https://picsum.photos/200",
                 remainedMedicine = 3
             )
-        )
+        ),
+        onNavigateRoutine = onNavigateRoutine
     )
 }
 

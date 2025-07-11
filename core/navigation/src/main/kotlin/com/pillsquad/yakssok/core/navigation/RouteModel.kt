@@ -7,9 +7,8 @@ sealed interface Route {
     data object Intro : Route
 
     @Serializable
-    data object Home : MainTabRoute
-}
+    data object Home : Route
 
-sealed interface MainTabRoute : Route {
-
+    @Serializable
+    data class Routine(val name: String) : Route
 }
