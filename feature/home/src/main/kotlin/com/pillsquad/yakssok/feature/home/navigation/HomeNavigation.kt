@@ -13,8 +13,11 @@ fun NavController.navigateHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
+    onNavigateRoutine: () -> Unit
 ) {
     composable<Route.Home> {
-        HomeRoute()
+        HomeRoute(
+            onNavigateRoutine = onNavigateRoutine
+        )
     }
 }

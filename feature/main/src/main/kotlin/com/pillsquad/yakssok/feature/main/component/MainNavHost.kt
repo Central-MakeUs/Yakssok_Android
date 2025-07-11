@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
 import com.pillsquad.yakssok.feature.main.MainNavigator
+import com.pillsquad.yakssok.feature.routine.navigation.routineNavGraph
 
 @Composable
 internal fun MainNavHost(
@@ -26,9 +27,11 @@ internal fun MainNavHost(
             navController = navigator.navController,
             startDestination = navigator.startDestination,
         ) {
-            homeNavGraph()
+            homeNavGraph(onNavigateRoutine = navigator::navigateRoutine)
 
             introNavGraph(onNavigateHome = navigator::navigateHome)
+
+            routineNavGraph(onNavigateBack = navigator::popBackStack)
         }
     }
 }
