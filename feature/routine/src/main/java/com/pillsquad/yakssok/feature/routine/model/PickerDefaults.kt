@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
-object TimePickerDefaults {
+object PickerDefaults {
     @Composable
     fun pickerStyle(
         textStyle: TextStyle = YakssokTheme.typography.header2,
