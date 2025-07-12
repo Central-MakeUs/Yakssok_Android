@@ -1,71 +1,71 @@
 package com.pillsquad.yakssok.feature.routine.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.routine.model.CurveEffect
+import com.pillsquad.yakssok.feature.routine.model.PickerDefaults
 import com.pillsquad.yakssok.feature.routine.model.PickerSelector
 import com.pillsquad.yakssok.feature.routine.model.PickerState
 import com.pillsquad.yakssok.feature.routine.model.PickerStyle
-import com.pillsquad.yakssok.feature.routine.model.PickerDefaults
 import com.pillsquad.yakssok.feature.routine.model.rememberPickerState
-import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalTime
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.number
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 @Composable
-internal fun TimePicker(
+internal fun DatePicker(
     modifier: Modifier = Modifier,
-    initialTime: LocalTime = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault()).time,
+    initialDate: LocalDate = getTodayDate(),
     visibleItemsCount: Int = PickerDefaults.VISIBLE_ITEM_COUNT,
     style: PickerStyle = PickerDefaults.pickerStyle(),
     selector: PickerSelector = PickerDefaults.pickerSelector(),
     curveEffect: CurveEffect = PickerDefaults.curveEffect(),
-    onValueChange: (LocalTime) -> Unit
+    onValueChange: (LocalDate) -> Unit
 ) {
-    val amPmItems = remember {
-        listOf("오전", "오후")
+    val yearItems = remember { listOf(initialDate.year, initialDate.year + 1) }
+    val monthItems = remember { (1..12).toList() }
+
+    val yearPickerState = rememberPickerState(
+        initialIndex = yearItems.indexOf(initialDate.year),
+        items = yearItems
+    )
+    val monthPickerState = rememberPickerState(
+        initialIndex = initialDate.month.number - 1,
+        items = monthItems
+    )
+
+    val dayItems by remember(yearPickerState.selectedIndex, monthPickerState.selectedIndex) {
+        derivedStateOf {
+            val year = yearPickerState.selectedItem
+            val month = monthPickerState.selectedItem
+            getDaysInMonth(year, month)
+        }
     }
-    val hourItems = remember { (1..12).toList() }
-    val minuteItems = remember { (0..59).toList() }
 
-    val amPmPickerState = rememberPickerState(
-        initialIndex = if (initialTime.hour < 12) 0 else 1,
-        items = amPmItems
+    val dayPickerState = rememberPickerState(
+        initialIndex = initialDate.day - 1,
+        items = dayItems
     )
-    val hourPickerState = rememberPickerState(
-        initialIndex = hourItems.indexOf(if (initialTime.hour % 12 == 0) 12 else initialTime.hour % 12),
-        items = hourItems
-    )
-    val minutePickerState = rememberPickerState(
-        initialIndex = minuteItems.indexOf(initialTime.minute),
-        items = minuteItems
-    )
-
-    var previousHour by remember { mutableIntStateOf(initialTime.hour) }
-    val scope = rememberCoroutineScope()
 
     Box(
         modifier = modifier,
@@ -78,8 +78,8 @@ internal fun TimePicker(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PickerItem(
-                items = amPmItems,
-                state = amPmPickerState,
+                items = yearItems,
+                state = yearPickerState,
                 visibleItemsCount = visibleItemsCount,
                 style = style,
                 modifier = Modifier.weight(0.5f),
@@ -87,10 +87,10 @@ internal fun TimePicker(
                 curveEffect = curveEffect,
                 onValueChange = {
                     onPickerValueChange(
-                        amPmPickerState,
-                        hourPickerState,
-                        minutePickerState,
-                        onValueChange
+                        yearState = yearPickerState,
+                        monthState = monthPickerState,
+                        dayState = dayPickerState,
+                        onValueChange = onValueChange
                     )
                 }
             )
@@ -102,37 +102,24 @@ internal fun TimePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = hourItems,
-                    state = hourPickerState,
+                    items = monthItems,
+                    state = monthPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
                     infiniteScroll = true,
                     curveEffect = curveEffect,
                     onValueChange = {
                         onPickerValueChange(
-                            amPmPickerState,
-                            hourPickerState,
-                            minutePickerState,
-                            onValueChange
+                            yearState = yearPickerState,
+                            monthState = monthPickerState,
+                            dayState = dayPickerState,
+                            onValueChange = onValueChange
                         )
-                        scope.launch {
-                            val currentHour = hourPickerState.selectedItem
-                            val currentIndex =
-                                amPmPickerState.lazyListState.firstVisibleItemIndex % amPmItems.size
-                            val nextIndex = (currentIndex + 1) % amPmItems.size
-
-                            if ((currentHour == 12 && previousHour == 11) ||
-                                (currentHour == 11 && previousHour == 12)
-                            ) {
-                                amPmPickerState.lazyListState.animateScrollToItem(nextIndex)
-                            }
-                            previousHour = currentHour
-                        }
                     }
                 )
                 Text(
                     modifier = Modifier.weight(0.3f),
-                    text = "시",
+                    text = "월",
                     style = YakssokTheme.typography.body0,
                     color = YakssokTheme.color.grey500,
                 )
@@ -148,8 +135,8 @@ internal fun TimePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = minuteItems,
-                    state = minutePickerState,
+                    items = dayItems,
+                    state = dayPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
                     infiniteScroll = true,
@@ -157,41 +144,54 @@ internal fun TimePicker(
                     curveEffect = curveEffect,
                     onValueChange = {
                         onPickerValueChange(
-                            amPmPickerState,
-                            hourPickerState,
-                            minutePickerState,
-                            onValueChange
+                            yearState = yearPickerState,
+                            monthState = monthPickerState,
+                            dayState = dayPickerState,
+                            onValueChange = onValueChange
                         )
                     }
                 )
                 Text(
                     modifier = Modifier.weight(0.3f),
-                    text = "분",
+                    text = "일",
                     style = YakssokTheme.typography.body0,
                     color = YakssokTheme.color.grey500,
                 )
             }
         }
     }
+
+}
+
+
+@OptIn(ExperimentalTime::class)
+private fun getTodayDate(): LocalDate {
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+}
+
+private fun getDaysInMonth(year: Int, month: Int): List<Int> {
+    val lastDay = try {
+        LocalDate(year, month, 1).plus(DatePeriod(months = 1))
+            .minus(DatePeriod(days = 1))
+            .day
+    } catch (e: Exception) {
+        Log.e("DatePicker", "getDaysInMonth: $e")
+        30
+    }
+    return (1..lastDay).toList()
 }
 
 private fun onPickerValueChange(
-    amPmState: PickerState<String>,
-    hourState: PickerState<Int>,
-    minuteState: PickerState<Int>,
-    onValueChange: (LocalTime) -> Unit
+    yearState: PickerState<Int>,
+    monthState: PickerState<Int>,
+    dayState: PickerState<Int>,
+    onValueChange: (LocalDate) -> Unit
 ) {
-    val amPm = amPmState.selectedItem
-    val hour = hourState.selectedItem
-    val minute = minuteState.selectedItem
+    val year = yearState.selectedItem
+    val month = monthState.selectedItem
+    val day = dayState.selectedItem
 
-    val adjustedHour = when (amPm) {
-        "오전" -> if (hour == 12) 0 else hour
-        "오후" -> if (hour != 12) hour + 12 else 12
-        else -> hour
-    }
+    val newDate = LocalDate(year, month, day)
 
-    val newTime = LocalTime(adjustedHour, minute)
-
-    onValueChange(newTime)
+    onValueChange(newDate)
 }
