@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,7 +51,7 @@ internal fun DatePicker(
         items = yearItems
     )
     val monthPickerState = rememberPickerState(
-        initialIndex = initialDate.month.number - 1,
+        initialIndex = initialDate.month.number,
         items = monthItems
     )
 
@@ -66,6 +67,19 @@ internal fun DatePicker(
         initialIndex = initialDate.day - 1,
         items = dayItems
     )
+
+    LaunchedEffect(yearPickerState.selectedItem, monthPickerState.selectedItem) {
+        val maxDays = getDaysInMonth(
+            year = yearPickerState.selectedItem,
+            month = monthPickerState.selectedItem
+        )
+
+        dayPickerState.updateItems(maxDays)
+
+        if (dayPickerState.selectedItem > maxDays.last()) {
+            dayPickerState.updateSelectedIndex(maxDays.size - 1)
+        }
+    }
 
     Box(
         modifier = modifier,
@@ -135,7 +149,7 @@ internal fun DatePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = dayItems,
+                    items = dayPickerState.items,
                     state = dayPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
@@ -189,7 +203,9 @@ private fun onPickerValueChange(
 ) {
     val year = yearState.selectedItem
     val month = monthState.selectedItem
-    val day = dayState.selectedItem
+    val maxDay = getDaysInMonth(year, month).last()
+
+    val day = dayState.selectedItem.coerceAtMost(maxDay)
 
     val newDate = LocalDate(year, month, day)
 
