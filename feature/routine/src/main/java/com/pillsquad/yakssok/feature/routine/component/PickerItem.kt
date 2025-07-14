@@ -22,8 +22,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.feature.routine.model.CurveEffect
 import com.pillsquad.yakssok.feature.routine.model.PickerState
 import com.pillsquad.yakssok.feature.routine.model.PickerStyle
@@ -96,7 +94,7 @@ internal fun <T> PickerItem(
             .collect { adjustedIndex ->
                 if (adjustedIndex != null && adjustedIndex != state.selectedIndex.value) {
                     state.updateSelectedIndex(adjustedIndex)
-                    onValueChange(items[adjustedIndex])
+//                    onValueChange(items[adjustedIndex])
                 }
             }
     }
@@ -104,7 +102,7 @@ internal fun <T> PickerItem(
     val totalItemHeight = itemHeightDp + style.itemSpacing
     val totalItemHeightPx = totalItemHeight.toPx()
 
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    Box(modifier = modifier) {
         LazyColumn(
             state = listState,
             flingBehavior = flingBehavior,
@@ -138,7 +136,6 @@ internal fun <T> PickerItem(
 
                 Text(
                     text = item?.let { itemFormatter(it) } ?: "",
-                    textAlign = TextAlign.Center,
                     maxLines = 1,
                     style = style.textStyle,
                     color = style.textColor.copy(alpha = alpha),

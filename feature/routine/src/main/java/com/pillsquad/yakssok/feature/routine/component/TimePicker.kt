@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,14 +15,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.routine.model.CurveEffect
+import com.pillsquad.yakssok.feature.routine.model.PickerDefaults
 import com.pillsquad.yakssok.feature.routine.model.PickerSelector
 import com.pillsquad.yakssok.feature.routine.model.PickerState
 import com.pillsquad.yakssok.feature.routine.model.PickerStyle
-import com.pillsquad.yakssok.feature.routine.model.PickerDefaults
 import com.pillsquad.yakssok.feature.routine.model.rememberPickerState
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
@@ -35,7 +32,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Composable
-internal fun TimePicker(
+fun TimePicker(
     modifier: Modifier = Modifier,
     initialTime: LocalTime = Clock.System.now()
         .toLocalDateTime(TimeZone.currentSystemDefault()).time,
@@ -185,9 +182,9 @@ private fun onPickerValueChange(
     val hour = hourState.selectedItem
     val minute = minuteState.selectedItem
 
-    val adjustedHour = when (amPm) {
-        "오전" -> if (hour == 12) 0 else hour
-        "오후" -> if (hour != 12) hour + 12 else 12
+    val adjustedHour = when {
+        amPm == "오전" && hour == 12 -> 0
+        amPm == "오후" && hour != 12 -> hour + 12
         else -> hour
     }
 

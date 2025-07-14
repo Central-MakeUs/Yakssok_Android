@@ -62,6 +62,6 @@ object YakssokLightColor : YakssokColor {
     override val subPurple = Color(0xFF7C24DB)
     override val subYellow = Color(0xFFFFB012)
     override val subGreen = Color(0xFF3ADE4D)
-    override val subBlue = Color(0xFF3C99D7)
+    override val subBlue = Color(0xFF40B0FA)
     override val subPink = Color(0xFFD224DB)
 }

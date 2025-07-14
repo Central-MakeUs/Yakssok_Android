@@ -20,7 +20,7 @@ kotlin = "2.2.0"
 # https://github.com/Kotlin/kotlinx.serialization
 kotlinxSerializationJson = "1.9.0"
 # https://github.com/Kotlin/kotlinx-datetime/releases
-kotlinxDatetime = "0.7.0"
+kotlinxDatetime = "0.7.1"
 # https://github.com/Kotlin/kotlinx.collections.immutable
 kotlinxImmutable = "0.4.0"
 
