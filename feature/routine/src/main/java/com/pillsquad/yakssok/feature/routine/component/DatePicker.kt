@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.routine.model.CurveEffect
 import com.pillsquad.yakssok.feature.routine.model.PickerDefaults
@@ -23,6 +24,7 @@ import com.pillsquad.yakssok.feature.routine.model.PickerSelector
 import com.pillsquad.yakssok.feature.routine.model.PickerState
 import com.pillsquad.yakssok.feature.routine.model.PickerStyle
 import com.pillsquad.yakssok.feature.routine.model.rememberPickerState
+import kotlinx.coroutines.delay
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -51,24 +53,25 @@ internal fun DatePicker(
         items = yearItems
     )
     val monthPickerState = rememberPickerState(
-        initialIndex = initialDate.month.number,
+        initialIndex = initialDate.month.number - 1,
         items = monthItems
     )
 
-    val dayItems by remember(yearPickerState.selectedIndex, monthPickerState.selectedIndex) {
-        derivedStateOf {
-            val year = yearPickerState.selectedItem
-            val month = monthPickerState.selectedItem
-            getDaysInMonth(year, month)
-        }
-    }
+    val selectedYearIndex by yearPickerState.selectedIndex.collectAsStateWithLifecycle()
+    val selectedMonthIndex by monthPickerState.selectedIndex.collectAsStateWithLifecycle()
 
     val dayPickerState = rememberPickerState(
         initialIndex = initialDate.day - 1,
-        items = dayItems
+        items = getDaysInMonth(initialDate.year, initialDate.month.number)
     )
 
-    LaunchedEffect(yearPickerState.selectedItem, monthPickerState.selectedItem) {
+    LaunchedEffect(selectedYearIndex, selectedMonthIndex) {
+        if (dayPickerState.isUserScrolling.value) {
+            return@LaunchedEffect
+        }
+
+        dayPickerState.suppressScrollSync.value = true
+
         val maxDays = getDaysInMonth(
             year = yearPickerState.selectedItem,
             month = monthPickerState.selectedItem
@@ -76,9 +79,23 @@ internal fun DatePicker(
 
         dayPickerState.updateItems(maxDays)
 
-        if (dayPickerState.selectedItem > maxDays.last()) {
-            dayPickerState.updateSelectedIndex(maxDays.size - 1)
-        }
+        val selectedDay = dayPickerState.selectedItem
+        val safeDay = selectedDay.coerceAtMost(maxDays.last())
+        val newIndex = maxDays.indexOf(safeDay)
+
+        dayPickerState.updateSelectedIndex(newIndex)
+
+        val scrollIndex = getStartIndexForInfiniteScroll(
+            itemSize = maxDays.size,
+            listScrollMiddle = Int.MAX_VALUE / 2,
+            visibleItemsMiddle = PickerDefaults.VISIBLE_ITEM_COUNT / 2,
+            startIndex = newIndex
+        )
+
+        dayPickerState.lazyListState.scrollToItem(scrollIndex)
+
+        delay(200)
+        dayPickerState.suppressScrollSync.value = false
     }
 
     Box(
@@ -92,7 +109,6 @@ internal fun DatePicker(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PickerItem(
-                items = yearItems,
                 state = yearPickerState,
                 visibleItemsCount = visibleItemsCount,
                 style = style,
@@ -116,7 +132,6 @@ internal fun DatePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = monthItems,
                     state = monthPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
@@ -149,7 +164,6 @@ internal fun DatePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = dayPickerState.items,
                     state = dayPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,

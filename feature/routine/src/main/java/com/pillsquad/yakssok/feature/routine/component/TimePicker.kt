@@ -75,7 +75,6 @@ fun TimePicker(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PickerItem(
-                items = amPmItems,
                 state = amPmPickerState,
                 visibleItemsCount = visibleItemsCount,
                 style = style,
@@ -99,7 +98,6 @@ fun TimePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = hourItems,
                     state = hourPickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
@@ -145,7 +143,6 @@ fun TimePicker(
             ) {
                 PickerItem(
                     modifier = Modifier.weight(0.9f),
-                    items = minuteItems,
                     state = minutePickerState,
                     visibleItemsCount = visibleItemsCount,
                     style = style,
