@@ -17,8 +17,7 @@ data class RoutineUiModel(
     val pillType: PillType? = null,
     val startDate: LocalDate = Clock.System.now()
         .toLocalDateTime(TimeZone.currentSystemDefault()).date,
-    val endDate: LocalDate = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+    val endDate: LocalDate? = null,
     val intakeCount: Int = 1,
     val intakeDays: List<WeekType> = listOf(
         WeekType.MONDAY,
@@ -29,5 +28,7 @@ data class RoutineUiModel(
         WeekType.SATURDAY,
         WeekType.SUNDAY
     ),
-    val intakeTimes: List<LocalTime> = emptyList(),
+    val intakeTimes: List<LocalTime> = listOf(
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
+    ),
 )
