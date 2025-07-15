@@ -45,7 +45,7 @@ import java.time.LocalTime
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateRoutine: () -> Unit
+    onNavigateRoutine: (String) -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -83,7 +83,7 @@ internal fun HomeRoute(
                 remainedMedicine = 3
             )
         ),
-        onNavigateRoutine = onNavigateRoutine
+        onNavigateRoutine = { onNavigateRoutine("김OO") }
     )
 }
 

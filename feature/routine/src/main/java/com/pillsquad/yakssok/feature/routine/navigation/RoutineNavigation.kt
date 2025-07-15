@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.routine.RoutineRoute
 
@@ -21,6 +22,7 @@ fun NavGraphBuilder.routineNavGraph(
 ) {
     composable<Route.Routine> {
         RoutineRoute(
+            name = it.toRoute<Route.Routine>().name,
             onNavigateBack = onNavigateBack
         )
     }
