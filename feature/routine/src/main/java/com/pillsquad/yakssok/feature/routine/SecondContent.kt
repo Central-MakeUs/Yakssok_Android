@@ -37,8 +37,8 @@ internal fun SecondContent(
     intakeCount: Int,
     intakeDays: List<WeekType>,
     intakeTimes: List<LocalTime>,
-    onStartTimeChange: () -> Unit,
-    onEndTimeChange: () -> Unit,
+    onStartDateChange: () -> Unit,
+    onEndDateChange: () -> Unit,
     onIntakeCountChange: () -> Unit,
     onIntakeDaysChange: () -> Unit,
     onIntakeTimesChange: (Int) -> Unit // for index
@@ -75,7 +75,7 @@ internal fun SecondContent(
                 modifier = Modifier.weight(1f),
                 title = "시작일",
                 content = startDateString,
-                onClick = onStartTimeChange
+                onClick = onStartDateChange
             )
             Text(
                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -87,7 +87,7 @@ internal fun SecondContent(
                 modifier = Modifier.weight(1f),
                 title = "종료일",
                 content = endDateString,
-                onClick = onEndTimeChange
+                onClick = onEndDateChange
             )
         }
 
