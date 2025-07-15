@@ -1,76 +1,89 @@
 package com.pillsquad.yakssok.feature.routine
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
+import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
-import com.pillsquad.yakssok.feature.routine.component.DatePicker
-import com.pillsquad.yakssok.feature.routine.component.TimePicker
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
+import com.pillsquad.yakssok.feature.routine.component.NumberIndicator
+import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Composable
 internal fun RoutineRoute(
+    viewModel: RoutineViewModel = hiltViewModel(),
+    name: String,
     onNavigateBack: () -> Unit
 ) {
-    val initialTime by remember {
-        mutableStateOf(
-            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
-        )
-    }
-    val initialDate by remember {
-        mutableStateOf(
-            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        )
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RoutineScreen(
-        initialTime = initialTime,
-        initialDate = initialDate
+        userName = name,
+        uiState = uiState,
+        onPillNameChange = viewModel::updatePillName,
+        onPillTypeChange = viewModel::updatePillType,
+        onBackClick = onNavigateBack,
+        onNextClick = onNavigateBack
     )
 }
 
 @Composable
 internal fun RoutineScreen(
-    initialTime: LocalTime,
-    initialDate: LocalDate
+    userName: String,
+    uiState: RoutineUiModel,
+    onPillNameChange: (String) -> Unit,
+    onPillTypeChange: (PillType) -> Unit,
+    onBackClick: () -> Unit,
+    onNextClick: () -> Unit
 ) {
-    var selectedTime by remember { mutableStateOf(initialTime) }
-    var selectedDate by remember { mutableStateOf(initialDate) }
+    val curEnabled = uiState.enabled[uiState.curPage]
 
-    Log.e("DatePicker", "selectedTime: $selectedTime")
-    Log.e("DatePicker", "selectedDate: $selectedDate")
-
-    Column(
+    Box(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100)
     ) {
-        TimePicker(
-            initialTime = initialTime,
+        Column(
+            modifier = Modifier.background(Color.Transparent)
         ) {
-            selectedTime = it
+            YakssokTopAppBar(onBackClick = onBackClick)
+            Spacer(modifier = Modifier.height(16.dp))
+            NumberIndicator(curPage = uiState.curPage)
+            Spacer(modifier = Modifier.height(32.dp))
+            FirstContent(
+                userName = userName,
+                pillName = uiState.pillName,
+                selectedPillType = uiState.pillType,
+                onPillNameChange = onPillNameChange,
+                onPillTypeChange = onPillTypeChange
+            )
         }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        DatePicker(
-            initialDate = initialDate,
-        ) {
-            selectedDate = it
-        }
+        YakssokButton(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .imePadding(),
+            text = stringResource(R.string.next_button),
+            enabled = curEnabled,
+            backgroundColor = if (curEnabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
+            contentColor = if (curEnabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
+            onClick = onNextClick,
+        )
     }
 }

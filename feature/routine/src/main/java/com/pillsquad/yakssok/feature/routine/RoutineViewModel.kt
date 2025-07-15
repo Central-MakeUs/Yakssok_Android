@@ -1,11 +1,41 @@
 package com.pillsquad.yakssok.feature.routine
 
 import androidx.lifecycle.ViewModel
+import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class RoutineViewModel @Inject constructor(
 
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(RoutineUiModel())
+    val uiState = _uiState.asStateFlow()
+
+    fun updatePillName(name: String) {
+        _uiState.update {
+            it.copy(pillName = name)
+        }
+        updateEnabled()
+    }
+
+    fun updatePillType(type: PillType) {
+        _uiState.update {
+            it.copy(pillType = type)
+        }
+        updateEnabled()
+    }
+
+    fun updateEnabled() {
+        val isFirstEnabled = uiState.value.pillType != null && uiState.value.pillName.trim().isNotEmpty()
+        _uiState.update {
+            it.copy(
+                enabled = listOf(isFirstEnabled, true, true)
+            )
+        }
+    }
 }
