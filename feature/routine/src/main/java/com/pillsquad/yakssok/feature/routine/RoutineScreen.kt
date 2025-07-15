@@ -66,12 +66,17 @@ internal fun RoutineScreen(
             Spacer(modifier = Modifier.height(16.dp))
             NumberIndicator(curPage = uiState.curPage)
             Spacer(modifier = Modifier.height(32.dp))
-            FirstContent(
-                userName = userName,
-                pillName = uiState.pillName,
-                selectedPillType = uiState.pillType,
-                onPillNameChange = onPillNameChange,
-                onPillTypeChange = onPillTypeChange
+            SecondContent(
+                startDate = uiState.startDate,
+                endDate = uiState.endDate,
+                intakeCount = uiState.intakeCount,
+                intakeDays = uiState.intakeDays,
+                intakeTimes = uiState.intakeTimes,
+                onStartTimeChange = {},
+                onEndTimeChange = {},
+                onIntakeCountChange = {},
+                onIntakeDaysChange = {},
+                onIntakeTimesChange = {}
             )
         }
         YakssokButton(

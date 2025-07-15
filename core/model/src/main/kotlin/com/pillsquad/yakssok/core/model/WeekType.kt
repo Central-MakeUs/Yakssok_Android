@@ -1,6 +1,6 @@
 package com.pillsquad.yakssok.core.model
 
-enum class WeekType(name: String) {
+enum class WeekType(val krName: String) {
     MONDAY("월"),
     TUESDAY("화"),
     WEDNESDAY("수"),
