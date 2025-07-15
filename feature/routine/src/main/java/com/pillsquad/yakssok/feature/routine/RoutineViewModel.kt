@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +29,18 @@ class RoutineViewModel @Inject constructor(
             it.copy(pillType = type)
         }
         updateEnabled()
+    }
+
+    fun updateStartDate(date: LocalDate) {
+        _uiState.update {
+            it.copy(startDate = date)
+        }
+    }
+
+    fun updateEndDate(date: LocalDate?) {
+        _uiState.update {
+            it.copy(endDate = date)
+        }
     }
 
     fun updateEnabled() {
