@@ -24,7 +24,6 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-
 @Composable
 internal fun RoutineRoute(
     onNavigateBack: () -> Unit
@@ -63,7 +62,6 @@ internal fun RoutineScreen(
         TimePicker(
             initialTime = initialTime,
         ) {
-            Log.e("PickerInit", "onValueChange time called with: $it")
             selectedTime = it
         }
 
@@ -72,7 +70,6 @@ internal fun RoutineScreen(
         DatePicker(
             initialDate = initialDate,
         ) {
-            Log.e("PickerInit", "onValueChange date called with: $it")
             selectedDate = it
         }
     }

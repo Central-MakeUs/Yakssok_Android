@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.routine.component
 
+import android.util.Log
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
@@ -34,8 +35,7 @@ import kotlin.math.abs
 @Composable
 internal fun <T> PickerItem(
     modifier: Modifier = Modifier,
-    items: List<T>,
-    state: PickerState<T> = rememberPickerState(items = items),
+    state: PickerState<T>,
     visibleItemsCount: Int,
     style: PickerStyle,
     textModifier: Modifier = Modifier,
@@ -44,6 +44,8 @@ internal fun <T> PickerItem(
     curveEffect: CurveEffect,
     onValueChange: (T) -> Unit
 ) {
+    val items = state.items
+
     val visibleItemsMiddle = visibleItemsCount / 2
     val listScrollCount = if (infiniteScroll) Int.MAX_VALUE else items.size + visibleItemsMiddle * 2
     val listScrollMiddle = listScrollCount / 2
@@ -56,19 +58,27 @@ internal fun <T> PickerItem(
     LaunchedEffect(state.initialIndex) {
         val safeStartIndex = state.initialIndex
         val listStartIndex = if (infiniteScroll) {
-            getStartIndexForInfiniteScroll(itemHeightPixels, listScrollMiddle, visibleItemsMiddle, safeStartIndex)
+            getStartIndexForInfiniteScroll(
+                itemSize = items.size,
+                listScrollMiddle = listScrollMiddle,
+                visibleItemsMiddle = visibleItemsMiddle,
+                startIndex = safeStartIndex
+            )
         } else {
             safeStartIndex
         }
         listState.scrollToItem(listStartIndex, 0)
 
         if (!infiniteScroll) {
-            val selectedItem = items.getOrNull(listStartIndex) ?: items.first()
             if (listStartIndex != state.selectedIndex.value) {
                 state.updateSelectedIndex(listStartIndex)
             }
-            onValueChange(selectedItem)
+            onValueChange(items[listStartIndex])
         }
+    }
+
+    LaunchedEffect(listState.isScrollInProgress) {
+        state.isUserScrolling.value = listState.isScrollInProgress
     }
 
     LaunchedEffect(listState) {
@@ -84,7 +94,7 @@ internal fun <T> PickerItem(
             .map { centerIndex ->
                 centerIndex?.let { index ->
                     if (infiniteScroll) {
-                        index % items.size
+                        index
                     } else {
                         (index - visibleItemsMiddle).coerceIn(0, items.size - 1)
                     }
@@ -92,9 +102,12 @@ internal fun <T> PickerItem(
             }
             .distinctUntilChanged()
             .collect { adjustedIndex ->
-                if (adjustedIndex != null && adjustedIndex != state.selectedIndex.value) {
-                    state.updateSelectedIndex(adjustedIndex)
-//                    onValueChange(items[adjustedIndex])
+                if (state.suppressScrollSync.value) return@collect
+
+                val safeIndex = adjustedIndex?.mod(items.size) ?: return@collect
+                if (safeIndex != state.selectedIndex.value) {
+                    state.updateSelectedIndex(safeIndex)
+                    onValueChange(items[safeIndex])
                 }
             }
     }
@@ -165,7 +178,7 @@ private fun <T> getItemForIndex(
     }
 }
 
-private fun getStartIndexForInfiniteScroll(
+fun getStartIndexForInfiniteScroll(
     itemSize: Int,
     listScrollMiddle: Int,
     visibleItemsMiddle: Int,

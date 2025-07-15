@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,28 +12,30 @@ import kotlinx.coroutines.flow.StateFlow
 class PickerState<T>(
     val lazyListState: LazyListState,
     val initialIndex: Int,
-    private var _items: List<T>
+    items: List<T>
 ) {
+    private val _items = mutableStateOf(items)
+    val items: List<T> get() = _items.value
+
     private val _selectedIndex = MutableStateFlow(initialIndex)
     val selectedIndex: StateFlow<Int>
         get() = _selectedIndex
 
-    val items: List<T>
-        get() = _items
-
     val selectedItem: T
         get() = items.getOrElse(_selectedIndex.value) { items.first() }
 
+    val suppressScrollSync = mutableStateOf(false)
+    val isUserScrolling = mutableStateOf(false)
+
     fun updateSelectedIndex(newIndex: Int) {
-        Log.d("PickerInit", "items: $items")
-        Log.d("PickerInit", "updateSelectedIndex: $newIndex")
         _selectedIndex.value = newIndex.coerceIn(0, items.size - 1)
     }
 
     fun updateItems(newItems: List<T>) {
-        _items = newItems
-        if (_selectedIndex.value >= _items.size) {
-            _selectedIndex.value = (_items.size - 1).coerceAtLeast(0)
+        _items.value = newItems
+
+        if (_selectedIndex.value >= items.size) {
+            _selectedIndex.value = (items.size - 1).coerceAtLeast(0)
         }
     }
 }
