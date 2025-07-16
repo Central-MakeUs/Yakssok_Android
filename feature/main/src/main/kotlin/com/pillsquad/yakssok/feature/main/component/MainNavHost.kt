@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.pillsquad.yakssok.feature.alert.alertNavGraph
+import com.pillsquad.yakssok.feature.alert.navigation.alertNavGraph
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
 import com.pillsquad.yakssok.feature.main.MainNavigator
