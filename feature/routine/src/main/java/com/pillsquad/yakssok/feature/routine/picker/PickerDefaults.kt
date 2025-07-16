@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.feature.routine.model
+package com.pillsquad.yakssok.feature.routine.picker
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape

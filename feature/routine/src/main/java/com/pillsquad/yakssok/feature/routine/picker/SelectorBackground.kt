@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.feature.routine.component
+package com.pillsquad.yakssok.feature.routine.picker
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,8 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.pillsquad.yakssok.feature.routine.model.PickerSelector
-import com.pillsquad.yakssok.feature.routine.model.PickerStyle
 
 @Composable
 fun SelectorBackground(

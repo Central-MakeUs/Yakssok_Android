@@ -3,16 +3,10 @@ package com.pillsquad.yakssok.feature.routine
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,12 +23,16 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
-import com.pillsquad.yakssok.feature.routine.component.DatePicker
+import com.pillsquad.yakssok.feature.routine.component.EndDateDialog
+import com.pillsquad.yakssok.feature.routine.component.IntakeDayDialog
 import com.pillsquad.yakssok.feature.routine.component.NumberIndicator
-import com.pillsquad.yakssok.feature.routine.component.TimePicker
+import com.pillsquad.yakssok.feature.routine.component.StartDateDialog
 import com.pillsquad.yakssok.feature.routine.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
+import com.pillsquad.yakssok.feature.routine.picker.DatePicker
+import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -51,89 +48,64 @@ internal fun RoutineRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var selectedStartDate: LocalDate? by remember { mutableStateOf(null) }
     var selectedEndDate: LocalDate? by remember { mutableStateOf(null) }
+    var selectedIntakeDays: List<WeekType> by remember { mutableStateOf(listOf()) }
     var isEndDateShow by remember { mutableStateOf(false) }
+    var isIntakeDaysShow by remember { mutableStateOf(false) }
 
     if (selectedStartDate != null) {
-        YakssokDialog(
-            title = "복용 시작 날짜를 설정해주세요",
-            content = {
-                DatePicker(
-                    modifier = Modifier.fillMaxWidth(),
-                    initialDate = selectedStartDate ?: uiState.startDate,
-                    onValueChange = {
-                        selectedStartDate = it
-                    }
-                )
-            },
-            enabled = selectedStartDate?.let {
-                it >= today
-            } ?: false,
+        StartDateDialog(
+            uiStartDate = uiState.startDate,
+            selectedStartDate = selectedStartDate,
             onDismiss = { selectedStartDate = null },
             onConfirm = {
-                viewModel.updateStartDate(selectedStartDate ?: uiState.startDate)
+                viewModel.updateStartDate(it)
                 selectedStartDate = null
-                selectedEndDate = uiState.endDate ?: Clock.System.now()
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                selectedEndDate = uiState.endDate ?: LocalDate.today()
                 isEndDateShow = true
+            },
+            onValueChange = {
+                selectedStartDate = it
             }
         )
     }
 
     if (isEndDateShow) {
-        var noEndDate by remember { mutableStateOf(false) }
-
-        YakssokDialog(
-            title = "복용 종료 날짜를 설정해주세요",
-            content = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    DatePicker(
-                        modifier = Modifier.fillMaxWidth(),
-                        initialDate = selectedEndDate ?: Clock.System.now()
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                        onValueChange = {
-                            selectedEndDate = it
-                            noEndDate = false
-                        }
-                    )
-                    NoEndDateCheckBox(
-                        isTrued = noEndDate,
-                        onClick = {
-                            noEndDate = !noEndDate
-                            selectedEndDate = if (noEndDate) {
-                                null
-                            } else {
-                                today
-                            }
-                        }
-                    )
-                }
-            },
-            enabled = if (noEndDate) {
-                true
-            } else {
-                val startDate = uiState.startDate
-                val endDate = selectedEndDate
-                if (endDate == null) {
-                    false
-                } else {
-                    endDate >= startDate
-                }
-            },
+        EndDateDialog(
+            uiStartDate = uiState.startDate,
+            selectedEndDate = selectedEndDate,
             onDismiss = {
                 selectedEndDate = null
                 isEndDateShow = false
             },
             onConfirm = {
-                val finalEndDate = if (noEndDate) null else selectedEndDate
-                viewModel.updateEndDate(finalEndDate)
+                viewModel.updateEndDate(it)
                 selectedEndDate = null
                 isEndDateShow = false
+                selectedIntakeDays = uiState.intakeDays
+                isIntakeDaysShow = true
+            },
+            onValueChange = {
+                selectedEndDate = it
+            }
+        )
+    }
+
+    if (isIntakeDaysShow) {
+        IntakeDayDialog(
+            selectedDay = selectedIntakeDays,
+            onDismiss = {
+                selectedIntakeDays = listOf()
+                isIntakeDaysShow = false
+            },
+            onConfirm = {
+                viewModel.updateIntakeDays(selectedIntakeDays)
+                selectedIntakeDays = listOf()
+                isIntakeDaysShow = false
+            },
+            onValueChange = {
+                selectedIntakeDays = it
             }
         )
     }
@@ -150,6 +122,10 @@ internal fun RoutineRoute(
             isEndDateShow = true
             selectedEndDate = uiState.startDate
         },
+        onIntakeDayChange = {
+            isIntakeDaysShow = true
+            selectedIntakeDays = uiState.intakeDays
+        },
         onBackClick = onNavigateBack,
         onNextClick = onNavigateBack
     )
@@ -163,6 +139,7 @@ internal fun RoutineScreen(
     onPillTypeChange: (PillType) -> Unit,
     onStartDateChange: () -> Unit,
     onEndDateChange: () -> Unit,
+    onIntakeDayChange: () -> Unit,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -187,7 +164,7 @@ internal fun RoutineScreen(
                 onStartDateChange = onStartDateChange,
                 onEndDateChange = onEndDateChange,
                 onIntakeCountChange = {},
-                onIntakeDaysChange = {},
+                onIntakeDaysChange = onIntakeDayChange,
                 onIntakeTimesChange = {}
             )
         }
@@ -202,32 +179,5 @@ internal fun RoutineScreen(
             contentColor = if (curEnabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
             onClick = onNextClick,
         )
-    }
-}
-
-@Composable
-private fun NoEndDateCheckBox(
-    isTrued: Boolean,
-    onClick: () -> Unit
-) {
-    val icResource = if (isTrued) R.drawable.ic_check_on else R.drawable.ic_check_off
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "종료일 없음",
-            style = YakssokTheme.typography.body1,
-            color = YakssokTheme.color.grey950
-        )
-        IconButton(
-            onClick = onClick
-        ) {
-            Icon(
-                painter = painterResource(id = icResource),
-                contentDescription = "check box",
-                tint = Color.Unspecified
-            )
-        }
     }
 }

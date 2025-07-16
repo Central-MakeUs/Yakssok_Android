@@ -2,12 +2,14 @@ package com.pillsquad.yakssok.feature.routine
 
 import androidx.lifecycle.ViewModel
 import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,6 +42,24 @@ class RoutineViewModel @Inject constructor(
     fun updateEndDate(date: LocalDate?) {
         _uiState.update {
             it.copy(endDate = date)
+        }
+    }
+
+    fun updateIntakeCount(count: Int) {
+        _uiState.update {
+            it.copy(intakeCount = count)
+        }
+    }
+
+    fun updateIntakeDays(days: List<WeekType>) {
+        _uiState.update {
+            it.copy(intakeDays = days)
+        }
+    }
+
+    fun updateIntakeTimes(times: List<LocalTime>) {
+        _uiState.update {
+            it.copy(intakeTimes = times)
         }
     }
 
