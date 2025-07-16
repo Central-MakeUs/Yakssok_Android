@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import com.pillsquad.yakssok.core.navigation.Route
+import com.pillsquad.yakssok.feature.alert.AlertRoute
 
 fun NavController.navigateAlert() {
     val navOptions = navOptions {
@@ -19,6 +20,8 @@ fun NavGraphBuilder.alertNavGraph(
     onNavigateBack: () -> Unit
 ) {
     composable<Route.Alert> {
-
+        AlertRoute(
+            onNavigateBack = onNavigateBack
+        )
     }
 }
