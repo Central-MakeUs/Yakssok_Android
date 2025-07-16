@@ -2,11 +2,10 @@ package com.pillsquad.yakssok.feature.routine.model
 
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
+import com.pillsquad.yakssok.feature.routine.util.now
+import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -15,8 +14,7 @@ data class RoutineUiModel(
     val enabled: List<Boolean> = listOf(false, true, true),
     val pillName: String = "",
     val pillType: PillType? = null,
-    val startDate: LocalDate = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+    val startDate: LocalDate = LocalDate.today(),
     val endDate: LocalDate? = null,
     val intakeCount: Int = 1,
     val intakeDays: List<WeekType> = listOf(
@@ -29,6 +27,8 @@ data class RoutineUiModel(
         WeekType.SUNDAY
     ),
     val intakeTimes: List<LocalTime> = listOf(
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
+        LocalTime.now(),
+        LocalTime.now(),
+        LocalTime.now(),
     ),
 )

@@ -57,14 +57,17 @@ class RoutineViewModel @Inject constructor(
         }
     }
 
-    fun updateIntakeTimes(times: List<LocalTime>) {
+    fun updateIntakeTime(time: LocalTime, index: Int) {
         _uiState.update {
-            it.copy(intakeTimes = times)
+            it.copy(intakeTimes = it.intakeTimes.mapIndexed { i, t ->
+                if (i == index) time else t
+            })
         }
     }
 
     fun updateEnabled() {
-        val isFirstEnabled = uiState.value.pillType != null && uiState.value.pillName.trim().isNotEmpty()
+        val isFirstEnabled =
+            uiState.value.pillType != null && uiState.value.pillName.trim().isNotEmpty()
         _uiState.update {
             it.copy(
                 enabled = listOf(isFirstEnabled, true, true)

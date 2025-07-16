@@ -130,7 +130,7 @@ internal fun SecondContent(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(intakeTimes.size) {
+            items(intakeCount) {
                 TimeCard(
                     numString = "${it + 1}번째",
                     time = intakeTimes[it],

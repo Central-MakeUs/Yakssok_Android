@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,14 +28,17 @@ import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.routine.component.EndDateDialog
+import com.pillsquad.yakssok.feature.routine.component.IntakeCountDialog
 import com.pillsquad.yakssok.feature.routine.component.IntakeDayDialog
 import com.pillsquad.yakssok.feature.routine.component.NumberIndicator
 import com.pillsquad.yakssok.feature.routine.component.StartDateDialog
+import com.pillsquad.yakssok.feature.routine.component.TimeDialog
 import com.pillsquad.yakssok.feature.routine.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import com.pillsquad.yakssok.feature.routine.picker.DatePicker
 import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -51,6 +56,10 @@ internal fun RoutineRoute(
     var selectedStartDate: LocalDate? by remember { mutableStateOf(null) }
     var selectedEndDate: LocalDate? by remember { mutableStateOf(null) }
     var selectedIntakeDays: List<WeekType> by remember { mutableStateOf(listOf()) }
+    var selectedIntakeCount: Int by remember { mutableIntStateOf(0) }
+    var selectedIntakeTimeIdx: Int by remember { mutableIntStateOf(-1) }
+    var selectedIntakeTime: LocalTime? by remember { mutableStateOf(null) }
+
     var isEndDateShow by remember { mutableStateOf(false) }
     var isIntakeDaysShow by remember { mutableStateOf(false) }
 
@@ -103,11 +112,58 @@ internal fun RoutineRoute(
                 viewModel.updateIntakeDays(selectedIntakeDays)
                 selectedIntakeDays = listOf()
                 isIntakeDaysShow = false
+                selectedIntakeCount = uiState.intakeCount
             },
             onValueChange = {
                 selectedIntakeDays = it
             }
         )
+    }
+
+    if (selectedIntakeCount > 0) {
+        IntakeCountDialog(
+            selectedCount = selectedIntakeCount,
+            onDismiss = { selectedIntakeCount = 0 },
+            onConfirm = {
+                viewModel.updateIntakeCount(selectedIntakeCount)
+                selectedIntakeCount = 0
+                selectedIntakeTimeIdx = 0
+                selectedIntakeTime = uiState.intakeTimes[0]
+            },
+            onValueChange = {
+                selectedIntakeCount = it
+            }
+        )
+    }
+
+    if (selectedIntakeTimeIdx >= 0) {
+        val currentTime = selectedIntakeTime ?: uiState.intakeTimes[selectedIntakeTimeIdx]
+
+        key(selectedIntakeTimeIdx) {
+            TimeDialog(
+                selectedIdx = selectedIntakeTimeIdx,
+                selectedTime = currentTime,
+                onDismiss = {
+                    selectedIntakeTimeIdx = -1
+                    selectedIntakeTime = null
+                },
+                onConfirm = {
+                    viewModel.updateIntakeTime(currentTime, selectedIntakeTimeIdx)
+                    if (selectedIntakeTimeIdx < uiState.intakeCount - 1) {
+                        val nextIdx = selectedIntakeTimeIdx + 1
+                        selectedIntakeTimeIdx = -1
+                        selectedIntakeTime = uiState.intakeTimes.getOrNull(nextIdx)
+                        selectedIntakeTimeIdx = nextIdx
+                    } else {
+                        selectedIntakeTimeIdx = -1
+                        selectedIntakeTime = null
+                    }
+                },
+                onValueChange = {
+                    selectedIntakeTime = it
+                }
+            )
+        }
     }
 
     RoutineScreen(
@@ -126,6 +182,13 @@ internal fun RoutineRoute(
             isIntakeDaysShow = true
             selectedIntakeDays = uiState.intakeDays
         },
+        onIntakeCountChange = {
+            selectedIntakeCount = uiState.intakeCount
+        },
+        onIntakeTimeChange = {
+            selectedIntakeTimeIdx = it
+            selectedIntakeTime = uiState.intakeTimes[it]
+        },
         onBackClick = onNavigateBack,
         onNextClick = onNavigateBack
     )
@@ -140,6 +203,8 @@ internal fun RoutineScreen(
     onStartDateChange: () -> Unit,
     onEndDateChange: () -> Unit,
     onIntakeDayChange: () -> Unit,
+    onIntakeCountChange: () -> Unit,
+    onIntakeTimeChange: (Int) -> Unit,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -163,9 +228,9 @@ internal fun RoutineScreen(
                 intakeTimes = uiState.intakeTimes,
                 onStartDateChange = onStartDateChange,
                 onEndDateChange = onEndDateChange,
-                onIntakeCountChange = {},
+                onIntakeCountChange = onIntakeCountChange,
                 onIntakeDaysChange = onIntakeDayChange,
-                onIntakeTimesChange = {}
+                onIntakeTimesChange = onIntakeTimeChange
             )
         }
         YakssokButton(
