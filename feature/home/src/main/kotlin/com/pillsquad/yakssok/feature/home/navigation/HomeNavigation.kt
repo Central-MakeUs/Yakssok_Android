@@ -13,11 +13,13 @@ fun NavController.navigateHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
-    onNavigateRoutine: (String) -> Unit
+    onNavigateRoutine: (String) -> Unit,
+    onNavigateAlert: () -> Unit
 ) {
     composable<Route.Home> {
         HomeRoute(
-            onNavigateRoutine = onNavigateRoutine
+            onNavigateRoutine = onNavigateRoutine,
+            onNavigateAlert = onNavigateAlert
         )
     }
 }
