@@ -17,6 +17,7 @@ internal fun TimeDialog(
 ) {
     YakssokDialog(
         title = "${selectedIdx + 1}번째 알림받을 시간을 설정해주세요",
+        cancelText = "닫기",
         content = {
             TimePicker (
                 modifier = Modifier.fillMaxWidth(),

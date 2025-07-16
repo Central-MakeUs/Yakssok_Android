@@ -18,6 +18,7 @@ internal fun StartDateDialog(
 ) {
     YakssokDialog(
         title = "복용 시작 날짜를 설정해주세요",
+        cancelText = "닫기",
         content = {
             DatePicker(
                 modifier = Modifier.fillMaxWidth(),

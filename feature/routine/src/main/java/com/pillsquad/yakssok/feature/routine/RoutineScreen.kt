@@ -29,6 +29,7 @@ import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
+import com.pillsquad.yakssok.feature.routine.component.CompleteDialog
 import com.pillsquad.yakssok.feature.routine.component.EndDateDialog
 import com.pillsquad.yakssok.feature.routine.component.IntakeCountDialog
 import com.pillsquad.yakssok.feature.routine.component.IntakeDayDialog
@@ -59,6 +60,7 @@ internal fun RoutineRoute(
 
     var isEndDateShow by remember { mutableStateOf(false) }
     var isIntakeDaysShow by remember { mutableStateOf(false) }
+    var isComplete by remember { mutableStateOf(false) }
 
     BackHandler {
         if (uiState.curPage > 0) {
@@ -171,6 +173,16 @@ internal fun RoutineRoute(
         }
     }
 
+    if (isComplete) {
+        CompleteDialog(
+            uiState = uiState,
+            onConfirm = {
+                isComplete = false
+                onNavigateBack()
+            }
+        )
+    }
+
     RoutineScreen(
         userName = name,
         uiState = uiState,
@@ -208,7 +220,7 @@ internal fun RoutineRoute(
             if (uiState.curPage < 2) {
                 viewModel.updateCurPage(uiState.curPage + 1)
             } else {
-                // TODO : 완료 처리
+                isComplete = true
             }
         }
     )
