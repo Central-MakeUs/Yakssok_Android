@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.feature.routine
 
 import androidx.lifecycle.ViewModel
+import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
@@ -18,6 +19,12 @@ class RoutineViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
+
+    fun updateCurPage(newPage: Int) {
+        _uiState.update {
+            it.copy(curPage = newPage)
+        }
+    }
 
     fun updatePillName(name: String) {
         _uiState.update {
@@ -62,6 +69,12 @@ class RoutineViewModel @Inject constructor(
             it.copy(intakeTimes = it.intakeTimes.mapIndexed { i, t ->
                 if (i == index) time else t
             })
+        }
+    }
+
+    fun updateAlarmType(type: AlarmType) {
+        _uiState.update {
+            it.copy(alarmType = type)
         }
     }
 

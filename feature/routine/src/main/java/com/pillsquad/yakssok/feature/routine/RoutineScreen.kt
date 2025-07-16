@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.routine
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
@@ -33,15 +35,10 @@ import com.pillsquad.yakssok.feature.routine.component.IntakeDayDialog
 import com.pillsquad.yakssok.feature.routine.component.NumberIndicator
 import com.pillsquad.yakssok.feature.routine.component.StartDateDialog
 import com.pillsquad.yakssok.feature.routine.component.TimeDialog
-import com.pillsquad.yakssok.feature.routine.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
-import com.pillsquad.yakssok.feature.routine.picker.DatePicker
 import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -62,6 +59,14 @@ internal fun RoutineRoute(
 
     var isEndDateShow by remember { mutableStateOf(false) }
     var isIntakeDaysShow by remember { mutableStateOf(false) }
+
+    BackHandler {
+        if (uiState.curPage > 0) {
+            viewModel.updateCurPage(uiState.curPage - 1)
+        } else {
+            onNavigateBack()
+        }
+    }
 
     if (selectedStartDate != null) {
         StartDateDialog(
@@ -189,8 +194,23 @@ internal fun RoutineRoute(
             selectedIntakeTimeIdx = it
             selectedIntakeTime = uiState.intakeTimes[it]
         },
-        onBackClick = onNavigateBack,
-        onNextClick = onNavigateBack
+        onAlarmTypeChange = {
+            viewModel.updateAlarmType(it)
+        },
+        onBackClick = {
+            if (uiState.curPage > 0) {
+                viewModel.updateCurPage(uiState.curPage - 1)
+            } else {
+                onNavigateBack()
+            }
+        },
+        onNextClick = {
+            if (uiState.curPage < 2) {
+                viewModel.updateCurPage(uiState.curPage + 1)
+            } else {
+                // TODO : 완료 처리
+            }
+        }
     )
 }
 
@@ -205,6 +225,7 @@ internal fun RoutineScreen(
     onIntakeDayChange: () -> Unit,
     onIntakeCountChange: () -> Unit,
     onIntakeTimeChange: (Int) -> Unit,
+    onAlarmTypeChange: (AlarmType) -> Unit,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -220,18 +241,31 @@ internal fun RoutineScreen(
             Spacer(modifier = Modifier.height(16.dp))
             NumberIndicator(curPage = uiState.curPage)
             Spacer(modifier = Modifier.height(32.dp))
-            SecondContent(
-                startDate = uiState.startDate,
-                endDate = uiState.endDate,
-                intakeCount = uiState.intakeCount,
-                intakeDays = uiState.intakeDays,
-                intakeTimes = uiState.intakeTimes,
-                onStartDateChange = onStartDateChange,
-                onEndDateChange = onEndDateChange,
-                onIntakeCountChange = onIntakeCountChange,
-                onIntakeDaysChange = onIntakeDayChange,
-                onIntakeTimesChange = onIntakeTimeChange
-            )
+            when (uiState.curPage) {
+                0 -> FirstContent(
+                    userName = userName,
+                    pillName = uiState.pillName,
+                    selectedPillType = uiState.pillType,
+                    onPillNameChange = onPillNameChange,
+                    onPillTypeChange = onPillTypeChange
+                )
+                1 -> SecondContent(
+                    startDate = uiState.startDate,
+                    endDate = uiState.endDate,
+                    intakeCount = uiState.intakeCount,
+                    intakeDays = uiState.intakeDays,
+                    intakeTimes = uiState.intakeTimes,
+                    onStartDateChange = onStartDateChange,
+                    onEndDateChange = onEndDateChange,
+                    onIntakeCountChange = onIntakeCountChange,
+                    onIntakeDaysChange = onIntakeDayChange,
+                    onIntakeTimesChange = onIntakeTimeChange
+                )
+                else -> ThirdContent(
+                    selectedAlarmType = uiState.alarmType,
+                    onAlarmTypeChange = onAlarmTypeChange
+                )
+            }
         }
         YakssokButton(
             modifier = Modifier

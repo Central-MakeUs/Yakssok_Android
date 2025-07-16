@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.routine.model
 
+import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.util.now
@@ -31,4 +32,5 @@ data class RoutineUiModel(
         LocalTime.now(),
         LocalTime.now(),
     ),
+    val alarmType: AlarmType = AlarmType.NAGGING
 )
