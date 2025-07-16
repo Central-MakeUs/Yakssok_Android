@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.feature.alert
+package com.pillsquad.yakssok.feature.alert.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
