@@ -39,7 +39,7 @@ private fun AlertScreen(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            MessageBubble("일이삼사오육칠팔구십일이삼사오")
+            MessageBubble("일이삼사오육칠팔구십일이삼사오", true)
         }
 //        LazyColumn(
 //            modifier = Modifier.fillMaxWidth().weight(1f)
