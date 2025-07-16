@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.component.RoutineText
+import com.pillsquad.yakssok.feature.routine.util.formatKotlinxTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format
@@ -180,11 +181,6 @@ private fun TimeCard(
     time: LocalTime,
     onClick: () -> Unit
 ) {
-    val amPm = if (time.hour >= 12) "오후" else "오전"
-    val timeFormatter = LocalTime.Format {
-        amPmHour(); char(':'); minute()
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -210,7 +206,7 @@ private fun TimeCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$amPm ${time.format(timeFormatter)}",
+                text = formatKotlinxTime(time),
                 style = YakssokTheme.typography.body1,
                 color = YakssokTheme.color.grey700
             )

@@ -25,10 +25,13 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
 @Composable
 fun YakssokDialog(
-    title: String,
+    title: String = "",
+    cancelText: String? = null,
+    confirmText: String = "선택",
     enabled: Boolean = true,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    titleComponent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val confirmColor = if (enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200
@@ -65,11 +68,15 @@ fun YakssokDialog(
                         .background(color = Color(0xFFDBDBDB))
                 )
                 Spacer(modifier = Modifier.height(28.dp))
-                Text(
-                    text = title,
-                    style = YakssokTheme.typography.subtitle1,
-                    color = YakssokTheme.color.grey900
-                )
+                if (titleComponent == null) {
+                    Text(
+                        text = title,
+                        style = YakssokTheme.typography.subtitle1,
+                        color = YakssokTheme.color.grey900
+                    )
+                } else {
+                    titleComponent()
+                }
                 Spacer(modifier = Modifier.height(20.dp))
                 content()
                 Spacer(modifier = Modifier.height(60.dp))
@@ -77,15 +84,17 @@ fun YakssokDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    if (cancelText != null) {
+                        YakssokButton(
+                            modifier = Modifier.weight(1f),
+                            text = cancelText,
+                            backgroundColor = YakssokTheme.color.grey100,
+                            onClick = onDismiss
+                        )
+                    }
                     YakssokButton(
                         modifier = Modifier.weight(1f),
-                        text = "닫기",
-                        backgroundColor = YakssokTheme.color.grey100,
-                        onClick = onDismiss
-                    )
-                    YakssokButton(
-                        modifier = Modifier.weight(1f),
-                        text = "선택",
+                        text = confirmText,
                         contentColor = contentColor,
                         backgroundColor = confirmColor,
                         enabled = enabled,

@@ -26,6 +26,7 @@ internal fun EndDateDialog(
 
     YakssokDialog(
         title = "복용 종료 날짜를 설정해주세요",
+        cancelText = "닫기",
         content = {
             Column(
                 modifier = Modifier.fillMaxWidth(),

@@ -26,6 +26,7 @@ internal fun IntakeDayDialog(
 
     YakssokDialog(
         title = "복용주기를 선택해주세요",
+        cancelText = "닫기",
         content = {
             Column(
                 modifier = Modifier.fillMaxWidth(),

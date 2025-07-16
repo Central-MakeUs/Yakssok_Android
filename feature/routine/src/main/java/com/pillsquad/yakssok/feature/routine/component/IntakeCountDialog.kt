@@ -17,6 +17,7 @@ internal fun IntakeCountDialog(
 
     YakssokDialog(
         title = "하루에 먹을 횟수를 선택해주세요",
+        cancelText = "닫기",
         content = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
