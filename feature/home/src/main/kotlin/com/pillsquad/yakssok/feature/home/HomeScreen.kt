@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,16 +35,15 @@ import com.pillsquad.yakssok.core.model.Medicine
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
-import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import java.time.LocalDate
-import java.time.LocalTime
 
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateRoutine: (String) -> Unit
+    onNavigateRoutine: (String) -> Unit,
+    onNavigateAlert: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -83,7 +81,8 @@ internal fun HomeRoute(
                 remainedMedicine = 3
             )
         ),
-        onNavigateRoutine = { onNavigateRoutine("김OO") }
+        onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateAlert = onNavigateAlert,
     )
 }
 
@@ -98,7 +97,7 @@ private fun HomeScreen(
     onSendMessage: (Mate) -> Unit = {},
     onNavigateMy: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
-    onNavigateAlarm: () -> Unit = {},
+    onNavigateAlert: () -> Unit = {},
     onNavigateRoutine: () -> Unit = {},
     onNavigateCalendar: () -> Unit = {},
 ) {
@@ -111,7 +110,7 @@ private fun HomeScreen(
         YakssokTopAppBar(
             modifier = Modifier.padding(horizontal = 16.dp),
             isLogo = true,
-            onNavigateAlarm = onNavigateAlarm,
+            onNavigateAlert = onNavigateAlert,
             onNavigateMy = onNavigateMy
         )
 

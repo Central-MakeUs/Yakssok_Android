@@ -9,6 +9,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.pillsquad.yakssok.core.navigation.Route
+import com.pillsquad.yakssok.feature.alert.navigateAlert
 import com.pillsquad.yakssok.feature.home.navigation.navigateHome
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
 import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
@@ -41,6 +42,10 @@ internal class MainNavigator(
 
     fun navigateRoutine(name: String) {
         navController.navigateRoutine(name)
+    }
+
+    fun navigateAlert() {
+        navController.navigateAlert()
     }
 }
 

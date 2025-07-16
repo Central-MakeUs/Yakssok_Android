@@ -26,7 +26,7 @@ fun YakssokTopAppBar(
     title: String? = null,
     isLogo: Boolean = false,
     onBackClick: (() -> Unit)? = null,
-    onNavigateAlarm: (() -> Unit)? = null,
+    onNavigateAlert: (() -> Unit)? = null,
     onNavigateMy: (() -> Unit)? = null
 ) {
     Box(
@@ -73,14 +73,14 @@ fun YakssokTopAppBar(
             }
         }
 
-        if (onNavigateAlarm != null && onNavigateMy != null) {
+        if (onNavigateAlert != null && onNavigateMy != null) {
             Row(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 YakssokIconButton(
                     iconId = R.drawable.ic_alarm,
-                    onClick = onNavigateAlarm,
+                    onClick = onNavigateAlert,
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 YakssokIconButton(
