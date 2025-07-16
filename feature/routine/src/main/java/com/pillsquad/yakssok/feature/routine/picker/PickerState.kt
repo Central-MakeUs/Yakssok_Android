@@ -1,6 +1,5 @@
-package com.pillsquad.yakssok.feature.routine.model
+package com.pillsquad.yakssok.feature.routine.picker
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
