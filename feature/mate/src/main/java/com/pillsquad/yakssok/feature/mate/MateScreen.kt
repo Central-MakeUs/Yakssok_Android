@@ -67,31 +67,7 @@ private fun MateScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(153.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .background(
-                        color = YakssokTheme.color.grey150,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-            )
-
-            Icon(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .fillMaxSize(),
-                painter = painterResource(R.drawable.img_mate_main),
-                contentDescription = "mate add",
-                tint = Color.Unspecified
-            )
-        }
+        IconBox()
 
         Spacer(modifier = Modifier.height(13.dp))
 
@@ -119,55 +95,96 @@ private fun MateScreen(
 
         Spacer(modifier = Modifier.height(21.dp))
 
-        Column(
+        CodeContent(
+            modifier = Modifier.weight(1f),
+            code = uiState.myCode
+        )
+    }
+}
+
+@Composable
+private fun IconBox(
+
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(153.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Spacer(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(horizontal = 32.dp)
                 .background(
-                    color = YakssokTheme.color.grey50,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                    color = YakssokTheme.color.grey150,
+                    shape = RoundedCornerShape(24.dp)
                 )
-                .navigationBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 44.dp, bottom = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "내 코드 알려주고,\n팔로우 요청해보세요!",
-                textAlign = TextAlign.Center,
-                style = YakssokTheme.typography.body1,
-                color = YakssokTheme.color.grey950
+        )
+
+        Icon(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .fillMaxSize(),
+            painter = painterResource(R.drawable.img_mate_main),
+            contentDescription = "mate add",
+            tint = Color.Unspecified
+        )
+    }
+}
+
+@Composable
+private fun CodeContent(
+    modifier: Modifier,
+    code: String
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = YakssokTheme.color.grey50,
+                shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
             )
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 44.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "내 코드 알려주고,\n팔로우 요청해보세요!",
+            textAlign = TextAlign.Center,
+            style = YakssokTheme.typography.body1,
+            color = YakssokTheme.color.grey950
+        )
 
-            Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
+        Text(
+            text = "내 코드 복사",
+            style = YakssokTheme.typography.body2,
+            color = YakssokTheme.color.grey950
+        )
+
+        Spacer(modifier = Modifier.height(9.dp))
+
+        DashedBorderBox {
             Text(
-                text = "내 코드 복사",
-                style = YakssokTheme.typography.body1,
+                text = code,
+                textDecoration = TextDecoration.Underline,
+                style = YakssokTheme.typography.body0,
                 color = YakssokTheme.color.grey950
-            )
-
-            Spacer(modifier = Modifier.height(9.dp))
-
-            DashedBorderBox {
-                Text(
-                    text = uiState.myCode,
-                    textDecoration = TextDecoration.Underline,
-                    style = YakssokTheme.typography.body0,
-                    color = YakssokTheme.color.grey950
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            YakssokButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding(),
-                text = "내 코드 공유하기",
-                backgroundColor = YakssokTheme.color.primary400,
-                contentColor = YakssokTheme.color.grey50,
-                onClick = {},
             )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        YakssokButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding(),
+            text = "내 코드 공유하기",
+            backgroundColor = YakssokTheme.color.primary400,
+            contentColor = YakssokTheme.color.grey50,
+            onClick = {},
+        )
     }
 }
