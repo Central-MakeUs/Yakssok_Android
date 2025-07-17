@@ -14,7 +14,7 @@ import com.pillsquad.yakssok.feature.info.navigateInfo
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
 import com.pillsquad.yakssok.feature.mate.navigation.navigateMate
 import com.pillsquad.yakssok.feature.mymate.navigateMyMate
-import com.pillsquad.yakssok.feature.mypage.navigateMyPage
+import com.pillsquad.yakssok.feature.mypage.navigation.navigateMyPage
 import com.pillsquad.yakssok.feature.myroutine.navigateMyRoutine
 import com.pillsquad.yakssok.feature.profile_edit.navigateProfileEdit
 import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
