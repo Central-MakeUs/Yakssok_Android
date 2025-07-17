@@ -2,18 +2,13 @@ package com.pillsquad.yakssok.feature.routine.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
 import androidx.navigation.toRoute
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.routine.RoutineRoute
 
-fun NavController.navigateRoutine(name: String) {
-    val navOptions = navOptions {
-        launchSingleTop = true
-        restoreState = true
-    }
-
+fun NavController.navigateRoutine(name: String, navOptions: NavOptions) {
     navigate(route = Route.Routine(name), navOptions = navOptions)
 }
 

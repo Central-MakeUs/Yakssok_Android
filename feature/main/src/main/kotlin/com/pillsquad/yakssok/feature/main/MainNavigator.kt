@@ -10,8 +10,13 @@ import androidx.navigation.navOptions
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.alert.navigation.navigateAlert
 import com.pillsquad.yakssok.feature.home.navigation.navigateHome
+import com.pillsquad.yakssok.feature.info.navigateInfo
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
 import com.pillsquad.yakssok.feature.mate.navigation.navigateMate
+import com.pillsquad.yakssok.feature.mymate.navigateMyMate
+import com.pillsquad.yakssok.feature.mypage.navigateMyPage
+import com.pillsquad.yakssok.feature.myroutine.navigateMyRoutine
+import com.pillsquad.yakssok.feature.profile_edit.navigateProfileEdit
 import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
 
 internal class MainNavigator(
@@ -28,6 +33,11 @@ internal class MainNavigator(
         }
     }
 
+    val defaultNavOptions = navOptions {
+        launchSingleTop = true
+        restoreState = true
+    }
+
     fun popBackStack() {
         navController.popBackStack()
     }
@@ -41,15 +51,35 @@ internal class MainNavigator(
     }
 
     fun navigateRoutine(name: String) {
-        navController.navigateRoutine(name)
+        navController.navigateRoutine(name, defaultNavOptions)
     }
 
     fun navigateAlert() {
-        navController.navigateAlert()
+        navController.navigateAlert(defaultNavOptions)
     }
 
     fun navigateMate() {
-        navController.navigateMate()
+        navController.navigateMate(defaultNavOptions)
+    }
+
+    fun navigateInfo(title: String, url: String) {
+        navController.navigateInfo(title = title, url = url, navOptions = defaultNavOptions)
+    }
+
+    fun navigateMyMate() {
+        navController.navigateMyMate(defaultNavOptions)
+    }
+
+    fun navigateMyPage() {
+        navController.navigateMyPage(defaultNavOptions)
+    }
+
+    fun navigateMyRoutine() {
+        navController.navigateMyRoutine(defaultNavOptions)
+    }
+
+    fun navigateProfileEdit() {
+        navController.navigateProfileEdit(defaultNavOptions)
     }
 }
 
