@@ -11,6 +11,7 @@ dependencies {
     implementation(projects.feature.intro)
     implementation(projects.feature.routine)
     implementation(projects.feature.alert)
+    implementation(projects.feature.mate)
 
     implementation(libs.kotlinx.immutable)
 }

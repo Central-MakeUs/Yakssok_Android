@@ -12,6 +12,7 @@ import com.pillsquad.yakssok.feature.alert.navigation.alertNavGraph
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
 import com.pillsquad.yakssok.feature.main.MainNavigator
+import com.pillsquad.yakssok.feature.mate.navigation.mateNavGraph
 import com.pillsquad.yakssok.feature.routine.navigation.routineNavGraph
 
 @Composable
@@ -30,7 +31,8 @@ internal fun MainNavHost(
         ) {
             homeNavGraph(
                 onNavigateRoutine = navigator::navigateRoutine,
-                onNavigateAlert = navigator::navigateAlert
+                onNavigateAlert = navigator::navigateAlert,
+                onNavigateMate = navigator::navigateMate
             )
 
             introNavGraph(onNavigateHome = navigator::navigateHome)
@@ -38,6 +40,8 @@ internal fun MainNavHost(
             routineNavGraph(onNavigateBack = navigator::popBackStack)
 
             alertNavGraph(onNavigateBack = navigator::popBackStack)
+
+            mateNavGraph(onNavigateBack = navigator::popBackStack)
         }
     }
 }

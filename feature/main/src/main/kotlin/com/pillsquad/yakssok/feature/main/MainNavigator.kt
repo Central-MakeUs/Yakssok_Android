@@ -11,6 +11,7 @@ import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.alert.navigation.navigateAlert
 import com.pillsquad.yakssok.feature.home.navigation.navigateHome
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
+import com.pillsquad.yakssok.feature.mate.navigation.navigateMate
 import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
 
 internal class MainNavigator(
@@ -45,6 +46,10 @@ internal class MainNavigator(
 
     fun navigateAlert() {
         navController.navigateAlert()
+    }
+
+    fun navigateMate() {
+        navController.navigateMate()
     }
 }
 
