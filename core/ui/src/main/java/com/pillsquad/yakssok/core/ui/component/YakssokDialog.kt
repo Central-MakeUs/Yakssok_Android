@@ -1,9 +1,10 @@
-package com.pillsquad.yakssok.feature.routine.component
+package com.pillsquad.yakssok.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +33,7 @@ fun YakssokDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     titleComponent: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val confirmColor = if (enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200
     val contentColor = if (enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400

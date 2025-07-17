@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
+import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.R
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import com.pillsquad.yakssok.feature.routine.util.formatKotlinxTime

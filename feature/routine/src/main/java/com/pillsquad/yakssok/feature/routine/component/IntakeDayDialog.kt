@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.model.WeekType
+import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 
 @Composable
 internal fun IntakeDayDialog(
