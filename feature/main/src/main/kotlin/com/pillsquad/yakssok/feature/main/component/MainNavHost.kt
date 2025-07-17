@@ -10,9 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.pillsquad.yakssok.feature.alert.navigation.alertNavGraph
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
+import com.pillsquad.yakssok.feature.info.infoNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
 import com.pillsquad.yakssok.feature.main.MainNavigator
 import com.pillsquad.yakssok.feature.mate.navigation.mateNavGraph
+import com.pillsquad.yakssok.feature.mymate.myMateNavGraph
+import com.pillsquad.yakssok.feature.mypage.myPageNavGraph
+import com.pillsquad.yakssok.feature.myroutine.myRoutineNavGraph
+import com.pillsquad.yakssok.feature.profile_edit.profileEditNavGraph
 import com.pillsquad.yakssok.feature.routine.navigation.routineNavGraph
 
 @Composable
@@ -42,6 +47,25 @@ internal fun MainNavHost(
             alertNavGraph(onNavigateBack = navigator::popBackStack)
 
             mateNavGraph(onNavigateBack = navigator::popBackStack)
+
+            infoNavGraph(onNavigateBack = navigator::popBackStack)
+
+            myMateNavGraph(
+                onNavigateMate = navigator::navigateMate,
+                onNavigateBack = navigator::popBackStack
+            )
+
+            myPageNavGraph(
+                onNavigateBack = navigator::popBackStack,
+                onNavigateProfileEdit = navigator::navigateProfileEdit,
+                onNavigateMyRoutine = navigator::navigateMyRoutine,
+                onNavigateMyMate = navigator::navigateMyMate,
+                onNavigateInfo = navigator::navigateInfo
+            )
+
+            myRoutineNavGraph(onNavigateBack = navigator::popBackStack)
+
+            profileEditNavGraph(onNavigateBack = navigator::popBackStack)
         }
     }
 }
