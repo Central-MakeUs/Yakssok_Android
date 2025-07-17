@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -34,6 +33,7 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.mate.component.DashedBorderBox
+import com.pillsquad.yakssok.feature.mate.component.MateCompleteDialog
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
 
 @Composable
@@ -45,16 +45,25 @@ internal fun MateRoute(
     var isComplete by remember { mutableStateOf(false) }
 
     if (isComplete) {
-        // TODO: 메이트 추가 완료
+        MateCompleteDialog(
+            mateName = uiState.mateName,
+            mateNickName = uiState.mateNickName,
+            imgUrl = uiState.imgUrl,
+            onNavigateBack = {
+                isComplete = false
+                onNavigateBack()
+            }
+        )
     }
 
-    when(uiState.curPage) {
+    when (uiState.curPage) {
         0 -> MateScreen(
             uiState = uiState,
             updateInputCode = viewModel::updateInputCode,
             onNavigateBack = onNavigateBack,
             onNavigatePlus = { viewModel.updateCurPage(1) }
         )
+
         1 -> PlusMateScreen(
             name = uiState.mateName,
             nickName = uiState.mateNickName,
