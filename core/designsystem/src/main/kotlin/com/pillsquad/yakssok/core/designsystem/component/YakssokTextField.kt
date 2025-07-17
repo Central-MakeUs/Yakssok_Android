@@ -37,10 +37,16 @@ fun YakssokTextField(
     maxLength: Int = 5,
     isShowClear: Boolean = false,
     isShowCounter: Boolean = false,
+    isSuffixEnabled: Boolean = false,
     suffixButtonText: String? = null,
     onSuffixButtonClick: (() -> Unit)? = null,
 ) {
     val isNotEmpty = value.isNotBlank()
+    val verticalPadding = if (suffixButtonText != null && onSuffixButtonClick != null) {
+        8
+    } else {
+        16
+    }
 
     BasicTextField(
         modifier = modifier.defaultMinSize(
@@ -64,7 +70,7 @@ fun YakssokTextField(
                         color = backgroundColor,
                         shape = RoundedCornerShape(16.dp)
                     )
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = verticalPadding.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -115,15 +121,18 @@ fun YakssokTextField(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = suffixButtonText,
-                        color = YakssokTheme.color.grey50,
+                        color = if (isSuffixEnabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
                         style = YakssokTheme.typography.body1,
                         modifier = Modifier
                             .background(
-                                color = YakssokTheme.color.grey950,
+                                color = if (isSuffixEnabled) YakssokTheme.color.grey950 else YakssokTheme.color.grey200,
                                 shape = RoundedCornerShape(12.dp)
                             )
-                            .clickable { onSuffixButtonClick() }
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .clickable(
+                                onClick = onSuffixButtonClick,
+                                enabled = isSuffixEnabled
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
             }
