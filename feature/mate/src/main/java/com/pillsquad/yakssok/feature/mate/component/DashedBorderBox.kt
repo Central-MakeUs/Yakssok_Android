@@ -21,8 +21,8 @@ internal fun DashedBorderBox(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 16.dp,
     strokeWidth: Dp = 1.dp,
-    dashLength: Float = 7f,
-    gapLength: Float = 8f,
+    dashLength: Float = 21f,
+    gapLength: Float = 24f,
     borderColor: Color = YakssokTheme.color.grey400,
     content: @Composable BoxScope.() -> Unit
 ) {
