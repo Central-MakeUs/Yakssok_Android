@@ -16,6 +16,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,19 +42,37 @@ internal fun MateRoute(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isComplete by remember { mutableStateOf(false) }
 
-    MateScreen(
-        uiState = uiState,
-        updateInputCode = viewModel::updateInputCode,
-        onNavigateBack = onNavigateBack
-    )
+    if (isComplete) {
+        // TODO: 메이트 추가 완료
+    }
+
+    when(uiState.curPage) {
+        0 -> MateScreen(
+            uiState = uiState,
+            updateInputCode = viewModel::updateInputCode,
+            onNavigateBack = onNavigateBack,
+            onNavigatePlus = { viewModel.updateCurPage(1) }
+        )
+        1 -> PlusMateScreen(
+            name = uiState.mateName,
+            nickName = uiState.mateNickName,
+            imgUrl = uiState.imgUrl,
+            enabled = uiState.isEnabled,
+            onValueChange = viewModel::updateNickName,
+            onNavigateBack = { viewModel.updateCurPage(0) },
+            onNavigateHome = { isComplete = true }
+        )
+    }
 }
 
 @Composable
 private fun MateScreen(
     uiState: MateUiModel,
     updateInputCode: (String) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigatePlus: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -90,7 +111,7 @@ private fun MateScreen(
             hint = "코드입력",
             isSuffixEnabled = uiState.inputCode.isNotEmpty(),
             suffixButtonText = "추가",
-            onSuffixButtonClick = { /*TODO*/ },
+            onSuffixButtonClick = onNavigatePlus,
         )
 
         Spacer(modifier = Modifier.height(21.dp))

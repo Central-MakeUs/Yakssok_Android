@@ -15,9 +15,26 @@ class MateViewModel @Inject constructor(
     private var _uiState = MutableStateFlow(MateUiModel())
     val uiState = _uiState.asStateFlow()
 
+    fun updateCurPage(newPage: Int) {
+        _uiState.update {
+            it.copy(curPage = newPage)
+        }
+    }
+
     fun updateInputCode(newCode: String) {
         _uiState.update {
             it.copy(inputCode = newCode)
         }
+    }
+
+    fun updateNickName(nickName: String) {
+        _uiState.update {
+            it.copy(mateNickName = nickName, isEnabled = validateNickName(nickName))
+        }
+    }
+
+    private fun validateNickName(nickName: String): Boolean {
+        val trimmed = nickName.trim()
+        return trimmed.isNotEmpty() && trimmed.length <= 5
     }
 }
