@@ -43,7 +43,8 @@ import java.time.LocalDate
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateRoutine: (String) -> Unit,
-    onNavigateAlert: () -> Unit
+    onNavigateAlert: () -> Unit,
+    onNavigateMate: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -81,8 +82,9 @@ internal fun HomeRoute(
                 remainedMedicine = 3
             )
         ),
-        onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
+        onNavigateRoutine = { onNavigateRoutine("김OO") },
     )
 }
 

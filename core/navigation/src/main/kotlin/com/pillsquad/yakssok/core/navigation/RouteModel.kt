@@ -14,4 +14,7 @@ sealed interface Route {
 
     @Serializable
     data object Alert : Route
+
+    @Serializable
+    data object Mate: Route
 }
