@@ -1,33 +1,56 @@
 package com.pillsquad.yakssok.feature.mate
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
+import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.feature.mate.component.DashedBorderBox
+import com.pillsquad.yakssok.feature.mate.model.MateUiModel
 
 @Composable
 internal fun MateRoute(
     viewModel: MateViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MateScreen(
+        uiState = uiState,
+        updateInputCode = viewModel::updateInputCode,
         onNavigateBack = onNavigateBack
     )
 }
 
 @Composable
 private fun MateScreen(
+    uiState: MateUiModel,
+    updateInputCode: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     Column(
@@ -37,9 +60,64 @@ private fun MateScreen(
             .statusBarsPadding()
     ) {
         YakssokTopAppBar(
+            modifier = Modifier.padding(horizontal = 16.dp),
             title = "메이트 추가",
             onBackClick = onNavigateBack
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(153.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp)
+                    .background(
+                        color = YakssokTheme.color.grey150,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+            )
+
+            Icon(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .fillMaxSize(),
+                painter = painterResource(R.drawable.img_mate_main),
+                contentDescription = "mate add",
+                tint = Color.Unspecified
+            )
+        }
+
+        Spacer(modifier = Modifier.height(13.dp))
+
+        Text(
+            modifier = Modifier.padding(start = 32.dp),
+            text = "메이트 코드 입력",
+            style = YakssokTheme.typography.body2,
+            color = YakssokTheme.color.grey950
+        )
+
+        Spacer(modifier = Modifier.height(7.dp))
+
+        YakssokTextField(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth(),
+            backgroundColor = YakssokTheme.color.grey50,
+            value = uiState.inputCode,
+            onValueChange = updateInputCode,
+            hint = "코드입력",
+            isSuffixEnabled = uiState.inputCode.isNotEmpty(),
+            suffixButtonText = "추가",
+            onSuffixButtonClick = { /*TODO*/ },
+        )
+
+        Spacer(modifier = Modifier.height(21.dp))
 
         Column(
             modifier = Modifier
@@ -50,10 +128,46 @@ private fun MateScreen(
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
                 .navigationBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 44.dp, bottom = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 44.dp, bottom = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "내 코드 알려주고,\n팔로우 요청해보세요!",
+                textAlign = TextAlign.Center,
+                style = YakssokTheme.typography.body1,
+                color = YakssokTheme.color.grey950
+            )
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "내 코드 복사",
+                style = YakssokTheme.typography.body1,
+                color = YakssokTheme.color.grey950
+            )
+
+            Spacer(modifier = Modifier.height(9.dp))
+
+            DashedBorderBox {
+                Text(
+                    text = uiState.myCode,
+                    textDecoration = TextDecoration.Underline,
+                    style = YakssokTheme.typography.body0,
+                    color = YakssokTheme.color.grey950
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            YakssokButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding(),
+                text = "내 코드 공유하기",
+                backgroundColor = YakssokTheme.color.primary400,
+                contentColor = YakssokTheme.color.grey50,
+                onClick = {},
+            )
         }
     }
-
 }
