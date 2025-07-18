@@ -15,13 +15,15 @@ fun NavController.navigateHome(navOptions: NavOptions) {
 fun NavGraphBuilder.homeNavGraph(
     onNavigateRoutine: (String) -> Unit,
     onNavigateAlert: () -> Unit,
-    onNavigateMate: () -> Unit
+    onNavigateMate: () -> Unit,
+    onNavigateMyPage: () -> Unit,
 ) {
     composable<Route.Home> {
         HomeRoute(
             onNavigateRoutine = onNavigateRoutine,
             onNavigateAlert = onNavigateAlert,
-            onNavigateMate = onNavigateMate
+            onNavigateMate = onNavigateMate,
+            onNavigateMyPage = onNavigateMyPage
         )
     }
 }

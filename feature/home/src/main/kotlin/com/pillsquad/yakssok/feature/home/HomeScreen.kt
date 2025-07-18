@@ -44,7 +44,8 @@ internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateRoutine: (String) -> Unit,
     onNavigateAlert: () -> Unit,
-    onNavigateMate: () -> Unit
+    onNavigateMate: () -> Unit,
+    onNavigateMyPage: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -82,6 +83,7 @@ internal fun HomeRoute(
                 remainedMedicine = 3
             )
         ),
+        onNavigateMy = onNavigateMyPage,
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
         onNavigateRoutine = { onNavigateRoutine("김OO") },

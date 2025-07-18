@@ -37,7 +37,8 @@ internal fun MainNavHost(
             homeNavGraph(
                 onNavigateRoutine = navigator::navigateRoutine,
                 onNavigateAlert = navigator::navigateAlert,
-                onNavigateMate = navigator::navigateMate
+                onNavigateMate = navigator::navigateMate,
+                onNavigateMyPage = navigator::navigateMyPage
             )
 
             introNavGraph(onNavigateHome = navigator::navigateHome)
