@@ -5,7 +5,7 @@ import com.pillsquad.yakssok.core.model.PillProgressType
 import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 
-data class MyRoutineUiModel(
+data class PillUiModel(
     val pillName: String = "",
     val pillType: PillType = PillType.OTHER,
     val pillProgressType: PillProgressType = PillProgressType.BEFORE,

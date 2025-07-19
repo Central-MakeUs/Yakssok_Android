@@ -26,11 +26,11 @@ import com.pillsquad.yakssok.core.model.PillType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.component.PillTypeCard
 import com.pillsquad.yakssok.core.ui.component.WeekRow
-import com.pillsquad.yakssok.feature.myroutine.model.MyRoutineUiModel
+import com.pillsquad.yakssok.feature.myroutine.model.PillUiModel
 
 @Composable
 internal fun InfoCard(
-    uiModel: MyRoutineUiModel,
+    uiModel: PillUiModel,
 ) {
     Column(
         modifier = Modifier
