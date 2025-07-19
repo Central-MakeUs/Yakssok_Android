@@ -36,6 +36,7 @@ fun YakssokIconButton(
 @Composable
 fun YakssokIconButton(
     imageVector: ImageVector,
+    color: Color = Color.Unspecified,
     size: Int = 24,
     onClick: () -> Unit,
 ) {
@@ -49,7 +50,7 @@ fun YakssokIconButton(
             modifier = Modifier.size(size.dp),
             imageVector = imageVector,
             contentDescription = "back",
-            tint = Color.Unspecified
+            tint = color
         )
     }
 }
