@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.feature.routine.util
+package com.pillsquad.yakssok.core.ui.ext
 
 import androidx.compose.ui.graphics.Color
 import com.pillsquad.yakssok.core.model.PillType

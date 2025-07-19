@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.ui.ext.toBackground
 import com.pillsquad.yakssok.feature.routine.component.RoutineText
-import com.pillsquad.yakssok.feature.routine.util.toBackground
 
 @Composable
 internal fun FirstContent(
