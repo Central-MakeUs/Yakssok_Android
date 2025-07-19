@@ -3,8 +3,10 @@ package com.pillsquad.yakssok.core.ui.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -31,14 +33,15 @@ import com.pillsquad.yakssok.core.ui.R
 @Composable
 fun MateLazyRow(
     mateList: List<Mate>,
-    clickedMateId: Int,
-    onNavigateMate: () -> Unit,
-    onMateClick: (Mate) -> Unit
+    clickedMateId: Int = -1,
+    imgSize: Int = 52,
+    iconSize: Int = 20,
+    iconButtonColor: Color = YakssokTheme.color.grey100,
+    onNavigateMate: (() -> Unit)? = null,
+    onMateClick: (Mate) -> Unit = {}
 ) {
     LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(YakssokTheme.color.grey50),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -47,14 +50,22 @@ fun MateLazyRow(
 
             MateItem(
                 mate = mate,
+                imgSize = imgSize,
                 onMateClick = onMateClick,
                 isClicked = (mate.id == clickedMateId)
             )
         }
-        item {
-            Column {
-                AddIconButton(onClick = onNavigateMate)
-                Spacer(modifier = Modifier.height(29.dp))
+        onNavigateMate?.let {
+            item {
+                Column {
+                    AddIconButton(
+                        size = imgSize,
+                        iconSize = iconSize,
+                        iconButtonColor = iconButtonColor,
+                        onClick = onNavigateMate
+                    )
+                    Spacer(modifier = Modifier.height(29.dp))
+                }
             }
         }
     }
@@ -63,18 +74,16 @@ fun MateLazyRow(
 @Composable
 private fun MateItem(
     mate: Mate,
+    imgSize: Int = 52,
     onMateClick: (Mate) -> Unit,
     isClicked: Boolean
 ) {
     Column(
-        modifier = Modifier
-            .width(52.dp)
-            .height(81.dp)
-            .clickable { onMateClick(mate) },
+        modifier = Modifier.clickable { onMateClick(mate) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(
-            modifier = Modifier.size(52.dp),
+            modifier = Modifier.size(imgSize.dp),
             imageUrl = mate.profileImage,
             isStroke = isClicked
         )
@@ -90,20 +99,28 @@ private fun MateItem(
 
 @Composable
 private fun AddIconButton(
+    size: Int,
+    iconSize: Int,
+    iconButtonColor: Color,
     onClick: () -> Unit
 ) {
     IconButton(
         modifier = Modifier
-            .size(52.dp)
+            .size(size.dp)
             .clip(CircleShape)
-            .background(YakssokTheme.color.grey100),
+            .background(iconButtonColor),
         onClick = onClick
     ) {
-        Icon(
-            modifier = Modifier.size(20.dp),
-            imageVector = Icons.Default.Add,
-            contentDescription = stringResource(R.string.add_mate),
-            tint = YakssokTheme.color.grey400
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(iconSize.dp),
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(R.string.add_mate),
+                tint = YakssokTheme.color.grey400
+            )
+        }
     }
 }
