@@ -16,7 +16,7 @@ import com.pillsquad.yakssok.feature.main.MainNavigator
 import com.pillsquad.yakssok.feature.mate.navigation.mateNavGraph
 import com.pillsquad.yakssok.feature.mymate.myMateNavGraph
 import com.pillsquad.yakssok.feature.mypage.navigation.myPageNavGraph
-import com.pillsquad.yakssok.feature.myroutine.myRoutineNavGraph
+import com.pillsquad.yakssok.feature.myroutine.navigation.myRoutineNavGraph
 import com.pillsquad.yakssok.feature.profile_edit.profileEditNavGraph
 import com.pillsquad.yakssok.feature.routine.navigation.routineNavGraph
 
@@ -64,7 +64,10 @@ internal fun MainNavHost(
                 onNavigateInfo = navigator::navigateInfo
             )
 
-            myRoutineNavGraph(onNavigateBack = navigator::popBackStack)
+            myRoutineNavGraph(
+                onNavigateRoutine = navigator::navigateRoutine,
+                onNavigateBack = navigator::popBackStack
+            )
 
             profileEditNavGraph(onNavigateBack = navigator::popBackStack)
         }
