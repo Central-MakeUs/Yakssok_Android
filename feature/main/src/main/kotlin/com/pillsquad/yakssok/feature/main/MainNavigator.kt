@@ -16,7 +16,7 @@ import com.pillsquad.yakssok.feature.mate.navigation.navigateMate
 import com.pillsquad.yakssok.feature.mymate.navigation.navigateMyMate
 import com.pillsquad.yakssok.feature.mypage.navigation.navigateMyPage
 import com.pillsquad.yakssok.feature.myroutine.navigation.navigateMyRoutine
-import com.pillsquad.yakssok.feature.profile_edit.navigateProfileEdit
+import com.pillsquad.yakssok.feature.profile_edit.navigation.navigateProfileEdit
 import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
 
 internal class MainNavigator(
