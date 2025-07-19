@@ -135,7 +135,7 @@ private fun SuccessContent(
         InfoRow(
             iconRes = R.drawable.ic_cotact_support,
             title = "개인정보 정책",
-            onClick = { onNavigateInfo("개인정보정책", "notionUrl") }
+            onClick = { onNavigateInfo("개인정보정책", BuildConfig.PRIVATE_POLICY) }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -143,7 +143,7 @@ private fun SuccessContent(
         InfoRow(
             iconRes = R.drawable.ic_error,
             title = "이용약관",
-            onClick = { onNavigateInfo("이용정책", "notionUrl") }
+            onClick = { onNavigateInfo("이용정책", BuildConfig.USAGE_POLICY) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
