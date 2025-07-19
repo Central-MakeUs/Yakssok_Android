@@ -15,10 +15,10 @@ fun NavGraphBuilder.infoNavGraph(
     onNavigateBack: () -> Unit
 ) {
     composable<Route.Info> {
-//        InfoRoute(
-//            title = it.toRoute<Route.Info>().title,
-//            url = it.toRoute<Route.Info>().url,
-//            onNavigateBack = onNavigateBack
-//        )
+        InfoRoute(
+            title = it.toRoute<Route.Info>().title,
+            url = it.toRoute<Route.Info>().url,
+            onNavigateBack = onNavigateBack
+        )
     }
 }
