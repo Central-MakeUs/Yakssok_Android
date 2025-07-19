@@ -13,7 +13,7 @@ import com.pillsquad.yakssok.feature.home.navigation.navigateHome
 import com.pillsquad.yakssok.feature.info.navigateInfo
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
 import com.pillsquad.yakssok.feature.mate.navigation.navigateMate
-import com.pillsquad.yakssok.feature.mymate.navigateMyMate
+import com.pillsquad.yakssok.feature.mymate.navigation.navigateMyMate
 import com.pillsquad.yakssok.feature.mypage.navigation.navigateMyPage
 import com.pillsquad.yakssok.feature.myroutine.navigation.navigateMyRoutine
 import com.pillsquad.yakssok.feature.profile_edit.navigateProfileEdit
