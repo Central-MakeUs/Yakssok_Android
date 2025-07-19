@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,10 +38,15 @@ internal fun ProfileEditRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val imagePickerLauncher = rememberImagePickerLauncher()
 
     ProfileEditScreen(
         uiState = uiState,
-        onImageUpdate = viewModel::updateImgUrl,
+        onImageUpdate = {
+            imagePickerLauncher.launch { uri ->
+                uri?.let { viewModel.updateImgUrl(it.toString()) }
+            }
+        },
         onValueChange = viewModel::updateName,
         onNavigateBack = onNavigateBack
     )
@@ -48,7 +55,7 @@ internal fun ProfileEditRoute(
 @Composable
 private fun ProfileEditScreen(
     uiState: ProfileEditUiModel,
-    onImageUpdate: (String) -> Unit,
+    onImageUpdate: () -> Unit,
     onValueChange: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -65,13 +72,15 @@ private fun ProfileEditScreen(
 
         Box(
             modifier = Modifier.clickable(
-                onClick = {},
+                onClick = onImageUpdate,
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             )
         ) {
             YakssokImage(
-                modifier = Modifier.size(100.dp).align(Alignment.Center),
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center),
                 imageUrl = uiState.imgUrl,
             )
 
