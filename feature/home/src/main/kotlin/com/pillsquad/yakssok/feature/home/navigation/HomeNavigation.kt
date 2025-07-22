@@ -17,13 +17,15 @@ fun NavGraphBuilder.homeNavGraph(
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,
+    onNavigateCalendar: () -> Unit
 ) {
     composable<Route.Home> {
         HomeRoute(
             onNavigateRoutine = onNavigateRoutine,
             onNavigateAlert = onNavigateAlert,
             onNavigateMate = onNavigateMate,
-            onNavigateMyPage = onNavigateMyPage
+            onNavigateMyPage = onNavigateMyPage,
+            onNavigateCalendar = onNavigateCalendar
         )
     }
 }
