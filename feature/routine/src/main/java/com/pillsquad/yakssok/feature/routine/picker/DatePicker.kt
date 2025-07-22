@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.coroutines.delay
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -31,7 +32,7 @@ import kotlin.time.ExperimentalTime
 @Composable
 internal fun DatePicker(
     modifier: Modifier = Modifier,
-    initialDate: LocalDate = getTodayDate(),
+    initialDate: LocalDate = LocalDate.today(),
     visibleItemsCount: Int = PickerDefaults.VISIBLE_ITEM_COUNT,
     style: PickerStyle = PickerDefaults.pickerStyle(),
     selector: PickerSelector = PickerDefaults.pickerSelector(),
@@ -182,12 +183,6 @@ internal fun DatePicker(
         }
     }
 
-}
-
-
-@OptIn(ExperimentalTime::class)
-private fun getTodayDate(): LocalDate {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 }
 
 private fun getDaysInMonth(year: Int, month: Int): List<Int> {
