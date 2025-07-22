@@ -4,10 +4,48 @@ import android.util.SparseArray
 import com.pillsquad.yakssok.core.model.Mate
 import com.pillsquad.yakssok.core.model.Medicine
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 data class CalendarUiModel(
-    val selectedDate: LocalDate,
-    val mateList: List<Mate>,
-    val selectedMate: Int,
-    val medicineCache: SparseArray<MutableMap<LocalDate, List<Medicine>>>
+    val selectedDate: LocalDate = LocalDate.today(),
+    val mateList: List<Mate> = listOf(
+        Mate(
+            id = 1,
+            name = "임용수",
+            nickName = "나",
+            profileImage = "https://picsum.photos/200",
+            remainedMedicine = 1
+        ),
+        Mate(
+            id = 2,
+            name = "조앵",
+            nickName = "PM",
+            profileImage = "https://picsum.photos/200",
+            remainedMedicine = 0
+        ),
+        Mate(
+            id = 3,
+            name = "리아",
+            nickName = "iOS",
+            profileImage = "https://picsum.photos/200",
+            remainedMedicine = 3
+        ),
+        Mate(
+            id = 4,
+            name = "노을",
+            nickName = "Server",
+            profileImage = "https://picsum.photos/200",
+            remainedMedicine = 3
+        )
+    ),
+    val selectedMate: Int = 1,
+    val medicineCache: SparseArray<MutableMap<LocalDate, List<Medicine>>> = SparseArray(),
 )
+
+@OptIn(ExperimentalTime::class)
+fun LocalDate.Companion.today(): LocalDate {
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+}
