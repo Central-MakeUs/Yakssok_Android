@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.pillsquad.yakssok.feature.alert.navigation.alertNavGraph
+import com.pillsquad.yakssok.feature.calendar.calendarNavGraph
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
 import com.pillsquad.yakssok.feature.info.infoNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
@@ -70,6 +71,14 @@ internal fun MainNavHost(
             )
 
             profileEditNavGraph(onNavigateBack = navigator::popBackStack)
+
+            calendarNavGraph(
+                onNavigateBack = navigator::popBackStack,
+                onNavigateRoutine = navigator::navigateRoutine,
+                onNavigateAlert = navigator::navigateAlert,
+                onNavigateMate = navigator::navigateMate,
+                onNavigateMyPage = navigator::navigateMyPage
+            )
         }
     }
 }

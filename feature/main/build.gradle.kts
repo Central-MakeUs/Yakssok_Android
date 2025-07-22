@@ -19,4 +19,5 @@ dependencies {
     implementation(projects.feature.profileEdit)
     implementation(projects.feature.myroutine)
     implementation(projects.feature.mymate)
+    implementation(projects.feature.calendar)
 }
