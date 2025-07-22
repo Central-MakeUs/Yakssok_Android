@@ -18,6 +18,12 @@ fun NavGraphBuilder.calendarNavGraph(
     onNavigateMyPage: () -> Unit,
 ) {
     composable<Route.Calendar> {
-
+        CalendarRoute(
+            onNavigateBack = onNavigateBack,
+            onNavigateRoutine = onNavigateRoutine,
+            onNavigateAlert = onNavigateAlert,
+            onNavigateMate = onNavigateMate,
+            onNavigateMyPage = onNavigateMyPage
+        )
     }
 }
