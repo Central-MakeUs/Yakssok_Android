@@ -46,6 +46,7 @@ internal fun HomeRoute(
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,
+    onNavigateCalendar: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
@@ -87,6 +88,7 @@ internal fun HomeRoute(
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
         onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateCalendar = onNavigateCalendar
     )
 }
 
