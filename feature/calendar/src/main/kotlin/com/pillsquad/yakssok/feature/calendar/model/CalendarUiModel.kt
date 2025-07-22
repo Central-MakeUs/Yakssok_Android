@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.feature.calendar
+package com.pillsquad.yakssok.feature.calendar.model
 
 import android.util.SparseArray
 import com.pillsquad.yakssok.core.model.Mate

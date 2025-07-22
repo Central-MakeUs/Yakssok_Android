@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.pillsquad.yakssok.feature.alert.navigation.alertNavGraph
-import com.pillsquad.yakssok.feature.calendar.calendarNavGraph
+import com.pillsquad.yakssok.feature.calendar.navigation.calendarNavGraph
 import com.pillsquad.yakssok.feature.home.navigation.homeNavGraph
 import com.pillsquad.yakssok.feature.info.infoNavGraph
 import com.pillsquad.yakssok.feature.intro.navigation.introNavGraph
