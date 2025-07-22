@@ -32,4 +32,7 @@ sealed interface Route {
 
     @Serializable
     data class Info(val title: String, val url: String): Route
+
+    @Serializable
+    data object Calendar: Route
 }

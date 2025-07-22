@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.alert.navigation.navigateAlert
+import com.pillsquad.yakssok.feature.calendar.navigateCalendar
 import com.pillsquad.yakssok.feature.home.navigation.navigateHome
 import com.pillsquad.yakssok.feature.info.navigateInfo
 import com.pillsquad.yakssok.feature.intro.navigation.navigateIntro
@@ -80,6 +81,10 @@ internal class MainNavigator(
 
     fun navigateProfileEdit() {
         navController.navigateProfileEdit(defaultNavOptions)
+    }
+
+    fun navigateCalendar() {
+        navController.navigateCalendar(defaultNavOptions)
     }
 }
 
