@@ -1,7 +1,9 @@
 package com.pillsquad.yakssok.feature.calendar.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.feature.calendar.model.CalendarConfig
 import com.pillsquad.yakssok.feature.calendar.model.today
 import kotlinx.coroutines.launch
@@ -79,6 +82,8 @@ internal fun Calendar(
                 }
             }
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),

@@ -15,7 +15,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokIconButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
@@ -33,7 +32,7 @@ internal fun CalendarHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = yearMonth.year.toString(),
+            text = "${yearMonth.year}년 ${yearMonth.month.ordinal + 1}월",
             style = YakssokTheme.typography.subtitle1,
             color = YakssokTheme.color.grey600
         )
