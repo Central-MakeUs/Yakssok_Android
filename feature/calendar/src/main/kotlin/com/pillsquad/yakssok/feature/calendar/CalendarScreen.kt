@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -23,7 +24,9 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.feature.calendar.component.Calendar
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
+import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun CalendarRoute(
@@ -40,6 +43,7 @@ internal fun CalendarRoute(
     CalendarScreen(
         uiState = uiState,
         scrollState = scrollState,
+        onUpdateSelectedDate = viewModel::updateSelectedDate,
         onNavigateBack = onNavigateBack,
         onNavigateRoutine = { onNavigateRoutine("김OO") },
         onNavigateAlert = onNavigateAlert,
@@ -52,12 +56,15 @@ internal fun CalendarRoute(
 internal fun CalendarScreen(
     uiState: CalendarUiModel = CalendarUiModel(),
     scrollState: ScrollState = rememberScrollState(),
+    onUpdateSelectedDate: (LocalDate) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateRoutine: () -> Unit = {},
     onNavigateAlert: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
     onNavigateMyPage: () -> Unit = {},
 ) {
+    val modifier = Modifier.padding(horizontal = 16.dp)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,54 +72,80 @@ internal fun CalendarScreen(
             .systemBarsPadding()
     ) {
         YakssokTopAppBar(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = modifier,
             onBackClick = onNavigateBack,
             onNavigateAlert = onNavigateAlert,
             onNavigateMy = onNavigateMyPage
         )
 
-        Column(
+        LazyColumn (
             modifier = Modifier
                 .fillMaxWidth()
-                .background(YakssokTheme.color.grey100)
-                .verticalScroll(scrollState)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
-            MateLazyRow(
-                mateList = uiState.mateList,
-                clickedMateId = uiState.selectedMate,
-                onNavigateMate = onNavigateMate,
-                onMateClick = {}
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // TODO: Calendar
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Spacer(
-                modifier = Modifier
-                    .height(8.dp)
-                    .fillMaxWidth()
-                    .background(YakssokTheme.color.grey100)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            if (uiState.medicineCache.isEmpty()) {
-                NoMedicineColumn(
-                    modifier = Modifier,
-                    isNeverAlarm = false,
-                    onNavigateToRoutine = onNavigateRoutine
+            item {
+                MateLazyRow(
+                    modifier = modifier,
+                    mateList = uiState.mateList,
+                    clickedMateId = uiState.selectedMate,
+                    onNavigateMate = onNavigateMate,
+                    onMateClick = {}
                 )
-            } else {
-                DailyMedicineList(
-                    medicineList = uiState.medicineCache[uiState.selectedMate]!!.values.flatten(),
-                    onItemClick = {},
-                    onNavigateToRoute = onNavigateRoutine
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            item {
+                Calendar(
+                    modifier = modifier,
+                    selectedDate = uiState.selectedDate,
+                    takenCache = uiState.takenCache[uiState.selectedMate] ?: emptyMap(),
+                    onDateSelected = onUpdateSelectedDate
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp)
+                        .fillMaxWidth()
+                        .background(YakssokTheme.color.grey100)
+                )
+            }
+
+
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            item {
+                if (uiState.medicineCache.isEmpty()) {
+                    NoMedicineColumn(
+                        modifier = modifier,
+                        isNeverAlarm = false,
+                        onNavigateToRoutine = onNavigateRoutine
+                    )
+                } else {
+                    DailyMedicineList(
+                        modifier = modifier,
+                        medicineList = uiState.medicineCache[uiState.selectedMate]!!.values.flatten(),
+                        onItemClick = {},
+                        onNavigateToRoute = onNavigateRoutine
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
