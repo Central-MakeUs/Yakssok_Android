@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,37 +41,48 @@ internal fun CalendarMonthItem(
     takenCache: Map<LocalDate, Boolean>,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val firstDayOfWeek by remember { mutableStateOf(currentYearMonth.firstDay.dayOfWeek) }
+    val firstDayOfWeek = currentYearMonth.firstDay.dayOfWeek.ordinal // 0(일) ~ 6(토)
+    val daysInMonth = currentYearMonth.numberOfDays
+    val paddedDates = buildList {
+        // 앞쪽 공백 (첫 주 요일 위치 맞추기)
+        repeat(firstDayOfWeek) {
+            add(null)
+        }
+        // 날짜 채우기
+        for (day in 1..daysInMonth) {
+            add(LocalDate(currentYearMonth.year, currentYearMonth.month, day))
+        }
+        // 뒷쪽 공백 (마지막 주 7칸 채우기)
+        while (size % 7 != 0) {
+            add(null)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Week()
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7)
-        ) {
-            for (i in 1 until firstDayOfWeek.ordinal) {
-                item {
+        paddedDates.chunked(7).forEach { week ->
+            Row(modifier = Modifier.fillMaxWidth()) {
+                week.forEach { date ->
                     Box(
-                        modifier = Modifier.weight(1f)
-                    )
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (date == null) {
+                            Spacer(modifier = Modifier)
+                        } else {
+                            CalendarDay(
+                                date = date,
+                                today = today,
+                                isSelected = date == selectedDate,
+                                isAllTaken = takenCache[date] ?: false,
+                                onDateSelected = onDateSelected
+                            )
+                        }
+                    }
                 }
-            }
-
-            items(currentYearMonth.numberOfDays) { day ->
-                val date = LocalDate(currentYearMonth.year, currentYearMonth.month, day + 1)
-                val isSelected = date == selectedDate
-
-                CalendarDay(
-                    date = date,
-                    today = today,
-                    isSelected = isSelected,
-                    isAllTaken = takenCache[date] ?: false,
-                    onDateSelected = onDateSelected
-                )
             }
         }
     }
@@ -86,7 +98,7 @@ private fun CalendarDay(
     onDateSelected: (LocalDate) -> Unit
 ) {
     val isToday = date == today
-    val isFuture = date > today
+    val isFuture = date >= today
 
     val textColor = if (isSelected) {
         YakssokTheme.color.grey50
@@ -110,7 +122,7 @@ private fun CalendarDay(
     ) {
         Text(
             modifier = Modifier
-                .padding(9.dp)
+                .fillMaxWidth()
                 .then(
                     if (isSelected) {
                         Modifier.background(
@@ -122,6 +134,7 @@ private fun CalendarDay(
                     }
                 ),
             text = date.day.toString(),
+            textAlign = TextAlign.Center,
             style = YakssokTheme.typography.body2,
             color = textColor
         )
@@ -132,8 +145,9 @@ private fun CalendarDay(
             Box(
                 modifier = Modifier
                     .alpha(0.9f)
+                    .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
                     .fillMaxWidth()
-                    .padding(start = (6.5).dp, end = (6.5).dp, bottom = 3.dp, top = 1.dp)
+                    .aspectRatio(1f)
                     .background(
                         color = YakssokTheme.color.grey100,
                         shape = CircleShape
