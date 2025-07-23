@@ -32,6 +32,7 @@ import com.pillsquad.yakssok.core.ui.R
 
 @Composable
 fun MateLazyRow(
+    modifier: Modifier = Modifier,
     mateList: List<Mate>,
     clickedMateId: Int = -1,
     imgSize: Int = 52,
@@ -41,7 +42,7 @@ fun MateLazyRow(
     onMateClick: (Mate) -> Unit = {}
 ) {
     LazyRow(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

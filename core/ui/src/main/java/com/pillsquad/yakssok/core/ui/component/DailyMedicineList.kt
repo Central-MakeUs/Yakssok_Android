@@ -31,6 +31,7 @@ import java.time.LocalTime
 
 @Composable
 fun DailyMedicineList(
+    modifier: Modifier = Modifier,
     medicineList: List<Medicine>,
     onItemClick: (Medicine) -> Unit,
     onNavigateToRoute: () -> Unit
@@ -39,7 +40,7 @@ fun DailyMedicineList(
     val takenMedicineList = medicineList.filter { it.isTaken }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(YakssokTheme.color.grey50)
     ) {
