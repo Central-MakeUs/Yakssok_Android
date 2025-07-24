@@ -1,6 +1,8 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.BuildConfig
+import com.pillsquad.yakssok.core.network.adapter.ApiResponseCallAdapterFactory
+import com.pillsquad.yakssok.core.network.api.AuthApi
 import com.pillsquad.yakssok.core.network.api.UserApi
 import dagger.Module
 import dagger.Provides
@@ -17,6 +19,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    private const val TYPE_JSON = "application/json"
 
     @Singleton
     @Provides
@@ -48,14 +52,19 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(json: Json, okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .client(okHttpClient)
             .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .addConverterFactory(json.asConverterFactory(TYPE_JSON.toMediaType()))
             .build()
 
-    private const val TYPE_JSON = "application/json"
-
     @Provides
+    @Singleton
     fun provideRetrofitApi(retrofit: Retrofit): UserApi =
         retrofit.create(UserApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAuthApi(retrofit: Retrofit): AuthApi =
+        retrofit.create(AuthApi::class.java)
 }
