@@ -7,5 +7,5 @@ plugins {
 setNamespace("feature.intro")
 
 dependencies {
-    implementation(libs.kakao)
+    implementation(libs.kakao.user)
 }

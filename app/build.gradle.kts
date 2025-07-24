@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.yakssok.android.application)
@@ -10,6 +11,8 @@ android {
         applicationId = "com.pillsquad.yakssok"
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "KAKAO_API_KEY", getProperty("KAKAO_API_KEY"))
     }
 
     packaging {
@@ -30,8 +33,14 @@ android {
     }
 }
 
+fun getProperty(key: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(key)
+}
+
 dependencies {
     implementation(projects.feature.main)
     implementation(projects.core.data)
     implementation(projects.core.network)
+
+    implementation(libs.kakao.user)
 }
