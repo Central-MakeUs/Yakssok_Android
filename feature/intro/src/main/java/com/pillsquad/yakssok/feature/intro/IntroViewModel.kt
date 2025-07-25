@@ -10,7 +10,6 @@ import com.kakao.sdk.user.UserApiClient
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,7 @@ class IntroViewModel @Inject constructor(
     }
 
     fun deleteLoginInfo() {
-        _uiState.update { it.copy(isHaveToSignup = false, nickName = "", isEnabled = false) }
+        _uiState.update { it.copy(isHaveToSignup = false, nickName = "", token  ="", isEnabled = false) }
     }
 
     fun changeNickName(nickName: String) {
@@ -38,7 +37,7 @@ class IntroViewModel @Inject constructor(
         }
     }
 
-    fun fetchNickName() {
+    fun signupUser(pushAgreement: Boolean) {
         _uiState.update { it.copy(isLoading = true) }
     }
 
@@ -78,7 +77,7 @@ class IntroViewModel @Inject constructor(
             _uiState.update {
                 when {
                     result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true)
-                    result.isSuccess && !result.getOrDefault(true) -> it.copy(isLoading = false, isHaveToSignup = true)
+                    result.isSuccess && !result.getOrDefault(true) -> it.copy(isLoading = false, isHaveToSignup = true, token = accessToken)
                     else -> it.copy(isLoading = false)
                 }
             }
