@@ -23,7 +23,7 @@ import com.pillsquad.yakssok.feature.routine.navigation.navigateRoutine
 internal class MainNavigator(
     val navController: NavHostController
 ) {
-    val startDestination = Route.Home
+    val startDestination = Route.Intro
 
     fun closeOptions(): NavOptions {
         return navOptions {
@@ -44,7 +44,7 @@ internal class MainNavigator(
     }
 
     fun navigateHome() {
-        navController.navigateHome(navOptions {  })
+        navController.navigateHome(closeOptions())
     }
 
     fun navigateIntro() {

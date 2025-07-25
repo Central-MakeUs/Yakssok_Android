@@ -10,6 +10,7 @@ import com.kakao.sdk.user.UserApiClient
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -39,6 +40,19 @@ class IntroViewModel @Inject constructor(
 
     fun signupUser(pushAgreement: Boolean) {
         _uiState.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            userRepository.joinUser(
+                accessToken = uiState.value.token,
+                nickName = uiState.value.nickName,
+                pushAgreement = pushAgreement
+            ).onSuccess {
+                loginUser(uiState.value.token)
+            }.onFailure {
+                // 실패 토스트
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
     }
 
     fun handleSignIn(context: Context) {
@@ -72,7 +86,9 @@ class IntroViewModel @Inject constructor(
 
     private fun loginUser(accessToken: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            if (uiState.value.isHaveToSignup) {
+                _uiState.update { it.copy(isLoading = true) }
+            }
             val result = userRepository.loginUser(accessToken)
             _uiState.update {
                 when {
@@ -91,6 +107,8 @@ class IntroViewModel @Inject constructor(
 
     private fun checkToken() {
         viewModelScope.launch {
+            delay(500)
+
             userRepository.checkToken().collect { valid ->
                 _uiState.update {
                     if (valid) it.copy(isLoading = true, loginSuccess = true)

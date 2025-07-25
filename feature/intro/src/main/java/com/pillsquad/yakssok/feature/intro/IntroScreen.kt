@@ -2,7 +2,12 @@ package com.pillsquad.yakssok.feature.intro
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.ContactsContract
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +19,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +37,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.YakssokDialog
@@ -47,25 +57,20 @@ internal fun IntroRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val context = LocalContext.current
     val activity = LocalView.current.context as Activity
 
-    var showRationale by remember { mutableStateOf(false) }
     var showSetting by remember { mutableStateOf(false) }
     var isPermissionGranted by remember { mutableStateOf(false) }
+    var pendingCheck by remember { mutableStateOf(false) }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-                activity,
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-
             when {
                 isGranted -> isPermissionGranted = true
-                shouldShowRationale -> showRationale = true
                 else -> showSetting = true
             }
         } else {
@@ -73,33 +78,25 @@ internal fun IntroRoute(
         }
     }
 
-    if (showRationale) {
-        NotificationAlertDialog(
-            onDismiss = {
-                showRationale = false
-                showSetting = true
-            },
-            onConfirm = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    isPermissionGranted = true
-                }
-            }
-        )
-    }
-
     if (showSetting) {
         SettingAlertDialog(
             onDismiss = {
-                showSetting = false
-            },
-            onConfirm = {
                 showSetting = false
                 if (uiState.loginSuccess) {
                     onNavigateHome()
                 } else {
                     viewModel.signupUser(false)
+                }
+            },
+            onConfirm = {
+                showSetting = false
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                    }
+                    pendingCheck = true
+                    activity.startActivity(intent)
                 }
             }
         )
@@ -111,19 +108,53 @@ internal fun IntroRoute(
         }
     }
 
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && pendingCheck) {
+                pendingCheck = false
+
+                val isGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
+
+                Log.d("PermissionCheck", "After settings, granted = $isGranted")
+
+                if (uiState.loginSuccess) {
+                    onNavigateHome()
+                } else {
+                    viewModel.signupUser(isGranted)
+                }
+            }
+        }
+
+        lifecycleOwner?.lifecycle?.addObserver(observer)
+        onDispose {
+            lifecycleOwner?.lifecycle?.removeObserver(observer)
+        }
+    }
+
     LaunchedEffect(uiState.loginSuccess) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            onNavigateHome()
+        if (uiState.loginSuccess) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                onNavigateHome()
+            }
         }
     }
 
     LaunchedEffect(isPermissionGranted) {
+        if (!isPermissionGranted) return@LaunchedEffect
+
         if (uiState.loginSuccess) {
             onNavigateHome()
         } else {
-            viewModel.signupUser(isPermissionGranted)
+            viewModel.signupUser(true)
         }
     }
 
