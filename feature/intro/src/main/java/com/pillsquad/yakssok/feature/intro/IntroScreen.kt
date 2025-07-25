@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,12 @@ internal fun IntroRoute(
     BackHandler {
         if (uiState.isHaveToSignup && !uiState.isLoading) {
             viewModel.deleteLoginInfo()
+        }
+    }
+
+    LaunchedEffect(uiState.loginSuccess) {
+        if (uiState.isLoading) {
+            onNavigateHome
         }
     }
 

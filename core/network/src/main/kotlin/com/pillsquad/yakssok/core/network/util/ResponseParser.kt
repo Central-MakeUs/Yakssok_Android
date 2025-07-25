@@ -16,8 +16,10 @@ internal fun <T> Response<BaseResponse<T>>.asApiResponse(): ApiResponse<T> {
             parseFailureResponse(this)
         }
     } catch (e: IOException) {
+        e.printStackTrace()
         ApiResponse.Failure.NetworkError(e)
     } catch (e: Exception) {
+        e.printStackTrace()
         ApiResponse.Failure.UnknownApiError(e)
     }
 }
@@ -33,6 +35,7 @@ private fun <T> parseFailureResponse(
         Json.parseToJsonElement(errorStr).jsonObject["message"]?.jsonPrimitive?.content
             ?: "Unknown error"
     } catch (e: Exception) {
+        e.printStackTrace()
         "파싱 실패: ${e.localizedMessage}"
     }
 

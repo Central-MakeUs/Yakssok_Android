@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class LoginRequest(
     val oauthAuthorizationCode: String,
     val oauthType: String,
-    val nonce: String
+    val nonce: String? = null
 )

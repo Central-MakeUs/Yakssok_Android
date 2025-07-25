@@ -7,6 +7,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IntroViewModel @Inject constructor(
-
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
@@ -48,7 +49,7 @@ class IntroViewModel @Inject constructor(
             if (error != null || token == null) {
                 // Snackbar or Toast 띄우기
             } else {
-                // server에 accessToken 전달
+                loginUser(token.accessToken)
             }
         }
 
@@ -62,8 +63,7 @@ class IntroViewModel @Inject constructor(
                     }
                     UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
                 } else {
-                    // 로그인 성공 처리
-                    // server에 accessToken 전달
+                    loginUser(token.accessToken)
                 }
             }
         } else {
@@ -73,8 +73,15 @@ class IntroViewModel @Inject constructor(
 
     private fun loginUser(accessToken: String) {
         viewModelScope.launch {
-            // server에 accessToken 전달
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = true) }
+            val result = userRepository.loginUser(accessToken)
+            _uiState.update {
+                when {
+                    result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true)
+                    result.isSuccess && !result.getOrDefault(true) -> it.copy(isLoading = false, isHaveToSignup = true)
+                    else -> it.copy(isLoading = false)
+                }
+            }
         }
     }
 
@@ -85,9 +92,12 @@ class IntroViewModel @Inject constructor(
 
     private fun checkToken() {
         viewModelScope.launch {
-            // datastore에서 token 존재하는지 확인
-            delay(1500)
-            _uiState.update { it.copy(isLoading = false) }
+            userRepository.checkToken().collect { valid ->
+                _uiState.update {
+                    if (valid) it.copy(isLoading = true, loginSuccess = true)
+                    else it.copy(isLoading = false)
+                }
+            }
         }
     }
 }
