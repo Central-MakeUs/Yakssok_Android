@@ -1,7 +1,10 @@
 package com.pillsquad.yakssok.core.domain.repository
 
-import com.pillsquad.yakssok.core.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun getUserByGymName(gymName: String): Result<User>
+
+    suspend fun loginUser(accessToken: String): Result<Boolean>
+
+    fun checkToken(): Flow<Boolean>
 }

@@ -27,3 +27,22 @@ inline fun <T, R> ApiResponse<T>.toResult(
             return Result.failure(throwable)
     }
 }
+
+fun <T> ApiResponse<T>.toResultForLogin(): Result<Boolean> {
+    return when (this) {
+        is ApiResponse.Success -> {
+            Result.success(true)
+        }
+        is ApiResponse.Failure.HttpError -> {
+            if (code == 3000L) {
+                Result.success(false)
+            } else {
+                Result.failure(Throwable("Http: $code: $message"))
+            }
+        }
+        is ApiResponse.Failure.NetworkError ->
+            Result.failure(throwable)
+        is ApiResponse.Failure.UnknownApiError ->
+            Result.failure(throwable)
+    }
+}

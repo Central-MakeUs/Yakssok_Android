@@ -12,18 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getUserByGymNameUseCase: GetUserByGymNameUseCase
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Init)
     val uiState: StateFlow<HomeUiState> = _uiState
-
-    fun searchUser(gymName: String) {
-        viewModelScope.launch {
-            _uiState.value = HomeUiState.Loading
-            getUserByGymNameUseCase(gymName)
-                .onSuccess { _uiState.value = HomeUiState.Success(it) }
-                .onFailure { _uiState.value = HomeUiState.Failure(it) }
-        }
-    }
 
 }

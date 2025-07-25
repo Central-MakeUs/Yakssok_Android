@@ -7,10 +7,4 @@ import retrofit2.http.Query
 
 interface UserApi {
 
-    // example
-    @GET("user")
-    suspend fun searchUser(
-        @Query("name") name: String
-    ): ApiResponse<UserResponse>
-
 }

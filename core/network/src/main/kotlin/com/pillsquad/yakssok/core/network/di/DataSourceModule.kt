@@ -1,8 +1,8 @@
 package com.pillsquad.yakssok.core.network.di
 
+import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
-import com.pillsquad.yakssok.core.network.retrofit.FakeUserDataSource
-import com.pillsquad.yakssok.core.network.retrofit.RetrofitUserDataSource
+import com.pillsquad.yakssok.core.network.retrofit.AuthRetrofitDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,15 +15,8 @@ import javax.inject.Named
 abstract class DataSourceModule {
 
     @Binds
-    @Named("RetrofitUser")
-    abstract fun bindUserDataSource(
-        retrofitUserDataSource: RetrofitUserDataSource
-    ): UserDataSource
-
-    @Binds
-    @Named("FakeUser")
-    abstract fun bindFakeUserDataSource(
-        fakeUserDataSource: FakeUserDataSource
-    ): UserDataSource
+    abstract fun bindAuthDataSource(
+        authRetrofitDataSource: AuthRetrofitDataSource
+    ): AuthDataSource
 
 }
