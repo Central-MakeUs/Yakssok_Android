@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,9 +27,10 @@ internal fun IntroRoute(
     onNavigateHome: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     BackHandler {
-        if (uiState.isLogin && !uiState.isLoading) {
+        if (uiState.isHaveToSignup && !uiState.isLoading) {
             viewModel.deleteLoginInfo()
         }
     }
@@ -47,7 +49,7 @@ internal fun IntroRoute(
             )
         }
 
-        uiState.isLogin -> {
+        uiState.isHaveToSignup -> {
             SignupScreen(
                 nickName = uiState.nickName,
                 onValueChange = viewModel::changeNickName,
@@ -59,7 +61,7 @@ internal fun IntroRoute(
 
         else -> {
             LoginScreen(
-                onClick = viewModel::handleSignIn
+                onClick = { viewModel.handleSignIn(context) }
             )
         }
     }
@@ -85,6 +87,7 @@ private fun LoginScreen(
                 tint = Color.Unspecified
             )
         }
+
         YakssokButton(
             modifier = Modifier.fillMaxWidth(),
             icon = R.drawable.ic_kakao,
