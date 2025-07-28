@@ -92,7 +92,7 @@ class IntroViewModel @Inject constructor(
             val result = userRepository.loginUser(accessToken)
             _uiState.update {
                 when {
-                    result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true)
+                    result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true, token = accessToken)
                     result.isSuccess && !result.getOrDefault(true) -> it.copy(isLoading = false, isHaveToSignup = true, token = accessToken)
                     else -> it.copy(isLoading = false)
                 }
@@ -107,11 +107,11 @@ class IntroViewModel @Inject constructor(
 
     private fun checkToken() {
         viewModelScope.launch {
-            delay(500)
+            delay(1000)
 
             userRepository.checkToken().collect { valid ->
                 _uiState.update {
-                    if (valid) it.copy(isLoading = true, loginSuccess = true)
+                    if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
                     else it.copy(isLoading = false)
                 }
             }
