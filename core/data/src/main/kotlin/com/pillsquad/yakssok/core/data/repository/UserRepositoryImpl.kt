@@ -1,5 +1,6 @@
-package com.pillsquad.yakssok.core.data
+package com.pillsquad.yakssok.core.data.repository
 
+import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toResultForLogin
@@ -50,10 +51,10 @@ class UserRepositoryImpl @Inject constructor(
             userLocalDataSource.saveRefreshToken(response.data.refreshToken)
         }
 
-//        getMyInfo().onFailure {
-//            it.printStackTrace()
-//            Log.e("UserRepositoryImpl", "loginUser: $it")
-//        }
+        getMyInfo().onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "loginUser: $it")
+        }
 
         return response.toResultForLogin()
     }

@@ -8,11 +8,21 @@ import com.pillsquad.yakssok.core.network.model.response.AccessTokenResponse
 import com.pillsquad.yakssok.core.network.model.response.TokenResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.PUT
 
-interface AuthApi {
+interface TokenApi {
 
-    @PUT("/api/auth/logout")
-    suspend fun logoutUser(
+    @POST("/api/auth/reissue")
+    suspend fun refreshToken(
+        @Body params: RefreshRequest
+    ): ApiResponse<AccessTokenResponse>
+
+    @POST("/api/auth/join")
+    suspend fun joinUser(
+        @Body params: JoinRequest
     ): ApiResponse<Unit>
+
+    @POST("/api/auth/login")
+    suspend fun loginUser(
+        @Body params: LoginRequest
+    ): ApiResponse<TokenResponse>
 }
