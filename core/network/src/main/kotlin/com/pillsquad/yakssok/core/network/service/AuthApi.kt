@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.network.api
+package com.pillsquad.yakssok.core.network.service
 
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.JoinRequest

@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.core.data
 
-import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toResultForLogin
@@ -11,7 +10,6 @@ import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.JoinRequest
 import com.pillsquad.yakssok.core.network.model.request.LoginRequest
-import com.pillsquad.yakssok.core.network.retrofit.UserRetrofitDataSource
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

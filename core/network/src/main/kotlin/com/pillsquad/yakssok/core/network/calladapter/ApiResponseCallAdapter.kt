@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.network.adapter
+package com.pillsquad.yakssok.core.network.calladapter
 
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.BaseResponse

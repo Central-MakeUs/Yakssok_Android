@@ -1,7 +1,7 @@
 package com.pillsquad.yakssok.core.network
 
-import com.pillsquad.yakssok.core.network.adapter.ApiResponseCallAdapterFactory
-import com.pillsquad.yakssok.core.network.api.UserApi
+import com.pillsquad.yakssok.core.network.calladapter.ApiResponseCallAdapterFactory
+import com.pillsquad.yakssok.core.network.service.UserApi
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json

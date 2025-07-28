@@ -1,6 +1,6 @@
-package com.pillsquad.yakssok.core.network.retrofit
+package com.pillsquad.yakssok.core.network.remote
 
-import com.pillsquad.yakssok.core.network.api.AuthApi
+import com.pillsquad.yakssok.core.network.service.AuthApi
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.JoinRequest
