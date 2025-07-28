@@ -26,7 +26,7 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.AlarmType
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.routine.component.CompleteDialog
@@ -231,7 +231,7 @@ internal fun RoutineScreen(
     userName: String,
     uiState: RoutineUiModel,
     onPillNameChange: (String) -> Unit,
-    onPillTypeChange: (PillType) -> Unit,
+    onPillTypeChange: (MedicationType) -> Unit,
     onStartDateChange: () -> Unit,
     onEndDateChange: () -> Unit,
     onIntakeDayChange: () -> Unit,
@@ -257,7 +257,7 @@ internal fun RoutineScreen(
                 0 -> FirstContent(
                     userName = userName,
                     pillName = uiState.pillName,
-                    selectedPillType = uiState.pillType,
+                    selectedMedicationType = uiState.medicationType,
                     onPillNameChange = onPillNameChange,
                     onPillTypeChange = onPillTypeChange
                 )

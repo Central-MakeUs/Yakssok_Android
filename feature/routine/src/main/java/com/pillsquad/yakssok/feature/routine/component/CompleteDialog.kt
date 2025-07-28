@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.ui.component.PillTypeCard
 import com.pillsquad.yakssok.core.ui.component.WeekRow
 import com.pillsquad.yakssok.core.ui.component.YakssokDialog
@@ -85,7 +85,7 @@ private fun InfoCard(
                 .background(Color.Transparent)
                 .padding(16.dp)
         ) {
-            PillTypeCard(uiState.pillType ?: PillType.OTHER)
+            PillTypeCard(uiState.medicationType ?: MedicationType.OTHER)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = uiState.pillName,

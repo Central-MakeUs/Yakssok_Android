@@ -2,7 +2,7 @@ package com.pillsquad.yakssok.feature.myroutine
 
 import androidx.lifecycle.ViewModel
 import com.pillsquad.yakssok.core.model.PillProgressType
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.myroutine.model.PillUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ class MyRoutineViewModel @Inject constructor(
     val testList = listOf(
         PillUiModel(
             pillName = "아세트아미노펜",
-            pillType = PillType.OTHER,
+            medicationType = MedicationType.OTHER,
             pillProgressType = PillProgressType.BEFORE,
             intakeCount = 1,
             intakeDays = listOf(WeekType.MONDAY, WeekType.TUESDAY, WeekType.WEDNESDAY, WeekType.THURSDAY, WeekType.FRIDAY, WeekType.SATURDAY, WeekType.SUNDAY),
@@ -28,7 +28,7 @@ class MyRoutineViewModel @Inject constructor(
         ),
         PillUiModel(
             pillName = "아아미노펜",
-            pillType = PillType.SUPPLEMENT,
+            medicationType = MedicationType.SUPPLEMENT,
             pillProgressType = PillProgressType.IN_PROGRESS,
             intakeCount = 1,
             intakeDays = listOf(WeekType.MONDAY, WeekType.TUESDAY, WeekType.WEDNESDAY, WeekType.THURSDAY, WeekType.FRIDAY, WeekType.SATURDAY, WeekType.SUNDAY),
@@ -36,7 +36,7 @@ class MyRoutineViewModel @Inject constructor(
         ),
         PillUiModel(
             pillName = "타이레놀",
-            pillType = PillType.TEMPORARY,
+            medicationType = MedicationType.TEMPORARY,
             pillProgressType = PillProgressType.AFTER,
             intakeCount = 1,
             intakeDays = listOf(WeekType.MONDAY, WeekType.TUESDAY, WeekType.WEDNESDAY, WeekType.THURSDAY, WeekType.FRIDAY, WeekType.SATURDAY, WeekType.SUNDAY),
