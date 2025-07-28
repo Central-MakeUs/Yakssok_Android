@@ -160,7 +160,7 @@ internal fun IntroRoute(
 
     when {
         uiState.isLoading -> {
-            val (loadingBackground, loadingIcon) = if (uiState.nickName.isEmpty()) {
+            val (loadingBackground, loadingIcon) = if (uiState.token.isBlank()) {
                 YakssokTheme.color.primary400 to R.drawable.img_splash_logo
             } else {
                 YakssokTheme.color.grey50 to R.drawable.img_signup_loading
