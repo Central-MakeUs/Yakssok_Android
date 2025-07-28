@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.BuildConfig
 import com.pillsquad.yakssok.core.network.calladapter.ApiResponseCallAdapterFactory
+import com.pillsquad.yakssok.core.network.interceptor.TokenInterceptor
 import com.pillsquad.yakssok.core.network.service.AuthApi
 import com.pillsquad.yakssok.core.network.service.UserApi
 import dagger.Module
@@ -14,7 +15,24 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class TokenInterceptorHttpClient
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class NoHeaderHttpClient
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class TokenRetrofit
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class NoHeaderRetrofit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,49 +40,66 @@ object NetworkModule {
 
     private const val TYPE_JSON = "application/json"
 
-    @Singleton
     @Provides
+    @Singleton
     fun providesNetworkJson(): Json = Json {
-        // Json을 보기 좋게 들여쓰기 형태로 출력 (디버깅)
         prettyPrint = true
-        // Json에 정의되지 않은 필드가 있어도 무시하고 파싱 (버전 호환성 향상)
         ignoreUnknownKeys = true
-        // 기본값도 JSON에 포함하여 직렬화(디버깅, 전체 상태 저장용)
         encodeDefaults = true
     }
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient =
-        OkHttpClient.Builder()
-            .apply {
-                if (BuildConfig.DEBUG) {
-                    addNetworkInterceptor(
-                        HttpLoggingInterceptor().apply {
-                            level = HttpLoggingInterceptor.Level.BODY
-                        }
-                    )
-                }
-            }
-            .build()
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
 
+    @TokenInterceptorHttpClient
     @Provides
     @Singleton
-    fun provideRetrofit(json: Json, okHttpClient: OkHttpClient): Retrofit =
+    fun provideTokenHttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(tokenInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
+
+    @NoHeaderHttpClient
+    @Provides
+    @Singleton
+    fun provideNoHeaderHttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
+
+    @TokenRetrofit
+    @Provides
+    @Singleton
+    fun provideTokenRetrofit(
+        @TokenInterceptorHttpClient okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(json.asConverterFactory(TYPE_JSON.toMediaType()))
             .build()
 
+    @NoHeaderRetrofit
     @Provides
     @Singleton
-    fun provideRetrofitApi(retrofit: Retrofit): UserApi =
-        retrofit.create(UserApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi =
-        retrofit.create(AuthApi::class.java)
+    fun provideNoHeaderRetrofit(
+        @NoHeaderHttpClient okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit =
+        Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(json.asConverterFactory(TYPE_JSON.toMediaType()))
+            .build()
 }

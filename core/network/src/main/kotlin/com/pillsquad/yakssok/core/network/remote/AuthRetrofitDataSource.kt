@@ -8,20 +8,22 @@ import com.pillsquad.yakssok.core.network.model.request.LoginRequest
 import com.pillsquad.yakssok.core.network.model.request.RefreshRequest
 import com.pillsquad.yakssok.core.network.model.response.AccessTokenResponse
 import com.pillsquad.yakssok.core.network.model.response.TokenResponse
+import com.pillsquad.yakssok.core.network.service.TokenApi
 import javax.inject.Inject
 
 class AuthRetrofitDataSource @Inject constructor(
-    private val authApi: AuthApi
+    private val authApi: AuthApi,
+    private val tokenApi: TokenApi
 ) : AuthDataSource {
     override suspend fun joinUser(params: JoinRequest): ApiResponse<Unit> =
-        authApi.joinUser(params)
+        tokenApi.joinUser(params)
 
     override suspend fun loginUser(params: LoginRequest): ApiResponse<TokenResponse> =
-        authApi.loginUser(params)
+        tokenApi.loginUser(params)
 
     override suspend fun logoutUser(): ApiResponse<Unit> =
         authApi.logoutUser()
 
     override suspend fun refreshToken(params: RefreshRequest): ApiResponse<AccessTokenResponse> =
-        authApi.refreshToken(params)
+        tokenApi.refreshToken(params)
 }

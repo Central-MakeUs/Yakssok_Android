@@ -48,4 +48,8 @@ class UserLocalDataSource @Inject constructor(
     suspend fun saveOauthType(oauthType: String) {
         userPreferences.saveOauthType(oauthType)
     }
+
+    suspend fun clearTokens() {
+        userPreferences.clearTokens()
+    }
 }

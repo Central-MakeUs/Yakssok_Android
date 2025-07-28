@@ -81,4 +81,11 @@ class UserPreferences @Inject constructor(
     suspend fun saveOauthType(oauthType: String) {
         dataStore.edit { it[OAUTH_TYPE] = oauthType }
     }
+
+    suspend fun clearTokens() {
+        dataStore.edit {
+            it.remove(ACCESS_TOKEN_KEY)
+            it.remove(REFRESH_TOKEN_KEY)
+        }
+    }
 }
