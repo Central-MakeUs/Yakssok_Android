@@ -1,9 +1,9 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.BuildConfig
-import com.pillsquad.yakssok.core.network.adapter.ApiResponseCallAdapterFactory
-import com.pillsquad.yakssok.core.network.api.AuthApi
-import com.pillsquad.yakssok.core.network.api.UserApi
+import com.pillsquad.yakssok.core.network.calladapter.ApiResponseCallAdapterFactory
+import com.pillsquad.yakssok.core.network.service.AuthApi
+import com.pillsquad.yakssok.core.network.service.UserApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
