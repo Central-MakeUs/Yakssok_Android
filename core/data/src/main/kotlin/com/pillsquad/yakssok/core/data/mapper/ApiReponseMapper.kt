@@ -4,7 +4,7 @@ import android.util.Log
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 
 inline fun <T, R> ApiResponse<T>.toResult(
-    transform: (T) -> R,
+    @Suppress("UNCHECKED_CAST") transform: (T) -> R = { it as R },
     // TODO: Error Code에 따른 action 처리 ex)410이면 자동 로그아웃
     codeActionMap: Map<Long, () -> Unit> = emptyMap()
 ): Result<R> {

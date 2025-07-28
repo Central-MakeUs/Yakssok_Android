@@ -2,7 +2,7 @@ package com.pillsquad.yakssok.feature.routine
 
 import androidx.lifecycle.ViewModel
 import com.pillsquad.yakssok.core.model.AlarmType
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,9 +33,9 @@ class RoutineViewModel @Inject constructor(
         updateEnabled()
     }
 
-    fun updatePillType(type: PillType) {
+    fun updatePillType(type: MedicationType) {
         _uiState.update {
-            it.copy(pillType = type)
+            it.copy(medicationType = type)
         }
         updateEnabled()
     }
@@ -80,7 +80,7 @@ class RoutineViewModel @Inject constructor(
 
     fun updateEnabled() {
         val isFirstEnabled =
-            uiState.value.pillType != null && uiState.value.pillName.trim().isNotEmpty()
+            uiState.value.medicationType != null && uiState.value.pillName.trim().isNotEmpty()
         _uiState.update {
             it.copy(
                 enabled = listOf(isFirstEnabled, true, true)

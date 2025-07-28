@@ -1,7 +1,7 @@
 package com.pillsquad.yakssok.feature.routine.model
 
 import com.pillsquad.yakssok.core.model.AlarmType
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.util.now
 import com.pillsquad.yakssok.feature.routine.util.today
@@ -14,7 +14,7 @@ data class RoutineUiModel(
     val curPage: Int = 0,
     val enabled: List<Boolean> = listOf(false, true, true),
     val pillName: String = "",
-    val pillType: PillType? = null,
+    val medicationType: MedicationType? = null,
     val startDate: LocalDate = LocalDate.today(),
     val endDate: LocalDate? = null,
     val intakeCount: Int = 1,

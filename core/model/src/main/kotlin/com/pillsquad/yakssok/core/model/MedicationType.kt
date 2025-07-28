@@ -1,6 +1,6 @@
 package com.pillsquad.yakssok.core.model
 
-enum class PillType(val krName: String, val color: Long) {
+enum class MedicationType(val krName: String, val color: Long) {
     MENTAL("정신 건강 관리", 0xFF7C24DB),
     BEAUTY("미용 관련 관리", 0xFF3ADE4D),
     CHRONIC("만성 질환 관리", 0xFF40B0FA),

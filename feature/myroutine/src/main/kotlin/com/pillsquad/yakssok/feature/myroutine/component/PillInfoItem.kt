@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokIconButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.PillProgressType
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.core.ui.component.PillTypeCard
 import com.pillsquad.yakssok.core.ui.component.WeekRow
@@ -41,7 +41,7 @@ internal fun InfoCard(
             )
     ) {
         TopColumn(
-            pillType = uiModel.pillType,
+            medicationType = uiModel.medicationType,
             pillName = uiModel.pillName,
             intakeDays = uiModel.intakeDays,
             progressType = uiModel.pillProgressType,
@@ -59,7 +59,7 @@ internal fun InfoCard(
 
 @Composable
 private fun TopColumn(
-    pillType: PillType,
+    medicationType: MedicationType,
     progressType: PillProgressType,
     pillName: String,
     intakeDays: List<WeekType>,
@@ -73,7 +73,7 @@ private fun TopColumn(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            PillTypeCard(pillType)
+            PillTypeCard(medicationType)
             Spacer(modifier = Modifier.width(8.dp))
             PillProgressTypeCard(progressType)
             Spacer(modifier = Modifier.weight(1f))

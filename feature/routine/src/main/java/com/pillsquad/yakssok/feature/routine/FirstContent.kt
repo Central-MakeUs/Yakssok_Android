@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.ui.ext.toBackground
 import com.pillsquad.yakssok.feature.routine.component.RoutineText
 
@@ -35,9 +34,9 @@ import com.pillsquad.yakssok.feature.routine.component.RoutineText
 internal fun FirstContent(
     userName: String,
     pillName: String,
-    selectedPillType: PillType?,
+    selectedMedicationType: MedicationType?,
     onPillNameChange: (String) -> Unit,
-    onPillTypeChange: (PillType) -> Unit
+    onPillTypeChange: (MedicationType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -64,7 +63,7 @@ internal fun FirstContent(
         )
         Spacer(modifier = Modifier.height(20.dp))
         PillTypeRow(
-            selectedPillType = selectedPillType,
+            selectedMedicationType = selectedMedicationType,
             onPillTypeChange = onPillTypeChange
         )
     }
@@ -72,18 +71,18 @@ internal fun FirstContent(
 
 @Composable
 private fun PillTypeRow(
-    selectedPillType: PillType?,
-    onPillTypeChange: (PillType) -> Unit
+    selectedMedicationType: MedicationType?,
+    onPillTypeChange: (MedicationType) -> Unit
 ) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
     ) {
-        PillType.entries.forEach { pillType ->
+        MedicationType.entries.forEach { pillType ->
             PillTypeItem(
-                pillType = pillType,
-                isSelected = selectedPillType == pillType,
+                medicationType = pillType,
+                isSelected = selectedMedicationType == pillType,
                 onClick = { onPillTypeChange(pillType) }
             )
         }
@@ -92,12 +91,12 @@ private fun PillTypeRow(
 
 @Composable
 private fun PillTypeItem(
-    pillType: PillType,
+    medicationType: MedicationType,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) Color(pillType.color) else YakssokTheme.color.grey200
-    val textColor = if (isSelected) Color(pillType.color) else YakssokTheme.color.grey700
+    val borderColor = if (isSelected) Color(medicationType.color) else YakssokTheme.color.grey200
+    val textColor = if (isSelected) Color(medicationType.color) else YakssokTheme.color.grey700
 
     Row(
         modifier = Modifier
@@ -107,7 +106,7 @@ private fun PillTypeItem(
                 shape = RoundedCornerShape(12.dp)
             )
             .background(
-                color = if (isSelected) pillType.toBackground() else Color.Transparent,
+                color = if (isSelected) medicationType.toBackground() else Color.Transparent,
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable(
@@ -126,7 +125,7 @@ private fun PillTypeItem(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = pillType.krName,
+            text = medicationType.krName,
             style = YakssokTheme.typography.body2,
             color = textColor
         )

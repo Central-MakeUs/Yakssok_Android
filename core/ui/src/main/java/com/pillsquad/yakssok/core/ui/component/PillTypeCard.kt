@@ -15,17 +15,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.PillType
+import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.ui.ext.toBackground
 
 @Composable
 fun PillTypeCard(
-    pillType: PillType
+    medicationType: MedicationType
 ) {
     Row(
         modifier = Modifier
             .background(
-                color = pillType.toBackground(),
+                color = medicationType.toBackground(),
                 shape = CircleShape
             )
             .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -35,13 +35,13 @@ fun PillTypeCard(
             modifier = Modifier
                 .size(6.dp)
                 .clip(CircleShape)
-                .background(Color(pillType.color))
+                .background(Color(medicationType.color))
         )
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-            text = pillType.krName,
+            text = medicationType.krName,
             style = YakssokTheme.typography.caption,
-            color = Color(pillType.color)
+            color = Color(medicationType.color)
         )
     }
 }

@@ -14,4 +14,5 @@ dependencies {
     implementation(projects.core.datastore)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.datetime)
 }
