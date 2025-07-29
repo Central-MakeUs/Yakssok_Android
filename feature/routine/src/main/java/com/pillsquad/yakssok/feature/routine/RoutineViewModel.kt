@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
-import com.pillsquad.yakssok.core.domain.usecase.ReleaseSoundPoolUseCase
+import com.pillsquad.yakssok.core.domain.usecase.StopAlarmSoundUseCase
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
@@ -31,7 +31,7 @@ sealed interface RoutineEvent {
 class RoutineViewModel @Inject constructor(
     private val postMedicationUseCase: PostMedicationUseCase,
     private val playAlarmSoundUseCase: PlayAlarmSoundUseCase,
-    private val releaseSoundPoolUseCase: ReleaseSoundPoolUseCase,
+    private val stopAlarmSoundUseCase: StopAlarmSoundUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
@@ -73,7 +73,7 @@ class RoutineViewModel @Inject constructor(
         viewModelScope.launch {
             postMedicationUseCase(medication)
                 .onSuccess {
-                    releaseSoundPool()
+                    stopSoundPool()
                     _event.emit(RoutineEvent.NavigateBack)
                 }.onFailure {
                     it.printStackTrace()
@@ -83,9 +83,9 @@ class RoutineViewModel @Inject constructor(
         }
     }
 
-    fun releaseSoundPool() {
+    fun stopSoundPool() {
         viewModelScope.launch {
-            releaseSoundPoolUseCase(uiState.value.alarmType)
+            stopAlarmSoundUseCase(uiState.value.alarmType)
         }
     }
 
