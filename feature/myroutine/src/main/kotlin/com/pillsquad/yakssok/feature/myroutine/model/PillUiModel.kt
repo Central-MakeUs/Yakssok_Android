@@ -20,5 +20,5 @@ data class PillUiModel(
         WeekType.SUNDAY
     ),
     val intakeTimes: String = "",
-    val alarmType: AlarmType = AlarmType.NAGGING
+    val alarmType: AlarmType = AlarmType.SCOLD
 )

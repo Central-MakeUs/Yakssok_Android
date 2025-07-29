@@ -87,6 +87,7 @@ object NetworkModule {
         Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(BuildConfig.BASE_URL)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .addConverterFactory(json.asConverterFactory(TYPE_JSON.toMediaType()))
             .build()
 
@@ -100,6 +101,7 @@ object NetworkModule {
         Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(BuildConfig.BASE_URL)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .addConverterFactory(json.asConverterFactory(TYPE_JSON.toMediaType()))
             .build()
 }

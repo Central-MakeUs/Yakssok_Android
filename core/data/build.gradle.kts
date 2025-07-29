@@ -8,6 +8,7 @@ plugins {
 setNamespace("core.data")
 
 dependencies {
+    implementation(projects.core.common)
     implementation(projects.core.domain)
     implementation(projects.core.model)
     implementation(projects.core.network)
