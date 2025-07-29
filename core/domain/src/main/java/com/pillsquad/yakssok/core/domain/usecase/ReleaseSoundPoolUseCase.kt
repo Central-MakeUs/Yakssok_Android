@@ -5,12 +5,12 @@ import com.pillsquad.yakssok.core.model.AlarmType
 import javax.inject.Inject
 
 class ReleaseSoundPoolUseCase @Inject constructor(
-    private val soundManager: SoundRepository
+    private val soundRepository: SoundRepository
 ) {
     operator fun invoke(prevAlarm: AlarmType?) {
         prevAlarm?.let {
-            soundManager.stopSound(it)
+            soundRepository.stopSound(it)
         }
-        soundManager.release()
+        soundRepository.release()
     }
 }

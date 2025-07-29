@@ -5,13 +5,13 @@ import com.pillsquad.yakssok.core.model.AlarmType
 import javax.inject.Inject
 
 class PlayAlarmSoundUseCase @Inject constructor(
-    private val soundManager: SoundRepository
+    private val soundRepository: SoundRepository
 ) {
     operator fun invoke(curAlarm: AlarmType, prevAlarm: AlarmType?) {
         if (curAlarm == prevAlarm) return
         prevAlarm?.let {
-            soundManager.stopSound(it)
+            soundRepository.stopSound(it)
         }
-        soundManager.playSound(curAlarm)
+        soundRepository.playSound(curAlarm)
     }
 }
