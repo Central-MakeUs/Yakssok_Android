@@ -3,7 +3,9 @@ package com.pillsquad.yakssok.feature.routine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
+import com.pillsquad.yakssok.core.domain.usecase.ReleaseSoundPoolUseCase
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
@@ -27,7 +29,9 @@ sealed interface RoutineEvent {
 
 @HiltViewModel
 class RoutineViewModel @Inject constructor(
-    private val postMedicationUseCase: PostMedicationUseCase
+    private val postMedicationUseCase: PostMedicationUseCase,
+    private val playAlarmSoundUseCase: PlayAlarmSoundUseCase,
+    private val releaseSoundPoolUseCase: ReleaseSoundPoolUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
@@ -49,7 +53,10 @@ class RoutineViewModel @Inject constructor(
         copy(intakeTimes = intakeTimes.mapIndexed { i, t -> if (i == index) time else t })
     }
 
-    fun updateAlarmType(type: AlarmType) = updateState { copy(alarmType = type) }
+    fun updateAlarmType(type: AlarmType) {
+        playAlarmSoundUseCase(type, uiState.value.alarmType)
+        updateState { copy(alarmType = type) }
+    }
 
     fun updatePillName(name: String) {
         _uiState.update { it.copy(pillName = name) }
@@ -66,6 +73,7 @@ class RoutineViewModel @Inject constructor(
         viewModelScope.launch {
             postMedicationUseCase(medication)
                 .onSuccess {
+                    releaseSoundPoolUseCase(uiState.value.alarmType)
                     _event.emit(RoutineEvent.NavigateBack)
                 }.onFailure {
                     it.printStackTrace()
