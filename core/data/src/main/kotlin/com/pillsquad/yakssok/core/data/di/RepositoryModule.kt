@@ -2,7 +2,9 @@ package com.pillsquad.yakssok.core.data.di
 
 import com.pillsquad.yakssok.core.data.repository.MedicationRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserRepositoryImpl
+import com.pillsquad.yakssok.core.data.sound.SoundRepositoryImpl
 import com.pillsquad.yakssok.core.domain.repository.MedicationRepository
+import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -23,4 +25,8 @@ abstract class RepositoryModule {
         medicationRepository: MedicationRepositoryImpl
     ): MedicationRepository
 
+    @Binds
+    abstract fun bindSoundRepository(
+        soundRepository: SoundRepositoryImpl
+    ): SoundRepository
 }

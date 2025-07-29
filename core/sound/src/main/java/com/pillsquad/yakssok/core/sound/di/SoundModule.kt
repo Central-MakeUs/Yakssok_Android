@@ -1,8 +1,7 @@
-package com.pillsquad.yakssok.core.data.di
+package com.pillsquad.yakssok.core.sound.di
 
 import android.content.Context
-import com.pillsquad.yakssok.core.data.sound.SoundManager
-import com.pillsquad.yakssok.core.domain.repository.SoundRepository
+import com.pillsquad.yakssok.core.sound.SoundManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,5 +17,5 @@ object SoundModule {
     @Singleton
     fun provideSoundManager(
         @ApplicationContext context: Context,
-    ): SoundRepository = SoundManager(context)
+    ): SoundManager = SoundManager(context)
 }
