@@ -73,13 +73,19 @@ class RoutineViewModel @Inject constructor(
         viewModelScope.launch {
             postMedicationUseCase(medication)
                 .onSuccess {
-                    releaseSoundPoolUseCase(uiState.value.alarmType)
+                    releaseSoundPool()
                     _event.emit(RoutineEvent.NavigateBack)
                 }.onFailure {
                     it.printStackTrace()
                     Log.e("RoutineViewModel", "postMedication: ${it.message}")
                     _event.emit(RoutineEvent.ShowToast("약을 등록하는데 실패했습니다."))
                 }
+        }
+    }
+
+    fun releaseSoundPool() {
+        viewModelScope.launch {
+            releaseSoundPoolUseCase(uiState.value.alarmType)
         }
     }
 

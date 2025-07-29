@@ -18,6 +18,7 @@ class SoundManager @Inject constructor(
         .build()
 
     private val soundMap: HashMap<AlarmType, Int> = HashMap(5)
+    private val streamIdMap: HashMap<AlarmType, Int> = HashMap(5)
 
     init {
        loadSounds()
@@ -25,16 +26,19 @@ class SoundManager @Inject constructor(
 
     override fun playSound(alarmType: AlarmType) {
         val soundId = soundMap[alarmType] ?: return
-        soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
+        val streamId = soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
+        streamIdMap[alarmType] = streamId
     }
 
     override fun stopSound(alarmType: AlarmType) {
-        val soundId = soundMap[alarmType] ?: return
-        soundPool.stop(soundId)
+        val streamId = streamIdMap[alarmType] ?: return
+        soundPool.stop(streamId)
+        streamIdMap.remove(alarmType)
     }
 
     override fun release() {
         soundPool.release()
+        streamIdMap.clear()
     }
 
     private fun loadSounds() {

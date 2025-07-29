@@ -67,6 +67,8 @@ internal fun RoutineRoute(
     var isComplete by remember { mutableStateOf(false) }
 
     BackHandler {
+        if (uiState.curPage == 2) viewModel.releaseSoundPool()
+
         if (uiState.curPage > 0) {
             viewModel.updateCurPage(uiState.curPage - 1)
         } else {
@@ -222,6 +224,8 @@ internal fun RoutineRoute(
             viewModel.updateAlarmType(it)
         },
         onBackClick = {
+            if (uiState.curPage == 2) viewModel.releaseSoundPool()
+
             if (uiState.curPage > 0) {
                 viewModel.updateCurPage(uiState.curPage - 1)
             } else {
