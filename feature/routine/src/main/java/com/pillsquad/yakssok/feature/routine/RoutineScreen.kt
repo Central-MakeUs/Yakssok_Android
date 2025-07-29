@@ -84,7 +84,6 @@ internal fun RoutineRoute(
 
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            viewModel.stopSoundPool()
         }
     }
 

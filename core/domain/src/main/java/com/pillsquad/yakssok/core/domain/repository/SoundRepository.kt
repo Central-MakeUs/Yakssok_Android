@@ -6,4 +6,5 @@ interface SoundRepository {
     fun initSoundPool()
     fun playSound(alarmType: AlarmType)
     fun stopSound(alarmType: AlarmType)
+    fun releaseSoundPool()
 }
