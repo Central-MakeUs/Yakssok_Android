@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.routine
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -20,10 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
@@ -66,8 +68,28 @@ internal fun RoutineRoute(
     var isIntakeDaysShow by remember { mutableStateOf(false) }
     var isComplete by remember { mutableStateOf(false) }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    viewModel.stopSoundPool()
+                }
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.stopSoundPool()
+        }
+    }
+
     BackHandler {
-        if (uiState.curPage == 2) viewModel.releaseSoundPool()
+        if (uiState.curPage == 2) viewModel.stopSoundPool()
 
         if (uiState.curPage > 0) {
             viewModel.updateCurPage(uiState.curPage - 1)
@@ -224,7 +246,7 @@ internal fun RoutineRoute(
             viewModel.updateAlarmType(it)
         },
         onBackClick = {
-            if (uiState.curPage == 2) viewModel.releaseSoundPool()
+            if (uiState.curPage == 2) viewModel.stopSoundPool()
 
             if (uiState.curPage > 0) {
                 viewModel.updateCurPage(uiState.curPage - 1)
