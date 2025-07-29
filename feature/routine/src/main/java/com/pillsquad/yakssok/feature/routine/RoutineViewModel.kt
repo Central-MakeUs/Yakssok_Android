@@ -3,8 +3,10 @@ package com.pillsquad.yakssok.feature.routine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.InitSoundPoolUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
+import com.pillsquad.yakssok.core.domain.usecase.ReleaseSoundPoolUseCase
 import com.pillsquad.yakssok.core.domain.usecase.StopAlarmSoundUseCase
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.MedicationType
@@ -31,13 +33,19 @@ sealed interface RoutineEvent {
 class RoutineViewModel @Inject constructor(
     private val postMedicationUseCase: PostMedicationUseCase,
     private val playAlarmSoundUseCase: PlayAlarmSoundUseCase,
-    private val stopAlarmSoundUseCase: StopAlarmSoundUseCase
+    private val stopAlarmSoundUseCase: StopAlarmSoundUseCase,
+    private val releaseSoundPoolUseCase: ReleaseSoundPoolUseCase,
+    private val initSoundPoolUseCase: InitSoundPoolUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
 
     private val _event = MutableSharedFlow<RoutineEvent>()
     val event = _event.asSharedFlow()
+
+    init {
+        initSoundPoolUseCase()
+    }
 
     fun updateCurPage(newPage: Int) = updateState { copy(curPage = newPage) }
 
@@ -97,5 +105,10 @@ class RoutineViewModel @Inject constructor(
 
     private inline fun updateState(update: RoutineUiModel.() -> RoutineUiModel) {
         _uiState.update { it.update() }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        releaseSoundPoolUseCase()
     }
 }

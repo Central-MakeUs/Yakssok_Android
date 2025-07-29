@@ -11,15 +11,13 @@ import javax.inject.Singleton
 class SoundRepositoryImpl @Inject constructor(
     private val soundManager: SoundManager
 ) : SoundRepository {
-    override fun initSoundPool() {
-        soundManager.reInitIfNeeded()
-    }
+    override fun initSoundPool() = soundManager.reInitIfNeeded()
 
-    override fun playSound(alarmType: AlarmType) {
+    override fun playSound(alarmType: AlarmType) =
         soundManager.playSound(alarmType.toSoundType())
-    }
 
-    override fun stopSound(alarmType: AlarmType) {
+    override fun stopSound(alarmType: AlarmType) =
         soundManager.stopSound(alarmType.toSoundType())
-    }
+
+    override fun releaseSoundPool() = soundManager.releaseSoundPool()
 }

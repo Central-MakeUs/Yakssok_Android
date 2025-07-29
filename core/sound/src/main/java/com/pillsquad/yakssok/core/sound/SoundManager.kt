@@ -34,6 +34,13 @@ class SoundManager @Inject constructor(
         streamIdMap.remove(soundType)
     }
 
+    fun releaseSoundPool() {
+        soundPool?.release()
+        soundPool = null
+        soundMap.clear()
+        streamIdMap.clear()
+    }
+
     fun reInitIfNeeded() {
         if (soundPool == null) {
             initSoundPool()
