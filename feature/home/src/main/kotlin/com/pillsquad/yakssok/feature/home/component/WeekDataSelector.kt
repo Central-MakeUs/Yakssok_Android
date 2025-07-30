@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,7 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.home.R
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
 @Composable
 internal fun WeekDataSelector(
@@ -60,7 +60,7 @@ private fun CalendarHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "${selectedDate.year}년 ${selectedDate.monthValue}월",
+            text = "${selectedDate.year}년 ${selectedDate.month.number}월",
             style = YakssokTheme.typography.body2,
             color = YakssokTheme.color.grey500
         )

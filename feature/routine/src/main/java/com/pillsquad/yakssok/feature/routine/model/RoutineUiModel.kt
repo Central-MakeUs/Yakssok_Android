@@ -1,11 +1,11 @@
 package com.pillsquad.yakssok.feature.routine.model
 
+import com.pillsquad.yakssok.core.common.now
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.Medication
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
-import com.pillsquad.yakssok.feature.routine.util.now
-import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.ExperimentalTime

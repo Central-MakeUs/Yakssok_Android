@@ -16,9 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,17 +25,22 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
-import com.pillsquad.yakssok.core.model.Mate
 import com.pillsquad.yakssok.core.model.Medicine
+import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
-import java.time.LocalDate
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 @Composable
 internal fun HomeRoute(
@@ -48,41 +51,21 @@ internal fun HomeRoute(
     onNavigateMyPage: () -> Unit,
     onNavigateCalendar: () -> Unit
 ) {
-    var userName by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     HomeScreen(
+        showFeedBackSection = uiState.showFeedBackSection,
+        selectedDate = uiState.selectedDate,
+        userProfileList = uiState.userList,
         scrollState = scrollState,
-        mateList = listOf(
-            Mate(
-                id = 1,
-                name = "임용수",
-                nickName = "나",
-                profileImage = "https://picsum.photos/200",
-                remainedMedicine = 1
-            ),
-            Mate(
-                id = 2,
-                name = "조앵",
-                nickName = "PM",
-                profileImage = "https://picsum.photos/200",
-                remainedMedicine = 0
-            ),
-            Mate(
-                id = 3,
-                name = "리아",
-                nickName = "iOS",
-                profileImage = "https://picsum.photos/200",
-                remainedMedicine = 3
-            ),
-            Mate(
-                id = 4,
-                name = "노을",
-                nickName = "Server",
-                profileImage = "https://picsum.photos/200",
-                remainedMedicine = 3
-            )
-        ),
+        selectedUserIdx = uiState.selectedUserIdx,
+        onClickUser = {
+            viewModel.onMateClick(it)
+        },
+        onSelectDate = {
+            viewModel.onSelectedDate(it)
+        },
         onNavigateMy = onNavigateMyPage,
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
@@ -93,13 +76,14 @@ internal fun HomeRoute(
 
 @Composable
 private fun HomeScreen(
-    isRounded: Boolean = false,
-    mateList: List<Mate> = emptyList(),
-    medicineList: List<Medicine> = emptyList(),
-    clickedMateId: Int = 0,
+    showFeedBackSection: Boolean = false,
+    selectedDate: LocalDate = LocalDate.today(),
+    userProfileList: List<User> = emptyList(),
+    selectedUserIdx: Int = 0,
     scrollState: ScrollState = rememberScrollState(),
-    onClickMate: (Mate) -> Unit = {},
-    onSendMessage: (Mate) -> Unit = {},
+    onClickUser: (Int) -> Unit = {},
+    onSelectDate: (LocalDate) -> Unit = {},
+    onSendMessage: (User) -> Unit = {},
     onNavigateMy: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
     onNavigateAlert: () -> Unit = {},
@@ -125,35 +109,47 @@ private fun HomeScreen(
                 .background(YakssokTheme.color.grey100)
                 .verticalScroll(scrollState)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyRow(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
-                items(mateList.size) { index ->
-                    UserInfoCard(
-                        name = mateList[index].name,
-                        nickName = mateList[index].nickName,
-                        profileUrl = mateList[index].profileImage,
-                        remainedMedicine = mateList[index].remainedMedicine,
-                        onClick = {
-                            onClickMate(mateList[index])
+
+
+            if (showFeedBackSection) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                    items(userProfileList.size) { index ->
+                        if (userProfileList[index].notTakenCount != null) {
+                            UserInfoCard(
+                                nickName = userProfileList[index].nickName,
+                                relationName = userProfileList[index].relationName,
+                                profileUrl = userProfileList[index].profileImage,
+                                remainedMedicine = userProfileList[index].notTakenCount ?: 0,
+                                onClick = {
+                                    onSendMessage(userProfileList[index])
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
                         }
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    }
+
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Spacer(modifier = Modifier.height(16.dp))
+
             HomeContent(
                 modifier = Modifier,
-                mateList = mateList,
-                medicineList = medicineList,
-                clickedMateId = clickedMateId,
-                isRounded = true,
-                onClickMate = onClickMate,
+                userProfileList = userProfileList,
+                medicineList = userProfileList[selectedUserIdx].medicineCache[selectedDate] ?: emptyList(),
+                selectedDate = selectedDate,
+                selectedUserId = selectedUserIdx,
+                isRounded = showFeedBackSection,
+                isNotMedicine = userProfileList[selectedUserIdx].isNotMedicine,
+                onClickUser = onClickUser,
+                onSelectDate = onSelectDate,
                 onNavigateMate = onNavigateMate,
                 onNavigateRoutine = onNavigateRoutine,
                 onNavigateCalendar = onNavigateCalendar
@@ -165,11 +161,14 @@ private fun HomeScreen(
 @Composable
 private fun HomeContent(
     modifier: Modifier,
-    mateList: List<Mate>,
+    userProfileList: List<User>,
     medicineList: List<Medicine>,
-    clickedMateId: Int,
+    selectedDate: LocalDate,
+    selectedUserId: Int,
     isRounded: Boolean,
-    onClickMate: (Mate) -> Unit,
+    isNotMedicine: Boolean,
+    onClickUser: (Int) -> Unit,
+    onSelectDate: (LocalDate) -> Unit = {},
     onNavigateMate: () -> Unit,
     onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit,
@@ -177,16 +176,13 @@ private fun HomeContent(
     val shape =
         if (isRounded) RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp) else RectangleShape
     val topPadding = if (isRounded) 32.dp else 10.dp
-    val weekDates = listOf(
-        LocalDate.now(),
-        LocalDate.now().plusDays(1),
-        LocalDate.now().plusDays(2),
-        LocalDate.now().plusDays(3),
-        LocalDate.now().plusDays(4),
-        LocalDate.now().plusDays(5),
-        LocalDate.now().plusDays(6)
-    )
-    var selectedDate by remember { mutableStateOf(weekDates[2]) }
+
+    val today = LocalDate.today()
+    val weekDates = remember {
+        val currentDayOfWeek = today.dayOfWeek.isoDayNumber
+        val monday = today.minus(currentDayOfWeek - 1, DateTimeUnit.DAY)
+        (0..6).map { monday.plus(it, DateTimeUnit.DAY) }
+    }
 
     Column(
         modifier = modifier
@@ -202,23 +198,23 @@ private fun HomeContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MateLazyRow(
-            mateList = mateList,
-            clickedMateId = clickedMateId,
+            userList = userProfileList,
+            selectedUserIdx = selectedUserId,
             onNavigateMate = onNavigateMate,
-            onMateClick = onClickMate
+            onMateClick = { onClickUser(it) }
         )
         Spacer(modifier = Modifier.height(8.dp))
         WeekDataSelector(
             weekDates = weekDates,
             selectedDate = selectedDate,
-            onDateSelected = { selectedDate = it },
+            onDateSelected = onSelectDate,
             onNavigateCalendar = onNavigateCalendar
         )
         Spacer(modifier = Modifier.height(32.dp))
         if (medicineList.isEmpty()) {
             NoMedicineColumn(
                 modifier = Modifier,
-                isNeverAlarm = false,
+                isNeverAlarm = isNotMedicine,
                 onNavigateToRoutine = onNavigateRoutine
             )
         } else {
