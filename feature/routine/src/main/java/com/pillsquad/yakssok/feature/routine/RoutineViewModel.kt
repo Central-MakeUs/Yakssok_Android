@@ -3,11 +3,11 @@ package com.pillsquad.yakssok.feature.routine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pillsquad.yakssok.core.domain.usecase.InitSoundPoolUseCase
-import com.pillsquad.yakssok.core.domain.usecase.PlayAlarmSoundUseCase
+import com.pillsquad.yakssok.core.domain.usecase.sound.InitSoundPoolUseCase
+import com.pillsquad.yakssok.core.domain.usecase.sound.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
-import com.pillsquad.yakssok.core.domain.usecase.ReleaseSoundPoolUseCase
-import com.pillsquad.yakssok.core.domain.usecase.StopAlarmSoundUseCase
+import com.pillsquad.yakssok.core.domain.usecase.sound.ReleaseSoundPoolUseCase
+import com.pillsquad.yakssok.core.domain.usecase.sound.StopAlarmSoundUseCase
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType

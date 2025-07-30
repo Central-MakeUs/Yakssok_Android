@@ -1,18 +1,9 @@
 package com.pillsquad.yakssok.core.domain.repository
 
 import com.pillsquad.yakssok.core.model.MyInfo
-import kotlinx.coroutines.flow.Flow
+import com.pillsquad.yakssok.core.model.User
 
 interface UserRepository {
-    suspend fun joinUser(
-        accessToken: String,
-        nickName: String,
-        pushAgreement: Boolean
-    ): Result<Unit>
-
-    suspend fun loginUser(accessToken: String): Result<Boolean>
-
-    suspend fun getMyInfo(): Result<MyInfo>
-
-    fun checkToken(): Flow<Boolean>
+    suspend fun postMyInfoToLocal(): Result<MyInfo>
+    suspend fun getMyInfo(): User
 }
