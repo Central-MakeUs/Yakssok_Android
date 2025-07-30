@@ -7,7 +7,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.pillsquad.yakssok.core.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IntroViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
@@ -42,7 +42,7 @@ class IntroViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            userRepository.joinUser(
+            authRepository.joinUser(
                 accessToken = uiState.value.token,
                 nickName = uiState.value.nickName,
                 pushAgreement = pushAgreement
@@ -89,7 +89,7 @@ class IntroViewModel @Inject constructor(
             if (uiState.value.isHaveToSignup) {
                 _uiState.update { it.copy(isLoading = true) }
             }
-            val result = userRepository.loginUser(accessToken)
+            val result = authRepository.loginUser(accessToken)
             _uiState.update {
                 when {
                     result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true, token = accessToken)
@@ -109,7 +109,7 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
 
-            userRepository.checkToken().collect { valid ->
+            authRepository.checkToken().collect { valid ->
                 _uiState.update {
                     if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
                     else it.copy(isLoading = false)

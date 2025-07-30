@@ -48,7 +48,6 @@ internal fun HomeRoute(
     onNavigateMyPage: () -> Unit,
     onNavigateCalendar: () -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     var userName by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 

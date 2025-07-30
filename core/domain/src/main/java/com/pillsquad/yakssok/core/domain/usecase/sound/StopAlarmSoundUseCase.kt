@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.domain.usecase
+package com.pillsquad.yakssok.core.domain.usecase.sound
 
 import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.model.AlarmType

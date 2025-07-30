@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.data.sound
+package com.pillsquad.yakssok.core.data.repository
 
 import com.pillsquad.yakssok.core.data.mapper.toSoundType
 import com.pillsquad.yakssok.core.domain.repository.SoundRepository
