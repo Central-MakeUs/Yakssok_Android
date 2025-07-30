@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.core.domain.repository
 
-import com.pillsquad.yakssok.core.model.MyInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

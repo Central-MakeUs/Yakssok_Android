@@ -1,13 +1,9 @@
 package com.pillsquad.yakssok.core.data.repository
 
-import android.util.Log
-import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toResultForLogin
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
-import com.pillsquad.yakssok.core.model.MyInfo
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
-import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.JoinRequest
 import com.pillsquad.yakssok.core.network.model.request.LoginRequest

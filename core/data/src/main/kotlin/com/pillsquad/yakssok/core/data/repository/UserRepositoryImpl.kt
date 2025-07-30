@@ -1,9 +1,9 @@
 package com.pillsquad.yakssok.core.data.repository
 
+import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
-import com.pillsquad.yakssok.core.model.MyInfo
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
@@ -14,7 +14,7 @@ class UserRepositoryImpl @Inject constructor(
     private val userRetrofitDataSource: UserDataSource,
     private val userLocalDataSource: UserLocalDataSource
 ) : UserRepository {
-    override suspend fun postMyInfoToLocal(): Result<MyInfo> {
+    override suspend fun postMyInfoToLocal() {
         val result = userRetrofitDataSource.getMyInfo().toResult(
             transform = { it.toMyInfo() }
         )
@@ -22,9 +22,10 @@ class UserRepositoryImpl @Inject constructor(
         result.onSuccess {
             userLocalDataSource.saveUserName(it.nickName)
             userLocalDataSource.saveUserProfileImg(it.profileImage)
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "postMyInfoToLocal: $it")
         }
-
-        return result
     }
 
     override suspend fun getMyInfo(): User {
