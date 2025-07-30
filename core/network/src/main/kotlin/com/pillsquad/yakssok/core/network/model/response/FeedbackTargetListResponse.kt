@@ -8,12 +8,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FeedbackTargetListResponse(
     @SerialName("followingMedicationStatusResponses")
-    val feedbackTargetList: List<FeedbackTarget>
+    val feedbackTargetResponseList: List<FeedbackTargetResponse>
 )
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class FeedbackTarget(
+data class FeedbackTargetResponse(
     val userId: Int,
     val nickName: String,
     val relationName: String,
