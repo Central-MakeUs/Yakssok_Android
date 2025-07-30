@@ -8,6 +8,7 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
+import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IntroViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
@@ -89,7 +91,7 @@ class IntroViewModel @Inject constructor(
             if (uiState.value.isHaveToSignup) {
                 _uiState.update { it.copy(isLoading = true) }
             }
-            val result = authRepository.loginUser(accessToken)
+            val result = loginUseCase(accessToken)
             _uiState.update {
                 when {
                     result.isSuccess && result.getOrDefault(false) -> it.copy(isLoading = false, loginSuccess = true, token = accessToken)
