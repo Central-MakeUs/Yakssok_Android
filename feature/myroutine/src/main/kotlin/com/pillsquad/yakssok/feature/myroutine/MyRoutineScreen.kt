@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun MyRoutineRoute(
     viewModel: MyRoutineViewModel = hiltViewModel(),
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +66,7 @@ internal fun MyRoutineRoute(
         pagerState = pagerState,
         scope = scope,
         itemList = uiState.value,
-        onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateRoutine = onNavigateRoutine,
         onNavigateBack = onNavigateBack
     )
 }

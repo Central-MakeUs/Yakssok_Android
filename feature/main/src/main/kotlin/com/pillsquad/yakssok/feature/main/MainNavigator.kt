@@ -51,8 +51,8 @@ internal class MainNavigator(
         navController.navigateIntro(closeOptions())
     }
 
-    fun navigateRoutine(name: String) {
-        navController.navigateRoutine(name, defaultNavOptions)
+    fun navigateRoutine() {
+        navController.navigateRoutine(defaultNavOptions)
     }
 
     fun navigateAlert() {

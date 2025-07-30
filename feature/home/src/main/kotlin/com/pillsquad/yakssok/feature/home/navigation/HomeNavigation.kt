@@ -13,7 +13,7 @@ fun NavController.navigateHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,

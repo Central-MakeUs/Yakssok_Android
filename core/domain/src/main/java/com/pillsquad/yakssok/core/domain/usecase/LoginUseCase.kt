@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.domain.usecase
 
+import android.util.Log
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import javax.inject.Inject
@@ -11,8 +12,14 @@ class LoginUseCase @Inject constructor(
     suspend operator fun invoke(accessToken: String): Result<Boolean> {
         val result = authRepository.loginUser(accessToken)
 
+        Log.e("UserRepositoryImpl", "invoke: $result")
+
         result.onSuccess {
+            Log.e("UserRepositoryImpl", "invoke: $it")
             userRepository.postMyInfoToLocal()
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "invoke: $it")
         }
 
         return result

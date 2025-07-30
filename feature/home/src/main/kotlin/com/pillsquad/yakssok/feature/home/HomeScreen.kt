@@ -45,7 +45,7 @@ import kotlinx.datetime.plus
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,
@@ -69,7 +69,7 @@ internal fun HomeRoute(
         onNavigateMy = onNavigateMyPage,
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
-        onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateRoutine = onNavigateRoutine,
         onNavigateCalendar = onNavigateCalendar
     )
 }

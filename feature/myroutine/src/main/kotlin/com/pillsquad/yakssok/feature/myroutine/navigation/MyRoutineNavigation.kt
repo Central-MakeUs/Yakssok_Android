@@ -12,7 +12,7 @@ fun NavController.navigateMyRoutine(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.myRoutineNavGraph(
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     composable<Route.MyRoutine> {

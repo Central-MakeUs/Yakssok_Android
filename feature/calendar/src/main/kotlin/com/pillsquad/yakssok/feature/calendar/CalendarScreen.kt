@@ -31,7 +31,7 @@ import kotlinx.datetime.LocalDate
 internal fun CalendarRoute(
     viewModel: CalendarViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,
@@ -44,7 +44,7 @@ internal fun CalendarRoute(
         scrollState = scrollState,
         onUpdateSelectedDate = viewModel::updateSelectedDate,
         onNavigateBack = onNavigateBack,
-        onNavigateRoutine = { onNavigateRoutine("김OO") },
+        onNavigateRoutine = onNavigateRoutine,
         onNavigateAlert = onNavigateAlert,
         onNavigateMate = onNavigateMate,
         onNavigateMyPage = onNavigateMyPage
