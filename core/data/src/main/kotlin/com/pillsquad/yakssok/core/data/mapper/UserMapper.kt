@@ -13,10 +13,3 @@ internal fun MyInfoResponse.toMyInfo(): MyInfo =
         followingCount = followingCount
     )
 
-internal fun FollowingInfoResponse.toUser(): User =
-    User(
-        id = userId,
-        nickName = nickName,
-        relationName = relationName,
-        profileImage = profileImageUrl ?: ""
-    )

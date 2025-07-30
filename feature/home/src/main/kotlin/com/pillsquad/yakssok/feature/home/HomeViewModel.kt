@@ -40,7 +40,8 @@ class HomeViewModel @Inject constructor(
             getUserProfileListUseCase()
                 .onSuccess {
                     _uiState.value = _uiState.value.copy(
-                        userList = it
+                        userList = it,
+                        showFeedBackSection = it.any { target -> target.notTakenCount != null }
                     )
                 }
                 .onFailure {
