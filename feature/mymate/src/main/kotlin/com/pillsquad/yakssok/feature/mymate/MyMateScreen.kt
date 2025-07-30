@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.Mate
+import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 
@@ -41,8 +41,8 @@ internal fun MyMateRoute(
 
 @Composable
 private fun MyMateScreen(
-    followingList: List<Mate> = emptyList(),
-    followerList: List<Mate> = emptyList(),
+    followingList: List<User> = emptyList(),
+    followerList: List<User> = emptyList(),
     onNavigateMate: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -64,7 +64,7 @@ private fun MyMateScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         MateLazyRow(
-            mateList = followingList,
+            userList = followingList,
             imgSize = 64,
             iconSize = 24,
             iconButtonColor = YakssokTheme.color.grey150,
@@ -81,7 +81,7 @@ private fun MyMateScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         MateLazyRow(
-            mateList = followerList,
+            userList = followerList,
             imgSize = 64,
             iconSize = 24,
         )

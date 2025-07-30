@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -27,33 +26,33 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.Mate
+import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.R
 
 @Composable
 fun MateLazyRow(
     modifier: Modifier = Modifier,
-    mateList: List<Mate>,
-    clickedMateId: Int = -1,
+    userList: List<User>,
+    selectedUserIdx: Int = -1,
     imgSize: Int = 52,
     iconSize: Int = 20,
     iconButtonColor: Color = YakssokTheme.color.grey100,
     onNavigateMate: (() -> Unit)? = null,
-    onMateClick: (Mate) -> Unit = {}
+    onMateClick: (Int) -> Unit = {}
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(mateList.size) { idx ->
-            val mate = mateList[idx]
+        items(userList.size) { idx ->
+            val user = userList[idx]
 
             MateItem(
-                mate = mate,
+                user = user,
                 imgSize = imgSize,
-                onMateClick = onMateClick,
-                isClicked = (mate.id == clickedMateId)
+                onMateClick = { onMateClick(idx) },
+                isClicked = (idx == selectedUserIdx)
             )
         }
         onNavigateMate?.let {
@@ -74,24 +73,24 @@ fun MateLazyRow(
 
 @Composable
 private fun MateItem(
-    mate: Mate,
+    user: User,
     imgSize: Int = 52,
-    onMateClick: (Mate) -> Unit,
+    onMateClick: (User) -> Unit,
     isClicked: Boolean
 ) {
     Column(
-        modifier = Modifier.clickable { onMateClick(mate) },
+        modifier = Modifier.clickable { onMateClick(user) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(
             modifier = Modifier.size(imgSize.dp),
-            imageUrl = mate.profileImage,
+            imageUrl = user.profileImage,
             isStroke = isClicked
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             modifier = Modifier.height(21.dp),
-            text = mate.name,
+            text = user.relationName,
             style = YakssokTheme.typography.body2,
             color = YakssokTheme.color.grey600
         )

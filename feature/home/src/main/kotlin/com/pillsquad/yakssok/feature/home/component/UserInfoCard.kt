@@ -30,8 +30,8 @@ import com.pillsquad.yakssok.feature.home.R
 
 @Composable
 internal fun UserInfoCard(
-    name: String,
     nickName: String,
+    relationName: String,
     profileUrl: String,
     remainedMedicine: Int,
     onClick: () -> Unit
@@ -59,12 +59,12 @@ internal fun UserInfoCard(
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
-                    text = nickName,
+                    text = relationName,
                     style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey400
                 )
                 Text(
-                    text = name,
+                    text = nickName,
                     style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey600
                 )

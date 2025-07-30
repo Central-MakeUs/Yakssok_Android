@@ -5,3 +5,7 @@ plugins {
 }
 
 setNamespace("feature.home")
+
+dependencies {
+    implementation(libs.kotlinx.datetime)
+}

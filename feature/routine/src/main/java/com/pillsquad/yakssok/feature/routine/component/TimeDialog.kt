@@ -3,9 +3,9 @@ package com.pillsquad.yakssok.feature.routine.component
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.picker.TimePicker
-import com.pillsquad.yakssok.feature.routine.util.now
 import kotlinx.datetime.LocalTime
 
 @Composable

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -89,8 +88,8 @@ internal fun CalendarScreen(
             item {
                 MateLazyRow(
                     modifier = modifier,
-                    mateList = uiState.mateList,
-                    clickedMateId = uiState.selectedMate,
+                    userList = uiState.userLists,
+                    selectedUserIdx = uiState.selectedMate,
                     onNavigateMate = onNavigateMate,
                     onMateClick = {}
                 )

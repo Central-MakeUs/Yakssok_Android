@@ -14,6 +14,6 @@ data class FollowingsResponse(
 data class FollowingInfoResponse(
     val userId: Int,
     val relationName: String,
-    val profileImageUrl: String,
+    val profileImageUrl: String?,
     val nickName: String
 )

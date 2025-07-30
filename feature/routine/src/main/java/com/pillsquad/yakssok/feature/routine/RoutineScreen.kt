@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
@@ -42,7 +43,6 @@ import com.pillsquad.yakssok.feature.routine.component.NumberIndicator
 import com.pillsquad.yakssok.feature.routine.component.StartDateDialog
 import com.pillsquad.yakssok.feature.routine.component.TimeDialog
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
-import com.pillsquad.yakssok.feature.routine.util.today
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.ExperimentalTime

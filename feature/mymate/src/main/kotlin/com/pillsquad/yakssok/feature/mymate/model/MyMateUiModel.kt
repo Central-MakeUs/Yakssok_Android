@@ -1,8 +1,8 @@
 package com.pillsquad.yakssok.feature.mymate.model
 
-import com.pillsquad.yakssok.core.model.Mate
+import com.pillsquad.yakssok.core.model.User
 
 data class MyMateUiModel(
-    val followingList: List<Mate> = emptyList(),
-    val followerList: List<Mate> = emptyList(),
+    val followingList: List<User> = emptyList(),
+    val followerList: List<User> = emptyList(),
 )

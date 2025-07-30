@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
@@ -28,8 +29,7 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun TimePicker(
     modifier: Modifier = Modifier,
-    initialTime: LocalTime = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault()).time,
+    initialTime: LocalTime = LocalTime.now(),
     visibleItemsCount: Int = PickerDefaults.VISIBLE_ITEM_COUNT,
     style: PickerStyle = PickerDefaults.pickerStyle(),
     selector: PickerSelector = PickerDefaults.pickerSelector(),

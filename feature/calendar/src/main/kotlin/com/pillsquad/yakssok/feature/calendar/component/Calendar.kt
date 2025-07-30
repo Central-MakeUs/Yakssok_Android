@@ -16,8 +16,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.feature.calendar.model.CalendarConfig
-import com.pillsquad.yakssok.feature.calendar.model.today
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
