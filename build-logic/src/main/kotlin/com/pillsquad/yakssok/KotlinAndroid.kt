@@ -24,21 +24,6 @@ internal fun Project.configureKotlinAndroid() {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
-        buildTypes {
-            getByName("debug") {
-                isMinifyEnabled = false
-                buildConfigField("boolean", "IS_DEBUG", "true")
-            }
-            getByName("release") {
-                isMinifyEnabled = true
-                buildConfigField("boolean", "IS_DEBUG", "false")
-                proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
-                )
-            }
-        }
-
         buildFeatures {
             buildConfig = true
         }
