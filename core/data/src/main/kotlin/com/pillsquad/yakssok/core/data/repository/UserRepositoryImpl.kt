@@ -31,8 +31,6 @@ class UserRepositoryImpl @Inject constructor(
             oauthType = "kakao",
             nonce = "",
             nickName = nickName,
-            pushAgreement = pushAgreement,
-            fcmToken = ""
         )
 
         return authRetrofitDataSource.joinUser(params = params).toResult(transform = { it })
