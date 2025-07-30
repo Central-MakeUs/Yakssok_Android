@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.feature.routine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
 import com.pillsquad.yakssok.core.domain.usecase.sound.InitSoundPoolUseCase
 import com.pillsquad.yakssok.core.domain.usecase.sound.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
@@ -36,6 +37,7 @@ class RoutineViewModel @Inject constructor(
     private val stopAlarmSoundUseCase: StopAlarmSoundUseCase,
     private val releaseSoundPoolUseCase: ReleaseSoundPoolUseCase,
     private val initSoundPoolUseCase: InitSoundPoolUseCase,
+    private val getMyInfoUseCase: GetMyInfoUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
@@ -44,6 +46,7 @@ class RoutineViewModel @Inject constructor(
     val event = _event.asSharedFlow()
 
     init {
+        getUserName()
         initSoundPoolUseCase()
     }
 
@@ -101,6 +104,14 @@ class RoutineViewModel @Inject constructor(
         val isFirstEnabled =
             uiState.value.medicationType != null && uiState.value.pillName.trim().isNotEmpty()
         updateState { copy(enabled = listOf(isFirstEnabled, true, true)) }
+    }
+
+    private fun getUserName() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(userName = getMyInfoUseCase().nickName)
+            }
+        }
     }
 
     private inline fun updateState(update: RoutineUiModel.() -> RoutineUiModel) {

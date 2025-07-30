@@ -8,8 +8,8 @@ import androidx.navigation.toRoute
 import com.pillsquad.yakssok.core.navigation.Route
 import com.pillsquad.yakssok.feature.routine.RoutineRoute
 
-fun NavController.navigateRoutine(name: String, navOptions: NavOptions) {
-    navigate(route = Route.Routine(name), navOptions = navOptions)
+fun NavController.navigateRoutine(navOptions: NavOptions) {
+    navigate(route = Route.Routine, navOptions = navOptions)
 }
 
 fun NavGraphBuilder.routineNavGraph(
@@ -17,7 +17,6 @@ fun NavGraphBuilder.routineNavGraph(
 ) {
     composable<Route.Routine> {
         RoutineRoute(
-            name = it.toRoute<Route.Routine>().name,
             onNavigateBack = onNavigateBack
         )
     }

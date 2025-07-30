@@ -10,7 +10,7 @@ sealed interface Route {
     data object Home : Route
 
     @Serializable
-    data class Routine(val name: String) : Route
+    data object Routine : Route
 
     @Serializable
     data object Alert : Route

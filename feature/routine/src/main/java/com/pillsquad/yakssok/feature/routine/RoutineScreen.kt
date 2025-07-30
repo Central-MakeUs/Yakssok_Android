@@ -51,7 +51,6 @@ import kotlin.time.ExperimentalTime
 @Composable
 internal fun RoutineRoute(
     viewModel: RoutineViewModel = hiltViewModel(),
-    name: String,
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -219,7 +218,7 @@ internal fun RoutineRoute(
     }
 
     RoutineScreen(
-        userName = name,
+        userName = uiState.userName,
         uiState = uiState,
         onPillNameChange = viewModel::updatePillName,
         onPillTypeChange = viewModel::updatePillType,

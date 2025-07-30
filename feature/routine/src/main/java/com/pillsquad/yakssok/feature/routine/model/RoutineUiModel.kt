@@ -12,6 +12,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 data class RoutineUiModel(
+    val userName: String = "나",
     val curPage: Int = 0,
     val enabled: List<Boolean> = listOf(false, true, true),
     val pillName: String = "",

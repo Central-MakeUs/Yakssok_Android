@@ -8,7 +8,7 @@ import com.pillsquad.yakssok.core.network.model.response.MyInfoResponse
 internal fun MyInfoResponse.toMyInfo(): MyInfo =
     MyInfo(
         nickName = nickName,
-        profileImage = profileImage,
+        profileImage = profileImage ?: "",
         medicationCount = medicationCount,
         followingCount = followingCount
     )

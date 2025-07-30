@@ -9,7 +9,9 @@ import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UserRepositoryImpl @Inject constructor(
     private val userRetrofitDataSource: UserDataSource,
     private val userLocalDataSource: UserLocalDataSource
@@ -18,6 +20,8 @@ class UserRepositoryImpl @Inject constructor(
         val result = userRetrofitDataSource.getMyInfo().toResult(
             transform = { it.toMyInfo() }
         )
+
+        Log.e("UserRepositoryImpl", "postMyInfoToLocal: $result")
 
         result.onSuccess {
             userLocalDataSource.saveUserName(it.nickName)
@@ -31,6 +35,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getMyInfo(): User {
         val name = userLocalDataSource.userNameFlow.firstOrNull().orEmpty().ifBlank { "나" }
         val image = userLocalDataSource.userProfileImgFlow.firstOrNull().orEmpty()
+
+        Log.e("UserRepositoryImpl", "getMyInfo: $name, $image")
 
         return User(
             id = 0,

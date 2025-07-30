@@ -13,7 +13,7 @@ fun NavController.navigateCalendar(navOptions: NavOptions) {
 
 fun NavGraphBuilder.calendarNavGraph(
     onNavigateBack: () -> Unit,
-    onNavigateRoutine: (String) -> Unit,
+    onNavigateRoutine: () -> Unit,
     onNavigateAlert: () -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateMyPage: () -> Unit,
