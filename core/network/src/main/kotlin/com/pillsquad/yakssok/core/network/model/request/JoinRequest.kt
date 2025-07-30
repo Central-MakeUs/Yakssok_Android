@@ -10,6 +10,4 @@ data class JoinRequest(
     val oauthType: String,
     val nonce: String,
     val nickName: String,
-    val pushAgreement: Boolean,
-    val fcmToken: String
 )

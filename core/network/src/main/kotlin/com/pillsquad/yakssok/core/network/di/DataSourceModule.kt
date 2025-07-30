@@ -1,9 +1,11 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
+import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
 import com.pillsquad.yakssok.core.network.datasource.MedicationDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.remote.AuthRetrofitDataSource
+import com.pillsquad.yakssok.core.network.remote.FriendRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.MedicationRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.UserRetrofitDataSource
 import dagger.Binds
@@ -29,4 +31,9 @@ abstract class DataSourceModule {
     abstract fun bindMedicationDataSource(
         medicationRetrofitDataSource: MedicationRetrofitDataSource
     ): MedicationDataSource
+
+    @Binds
+    abstract fun bindFriendDataSource(
+        friendRetrofitDataSource: FriendRetrofitDataSource
+    ): FriendDataSource
 }

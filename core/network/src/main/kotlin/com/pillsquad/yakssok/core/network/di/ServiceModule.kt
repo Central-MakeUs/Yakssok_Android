@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.service.AuthApi
+import com.pillsquad.yakssok.core.network.service.FriendApi
 import com.pillsquad.yakssok.core.network.service.MedicationApi
 import com.pillsquad.yakssok.core.network.service.TokenApi
 import com.pillsquad.yakssok.core.network.service.UserApi
@@ -38,4 +39,10 @@ object ServiceModule {
     fun provideMedicationApi(
         @TokenRetrofit retrofit: Retrofit
     ): MedicationApi = retrofit.create(MedicationApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFriendApi(
+        @TokenRetrofit retrofit: Retrofit
+    ): FriendApi = retrofit.create(FriendApi::class.java)
 }
