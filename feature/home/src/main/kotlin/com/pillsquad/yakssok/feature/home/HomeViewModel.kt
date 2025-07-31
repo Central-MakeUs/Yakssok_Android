@@ -1,12 +1,14 @@
 package com.pillsquad.yakssok.feature.home
 
 import android.util.Log
+import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
+import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.UserCache
 import com.pillsquad.yakssok.feature.home.model.HomeUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +21,7 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import javax.inject.Inject
+import androidx.core.util.size
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -51,16 +54,26 @@ class HomeViewModel @Inject constructor(
         val userIdx = uiState.value.selectedUserIdx
         val date = uiState.value.selectedDate
 
-        val routineMap = uiState.value.routineCache[userIdx] ?: return
-        val routines = routineMap[date]?.map {
+        val currentCache = uiState.value.routineCache
+        val currentMap = currentCache[userIdx] ?: return
+        val updatedRoutines = currentMap[date]?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return
 
-        routineMap[date] = routines
+        val newRoutineMap = currentMap.toMutableMap().apply {
+            put(date, updatedRoutines)
+        }
 
-        _uiState.value = _uiState.value.copy(
-            routineCache = uiState.value.routineCache.apply { put(userIdx, routineMap) }
-        )
+        val newCache = SparseArray<MutableMap<LocalDate, List<Routine>>>().apply {
+            for (i in 0 until currentCache.size) {
+                val key = currentCache.keyAt(i)
+                val value = currentCache.valueAt(i)
+                put(key, value)
+            }
+            put(userIdx, newRoutineMap)
+        }
+
+        _uiState.value = _uiState.value.copy(routineCache = newCache)
 
         viewModelScope.launch {
             updateRoutineTakenUseCase(routineId)
