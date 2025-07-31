@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.home
 
+import android.util.SparseArray
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ internal fun HomeRoute(
         showFeedBackSection = uiState.showFeedBackSection,
         selectedDate = uiState.selectedDate,
         userProfileList = uiState.userList,
+        routineCache = uiState.routineCache,
         scrollState = scrollState,
         selectedUserIdx = uiState.selectedUserIdx,
         onClickUser = {
@@ -66,6 +68,7 @@ internal fun HomeRoute(
         onSelectDate = {
             viewModel.onSelectedDate(it)
         },
+        onClickRoutine = viewModel::onRoutineClick,
         onNavigateMy = onNavigateMyPage,
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
@@ -79,10 +82,12 @@ private fun HomeScreen(
     showFeedBackSection: Boolean = false,
     selectedDate: LocalDate = LocalDate.today(),
     userProfileList: List<User> = emptyList(),
+    routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>> = SparseArray(),
     selectedUserIdx: Int = 0,
     scrollState: ScrollState = rememberScrollState(),
     onClickUser: (Int) -> Unit = {},
     onSelectDate: (LocalDate) -> Unit = {},
+    onClickRoutine: (Int) -> Unit = {},
     onSendMessage: (User) -> Unit = {},
     onNavigateMy: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
@@ -143,13 +148,14 @@ private fun HomeScreen(
             HomeContent(
                 modifier = Modifier,
                 userProfileList = userProfileList,
-                routineList = userProfileList[selectedUserIdx].routineCache[selectedDate] ?: emptyList(),
+                routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList(),
                 selectedDate = selectedDate,
-                selectedUserId = selectedUserIdx,
+                selectedUserIdx = selectedUserIdx,
                 isRounded = showFeedBackSection,
                 isNotMedicine = userProfileList[selectedUserIdx].isNotMedicine,
                 onClickUser = onClickUser,
                 onSelectDate = onSelectDate,
+                onClickRoutine = onClickRoutine,
                 onNavigateMate = onNavigateMate,
                 onNavigateRoutine = onNavigateRoutine,
                 onNavigateCalendar = onNavigateCalendar
@@ -164,11 +170,12 @@ private fun HomeContent(
     userProfileList: List<User>,
     routineList: List<Routine>,
     selectedDate: LocalDate,
-    selectedUserId: Int,
+    selectedUserIdx: Int,
     isRounded: Boolean,
     isNotMedicine: Boolean,
     onClickUser: (Int) -> Unit,
     onSelectDate: (LocalDate) -> Unit = {},
+    onClickRoutine: (Int) -> Unit = {},
     onNavigateMate: () -> Unit,
     onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit,
@@ -199,7 +206,7 @@ private fun HomeContent(
     ) {
         MateLazyRow(
             userList = userProfileList,
-            selectedUserIdx = selectedUserId,
+            selectedUserIdx = selectedUserIdx,
             onNavigateMate = onNavigateMate,
             onMateClick = { onClickUser(it) }
         )
@@ -218,9 +225,12 @@ private fun HomeContent(
                 onNavigateToRoutine = onNavigateRoutine
             )
         } else {
+            val isCheckBoxVisible = (selectedUserIdx == 0) && (selectedDate == today)
+
             DailyMedicineList(
                 routineList = routineList,
-                onItemClick = {},
+                isCheckBoxVisible = isCheckBoxVisible,
+                onItemClick = onClickRoutine,
                 onNavigateToRoute = onNavigateRoutine
             )
         }

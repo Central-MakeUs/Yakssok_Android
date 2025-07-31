@@ -75,11 +75,11 @@ fun MateLazyRow(
 private fun MateItem(
     user: User,
     imgSize: Int = 52,
-    onMateClick: (User) -> Unit,
+    onMateClick: () -> Unit,
     isClicked: Boolean
 ) {
     Column(
-        modifier = Modifier.clickable { onMateClick(user) },
+        modifier = Modifier.clickable { onMateClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(

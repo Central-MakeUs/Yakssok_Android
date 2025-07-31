@@ -24,17 +24,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
-import kotlinx.datetime.LocalTime
 
 @Composable
 fun DailyMedicineList(
     modifier: Modifier = Modifier,
+    isCheckBoxVisible: Boolean = false,
     routineList: List<Routine>,
-    onItemClick: (Routine) -> Unit,
+    onItemClick: (Int) -> Unit,
     onNavigateToRoute: () -> Unit
 ) {
     val haveToTakeMedicineList = routineList.filter { !it.isTaken }
@@ -61,8 +60,9 @@ fun DailyMedicineList(
         Spacer(modifier = Modifier.height(16.dp))
         haveToTakeMedicineList.forEach { medicine ->
             DailyMedicineRow(
+                isCheckBoxVisible = isCheckBoxVisible,
                 routine = medicine,
-                onClick = { onItemClick(medicine) }
+                onClick = { medicine.routineId?.let { onItemClick(it) } }
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -75,8 +75,9 @@ fun DailyMedicineList(
         Spacer(modifier = Modifier.height(20.dp))
         takenMedicineList.forEach { medicine ->
             DailyMedicineRow(
+                isCheckBoxVisible = isCheckBoxVisible,
                 routine = medicine,
-                onClick = { onItemClick(medicine) }
+                onClick = { medicine.routineId?.let { onItemClick(it) } }
             )
             Spacer(modifier = Modifier.height(8.dp))
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
+import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
 import com.pillsquad.yakssok.core.model.UserCache
 import com.pillsquad.yakssok.feature.home.model.HomeUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getUserProfileListUseCase: GetUserProfileListUseCase,
-    private val getUserRoutineUseCase: GetUserRoutineUseCase
+    private val getUserRoutineUseCase: GetUserRoutineUseCase,
+    private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiModel())
     val uiState = _uiState.asStateFlow()
@@ -45,6 +47,26 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    fun onRoutineClick(routineId: Int) {
+        val userIdx = uiState.value.selectedUserIdx
+        val date = uiState.value.selectedDate
+
+        val routineMap = uiState.value.routineCache[userIdx] ?: return
+        val routines = routineMap[date]?.map {
+            if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
+        } ?: return
+
+        routineMap[date] = routines
+
+        _uiState.value = _uiState.value.copy(
+            routineCache = uiState.value.routineCache.apply { put(userIdx, routineMap) }
+        )
+
+        viewModelScope.launch {
+            updateRoutineTakenUseCase(routineId)
+        }
+    }
+
     private fun loadUserAndRoutines() {
         viewModelScope.launch {
             getUserProfileListUseCase()
@@ -54,14 +76,13 @@ class HomeViewModel @Inject constructor(
                         showFeedBackSection = users.any { target -> target.notTakenCount != null }
                     )
 
-                    val myUser = users.firstOrNull() ?: return@onSuccess
                     val (startDate, endDate) = getStartEndDate()
 
                     getUserRoutineUseCase(
                         startDate = startDate,
                         endDate = endDate
-                    ).onSuccess {  cache ->
-                        updateUserCache(myUser.id, cache)
+                    ).onSuccess { cache ->
+                        updateRoutineCache(0, cache)
                     }.onFailure {
                         it.printStackTrace()
                         Log.e("HomeViewModel", "getRoutineMy: $it")
@@ -74,7 +95,10 @@ class HomeViewModel @Inject constructor(
                             startDate = startDate,
                             endDate = endDate
                         ).onSuccess { cache ->
-                            updateUserCache(friend.id, cache)
+                            val userIdx = users.indexOfFirst { it.id == friend.id }
+                            if (userIdx != -1) {
+                                updateRoutineCache(userIdx, cache)
+                            }
                         }.onFailure {
                             it.printStackTrace()
                             Log.e("HomeViewModel", "getRoutineFriend: $it")
@@ -89,16 +113,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updateUserCache(userId: Int, cache: UserCache) {
-        val updatedList = _uiState.value.userList.map { user ->
-            if (user.id == userId) {
-                user.copy(
-                    routineCache = cache.routineCache,
-                    takenCache = cache.takenCache
-                )
-            } else user
-        }
-        _uiState.value = _uiState.value.copy(userList = updatedList)
+    private fun updateRoutineCache(userIdx: Int, cache: UserCache) {
+        val sparseArray = uiState.value.routineCache.apply { put(userIdx, cache.routineCache) }
+
+        _uiState.value = _uiState.value.copy(
+            routineCache = sparseArray,
+            userList = uiState.value.userList.mapIndexed { idx, user ->
+                if (idx == userIdx) {
+                    user.copy(isNotMedicine = cache.routineCache.isEmpty())
+                } else {
+                    user
+                }
+            }
+        )
     }
 
     private fun getStartEndDate(): Pair<LocalDate, LocalDate> {
