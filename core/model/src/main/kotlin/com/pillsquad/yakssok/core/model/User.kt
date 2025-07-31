@@ -8,6 +8,7 @@ data class User (
     val relationName: String,
     val profileImage: String,
     val notTakenCount: Int? = null,
-    val medicineCache: MutableMap<LocalDate, List<Medicine>> = mutableMapOf(),
-    val isNotMedicine: Boolean = medicineCache.isEmpty()
+    val routineCache: MutableMap<LocalDate, List<Routine>> = mutableMapOf(),
+    val takenCache: MutableMap<LocalDate, Boolean> = mutableMapOf(),
+    val isNotMedicine: Boolean = routineCache.isEmpty()
 )

@@ -127,7 +127,7 @@ internal fun CalendarScreen(
             }
 
             item {
-                if (uiState.medicineCache.isEmpty()) {
+                if (uiState.routineCache.isEmpty()) {
                     NoMedicineColumn(
                         modifier = modifier,
                         isNeverAlarm = false,
@@ -136,7 +136,7 @@ internal fun CalendarScreen(
                 } else {
                     DailyMedicineList(
                         modifier = modifier,
-                        medicineList = uiState.medicineCache[uiState.selectedMate]!!.values.flatten(),
+                        routineList = uiState.routineCache[uiState.selectedMate]!!.values.flatten(),
                         onItemClick = {},
                         onNavigateToRoute = onNavigateRoutine
                     )

@@ -25,19 +25,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.Medicine
+import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
 import java.time.LocalTime
 
 @Composable
 fun DailyMedicineList(
     modifier: Modifier = Modifier,
-    medicineList: List<Medicine>,
-    onItemClick: (Medicine) -> Unit,
+    routineList: List<Routine>,
+    onItemClick: (Routine) -> Unit,
     onNavigateToRoute: () -> Unit
 ) {
-    val haveToTakeMedicineList = medicineList.filter { !it.isTaken }
-    val takenMedicineList = medicineList.filter { it.isTaken }
+    val haveToTakeMedicineList = routineList.filter { !it.isTaken }
+    val takenMedicineList = routineList.filter { it.isTaken }
 
     Column(
         modifier = modifier
@@ -60,7 +60,7 @@ fun DailyMedicineList(
         Spacer(modifier = Modifier.height(16.dp))
         haveToTakeMedicineList.forEach { medicine ->
             DailyMedicineRow(
-                medicine = medicine,
+                routine = medicine,
                 onClick = { onItemClick(medicine) }
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -74,7 +74,7 @@ fun DailyMedicineList(
         Spacer(modifier = Modifier.height(20.dp))
         takenMedicineList.forEach { medicine ->
             DailyMedicineRow(
-                medicine = medicine,
+                routine = medicine,
                 onClick = { onItemClick(medicine) }
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -113,26 +113,26 @@ private fun DailyMedicineListPreview() {
                 .systemBarsPadding()
                 .padding(16.dp)
         ) {
-            val medicineList = listOf(
-                Medicine(
-                    name = "종합 비타민 오쏘몰",
-                    time = LocalTime.now(),
+            val routineLists = listOf(
+                Routine(
+                    medicationName = "종합 비타민 오쏘몰",
+                    intakeTime = LocalTime.now(),
                     isTaken = true
                 ),
-                Medicine(
-                    name = "피부약",
-                    time = LocalTime.now(),
+                Routine(
+                    medicationName = "피부약",
+                    intakeTime = LocalTime.now(),
                     isTaken = false
                 ),
-                Medicine(
-                    name = "현대백화점에서산알약입니다이오",
-                    time = LocalTime.now(),
+                Routine(
+                    medicationName = "현대백화점에서산알약입니다이오",
+                    intakeTime = LocalTime.now(),
                     isTaken = false
                 )
             )
 
             DailyMedicineList(
-                medicineList = medicineList,
+                routineList = routineLists,
                 onItemClick = {},
                 onNavigateToRoute = {}
             )

@@ -21,7 +21,7 @@ data class ScheduleGroupDto(
 @Serializable
 data class ScheduleDto(
     val date: String,
-    val scheduleId: Int,
+    val scheduleId: Int?,
     val medicationType: String,
     val medicationName: String,
     val intakeTime: String,
