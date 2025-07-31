@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.core.network.di
 import com.pillsquad.yakssok.core.network.service.AuthApi
 import com.pillsquad.yakssok.core.network.service.FriendApi
 import com.pillsquad.yakssok.core.network.service.MedicationApi
+import com.pillsquad.yakssok.core.network.service.RoutineApi
 import com.pillsquad.yakssok.core.network.service.TokenApi
 import com.pillsquad.yakssok.core.network.service.UserApi
 import dagger.Module
@@ -10,6 +11,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -45,4 +47,10 @@ object ServiceModule {
     fun provideFriendApi(
         @TokenRetrofit retrofit: Retrofit
     ): FriendApi = retrofit.create(FriendApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideRoutineApi(
+        @TokenRetrofit retrofit: Retrofit
+    ): RoutineApi = retrofit.create(RoutineApi::class.java)
 }
