@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,14 +25,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
-import java.time.LocalTime
+import kotlinx.datetime.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun DailyMedicineRow(
@@ -46,9 +42,7 @@ fun DailyMedicineRow(
         if (routine.isTaken) YakssokTheme.color.grey200 else YakssokTheme.color.primary400
     val checkIcon =
         if (routine.isTaken) R.drawable.ic_checkbox_false else R.drawable.ic_checkbox_true
-    val formattedTime = routine.intakeTime.format(
-        DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH)
-    )
+    val formattedTime = formatLocalTime(routine.intakeTime)
     val rowHeight = if (routine.medicationName.length > 10) 72.dp else 56.dp
 
     Row(
@@ -77,7 +71,7 @@ fun DailyMedicineRow(
                 text = routine.medicationName,
                 style = YakssokTheme.typography.subtitle2,
                 color = textColor,
-                textDecoration = if(routine.isTaken) TextDecoration.LineThrough else null
+                textDecoration = if (routine.isTaken) TextDecoration.LineThrough else null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -118,37 +112,8 @@ fun DailyMedicineRow(
     }
 }
 
-@Preview
-@Composable
-fun DailyMedicineRowPreview() {
-    YakssokTheme {
-        Column(
-            modifier = Modifier.systemBarsPadding()
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            DailyMedicineRow(
-                routine = Routine(
-                    medicationName = "종합 비타민 오쏘몰",
-                    intakeTime = LocalTime.now(),
-                    isTaken = true
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            DailyMedicineRow(
-                routine = Routine(
-                    medicationName = "피부약",
-                    intakeTime = LocalTime.now(),
-                    isTaken = false
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            DailyMedicineRow(
-                routine = Routine(
-                    medicationName = "현대백화점에서산알약입니다이오",
-                    intakeTime = LocalTime.now(),
-                    isTaken = false
-                )
-            )
-        }
-    }
+private fun formatLocalTime(localTime: LocalTime): String {
+    val javaTime = java.time.LocalTime.of(localTime.hour, localTime.minute)
+    val formatter = DateTimeFormatter.ofPattern("h:mm a") // ex: 9:00 AM, 10:00 PM
+    return javaTime.format(formatter)
 }

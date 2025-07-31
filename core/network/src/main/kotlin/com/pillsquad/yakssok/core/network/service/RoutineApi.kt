@@ -17,9 +17,9 @@ interface RoutineApi {
 
     @GET("/api/medication-schedules/friends/{friendsId}")
     suspend fun getFriendRoutine(
+        @Path("friendsId") friendsId: Int,
         @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String,
-        @Path("friendsId") friendsId: Int
+        @Query("endDate") endDate: String
     ): ApiResponse<RoutineResponse>
 
     @PUT("/api/medication-schedules/{scheduleId}/take")

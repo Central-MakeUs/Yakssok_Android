@@ -21,22 +21,17 @@ class UserRepositoryImpl @Inject constructor(
             transform = { it.toMyInfo() }
         )
 
-        Log.e("UserRepositoryImpl", "postMyInfoToLocal: $result")
-
         result.onSuccess {
             userLocalDataSource.saveUserName(it.nickName)
             userLocalDataSource.saveUserProfileImg(it.profileImage)
         }.onFailure {
             it.printStackTrace()
-            Log.e("UserRepositoryImpl", "postMyInfoToLocal: $it")
         }
     }
 
     override suspend fun getMyInfo(): User {
         val name = userLocalDataSource.userNameFlow.firstOrNull().orEmpty().ifBlank { "나" }
         val image = userLocalDataSource.userProfileImgFlow.firstOrNull().orEmpty()
-
-        Log.e("UserRepositoryImpl", "getMyInfo: $name, $image")
 
         return User(
             id = 0,

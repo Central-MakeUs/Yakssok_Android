@@ -12,13 +12,20 @@ class RoutineRetrofitDataSource @Inject constructor(
     override suspend fun getMyRoutine(
         startDate: String,
         endDate: String
-    ): ApiResponse<RoutineResponse> = routineApi.getMyRoutine(startDate, endDate)
+    ): ApiResponse<RoutineResponse> = routineApi.getMyRoutine(
+        startDate = startDate,
+        endDate = endDate
+    )
 
     override suspend fun getFriendRoutine(
         startDate: String,
         endDate: String,
         friendsId: Int
-    ): ApiResponse<RoutineResponse> = routineApi.getFriendRoutine(startDate, endDate, friendsId)
+    ): ApiResponse<RoutineResponse> = routineApi.getFriendRoutine(
+        friendsId = friendsId,
+        startDate = startDate,
+        endDate = endDate
+    )
 
     override suspend fun putTakeRoutine(scheduleId: Int): ApiResponse<Unit> =
         routineApi.putTakeRoutine(scheduleId)
