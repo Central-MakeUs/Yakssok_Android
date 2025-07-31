@@ -78,6 +78,8 @@ private fun MateItem(
     onMateClick: () -> Unit,
     isClicked: Boolean
 ) {
+    val textColor = if (isClicked) YakssokTheme.color.primary500 else YakssokTheme.color.grey600
+
     Column(
         modifier = Modifier.clickable { onMateClick() },
         horizontalAlignment = Alignment.CenterHorizontally
@@ -92,7 +94,7 @@ private fun MateItem(
             modifier = Modifier.height(21.dp),
             text = user.relationName,
             style = YakssokTheme.typography.body2,
-            color = YakssokTheme.color.grey600
+            color = textColor
         )
     }
 }
