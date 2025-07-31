@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,12 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.Medicine
+import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -40,18 +38,18 @@ import java.util.Locale
 
 @Composable
 fun DailyMedicineRow(
-    medicine: Medicine,
+    routine: Routine,
     onClick: () -> Unit = {}
 ) {
-    val textColor = if (medicine.isTaken) YakssokTheme.color.grey600 else YakssokTheme.color.grey950
+    val textColor = if (routine.isTaken) YakssokTheme.color.grey600 else YakssokTheme.color.grey950
     val rightColor =
-        if (medicine.isTaken) YakssokTheme.color.grey200 else YakssokTheme.color.primary400
+        if (routine.isTaken) YakssokTheme.color.grey200 else YakssokTheme.color.primary400
     val checkIcon =
-        if (medicine.isTaken) R.drawable.ic_checkbox_false else R.drawable.ic_checkbox_true
-    val formattedTime = medicine.time.format(
+        if (routine.isTaken) R.drawable.ic_checkbox_false else R.drawable.ic_checkbox_true
+    val formattedTime = routine.intakeTime.format(
         DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH)
     )
-    val rowHeight = if (medicine.name.length > 10) 72.dp else 56.dp
+    val rowHeight = if (routine.medicationName.length > 10) 72.dp else 56.dp
 
     Row(
         modifier = Modifier
@@ -76,10 +74,10 @@ fun DailyMedicineRow(
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 modifier = Modifier.weight(1f),
-                text = medicine.name,
+                text = routine.medicationName,
                 style = YakssokTheme.typography.subtitle2,
                 color = textColor,
-                textDecoration = if(medicine.isTaken) TextDecoration.LineThrough else null
+                textDecoration = if(routine.isTaken) TextDecoration.LineThrough else null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -129,25 +127,25 @@ fun DailyMedicineRowPreview() {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             DailyMedicineRow(
-                medicine = Medicine(
-                    name = "종합 비타민 오쏘몰",
-                    time = LocalTime.now(),
+                routine = Routine(
+                    medicationName = "종합 비타민 오쏘몰",
+                    intakeTime = LocalTime.now(),
                     isTaken = true
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
             DailyMedicineRow(
-                medicine = Medicine(
-                    name = "피부약",
-                    time = LocalTime.now(),
+                routine = Routine(
+                    medicationName = "피부약",
+                    intakeTime = LocalTime.now(),
                     isTaken = false
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
             DailyMedicineRow(
-                medicine = Medicine(
-                    name = "현대백화점에서산알약입니다이오",
-                    time = LocalTime.now(),
+                routine = Routine(
+                    medicationName = "현대백화점에서산알약입니다이오",
+                    intakeTime = LocalTime.now(),
                     isTaken = false
                 )
             )

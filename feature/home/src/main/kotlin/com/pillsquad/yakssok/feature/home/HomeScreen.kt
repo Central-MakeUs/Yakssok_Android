@@ -29,7 +29,7 @@ import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
-import com.pillsquad.yakssok.core.model.Medicine
+import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
@@ -143,7 +143,7 @@ private fun HomeScreen(
             HomeContent(
                 modifier = Modifier,
                 userProfileList = userProfileList,
-                medicineList = userProfileList[selectedUserIdx].medicineCache[selectedDate] ?: emptyList(),
+                routineList = userProfileList[selectedUserIdx].routineCache[selectedDate] ?: emptyList(),
                 selectedDate = selectedDate,
                 selectedUserId = selectedUserIdx,
                 isRounded = showFeedBackSection,
@@ -162,7 +162,7 @@ private fun HomeScreen(
 private fun HomeContent(
     modifier: Modifier,
     userProfileList: List<User>,
-    medicineList: List<Medicine>,
+    routineList: List<Routine>,
     selectedDate: LocalDate,
     selectedUserId: Int,
     isRounded: Boolean,
@@ -211,7 +211,7 @@ private fun HomeContent(
             onNavigateCalendar = onNavigateCalendar
         )
         Spacer(modifier = Modifier.height(32.dp))
-        if (medicineList.isEmpty()) {
+        if (routineList.isEmpty()) {
             NoMedicineColumn(
                 modifier = Modifier,
                 isNeverAlarm = isNotMedicine,
@@ -219,7 +219,7 @@ private fun HomeContent(
             )
         } else {
             DailyMedicineList(
-                medicineList = medicineList,
+                routineList = routineList,
                 onItemClick = {},
                 onNavigateToRoute = onNavigateRoutine
             )

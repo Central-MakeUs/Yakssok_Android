@@ -13,7 +13,7 @@ data class HomeUiModel(
             nickName = "나",
             relationName = "나",
             profileImage = "",
-            medicineCache = mutableMapOf()
+            routineCache = mutableMapOf()
         )
     ),
     val showFeedBackSection: Boolean = false,
