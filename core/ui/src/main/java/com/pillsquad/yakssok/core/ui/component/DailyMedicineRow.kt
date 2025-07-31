@@ -35,13 +35,14 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyMedicineRow(
     routine: Routine,
+    isCheckBoxVisible: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     val textColor = if (routine.isTaken) YakssokTheme.color.grey600 else YakssokTheme.color.grey950
     val rightColor =
-        if (routine.isTaken) YakssokTheme.color.grey200 else YakssokTheme.color.primary400
+        if (routine.isTaken) YakssokTheme.color.primary200 else YakssokTheme.color.grey200
     val checkIcon =
-        if (routine.isTaken) R.drawable.ic_checkbox_false else R.drawable.ic_checkbox_true
+        if (routine.isTaken) R.drawable.ic_checkbox_true else R.drawable.ic_checkbox_false
     val formattedTime = formatLocalTime(routine.intakeTime)
     val rowHeight = if (routine.medicationName.length > 10) 72.dp else 56.dp
 
@@ -103,11 +104,13 @@ fun DailyMedicineRow(
                 .padding(end = 16.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
-            Icon(
-                painter = painterResource(checkIcon),
-                contentDescription = "check",
-                tint = Color.Unspecified
-            )
+            if (isCheckBoxVisible) {
+                Icon(
+                    painter = painterResource(checkIcon),
+                    contentDescription = "check",
+                    tint = Color.Unspecified
+                )
+            }
         }
     }
 }
