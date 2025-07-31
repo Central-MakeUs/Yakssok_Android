@@ -10,4 +10,7 @@ setNamespace("core.ui")
 dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.model)
+    implementation(projects.core.common)
+
+    implementation(libs.kotlinx.datetime)
 }

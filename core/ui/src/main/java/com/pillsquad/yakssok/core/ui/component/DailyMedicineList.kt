@@ -24,10 +24,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
-import java.time.LocalTime
+import kotlinx.datetime.LocalTime
 
 @Composable
 fun DailyMedicineList(
@@ -113,26 +114,8 @@ private fun DailyMedicineListPreview() {
                 .systemBarsPadding()
                 .padding(16.dp)
         ) {
-            val routineLists = listOf(
-                Routine(
-                    medicationName = "종합 비타민 오쏘몰",
-                    intakeTime = LocalTime.now(),
-                    isTaken = true
-                ),
-                Routine(
-                    medicationName = "피부약",
-                    intakeTime = LocalTime.now(),
-                    isTaken = false
-                ),
-                Routine(
-                    medicationName = "현대백화점에서산알약입니다이오",
-                    intakeTime = LocalTime.now(),
-                    isTaken = false
-                )
-            )
-
             DailyMedicineList(
-                routineList = routineLists,
+                routineList = listOf(),
                 onItemClick = {},
                 onNavigateToRoute = {}
             )

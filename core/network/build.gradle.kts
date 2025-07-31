@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.pillsquad.yakssok.setNamespace
+import org.gradle.kotlin.dsl.implementation
 
 plugins {
     alias(libs.plugins.yakssok.android.library)
