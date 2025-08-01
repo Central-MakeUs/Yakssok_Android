@@ -1,9 +1,9 @@
 package com.pillsquad.yakssok.core.data.mapper
 
 import com.pillsquad.yakssok.core.model.MyInfo
-import com.pillsquad.yakssok.core.model.User
-import com.pillsquad.yakssok.core.network.model.response.FollowingInfoResponse
+import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.model.response.MyInfoResponse
+import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
 
 internal fun MyInfoResponse.toMyInfo(): MyInfo =
     MyInfo(
@@ -13,3 +13,8 @@ internal fun MyInfoResponse.toMyInfo(): MyInfo =
         followingCount = followingCount
     )
 
+internal fun UserInfoResponse.toUserInfo(): UserInfo =
+    UserInfo(
+        nickName = nickname,
+        profileImageUrl = profileImageUrl ?: ""
+    )
