@@ -19,9 +19,9 @@ import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 
 @Composable
 internal fun PlusMateScreen(
-    name: String,
     nickName: String,
-    imgUrl: String,
+    relationName: String,
+    profileImageUrl: String,
     enabled: Boolean,
     onValueChange: (String) -> Unit,
     onNavigateBack: () -> Unit,
@@ -37,8 +37,8 @@ internal fun PlusMateScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         ProfileColumn(
-            name = name,
-            imgUrl = imgUrl
+            name = nickName,
+            imgUrl = profileImageUrl
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -62,7 +62,7 @@ internal fun PlusMateScreen(
         YakssokTextField(
             modifier = Modifier.fillMaxWidth(),
             backgroundColor = YakssokTheme.color.grey50,
-            value = nickName,
+            value = relationName,
             onValueChange = onValueChange,
             hint = "내 친구, 울엄마 등",
             isShowClear = true,

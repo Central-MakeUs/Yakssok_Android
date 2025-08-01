@@ -2,7 +2,6 @@ package com.pillsquad.yakssok.feature.mate.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -23,8 +22,8 @@ import com.pillsquad.yakssok.feature.mate.R
 
 @Composable
 internal fun MateCompleteDialog(
-    mateName: String,
-    mateNickName: String,
+    nickName: String,
+    relationName: String,
     imgUrl: String,
     onNavigateBack: () -> Unit
 ) {
@@ -35,7 +34,7 @@ internal fun MateCompleteDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${mateName}님과 메이트가 되었어요!",
+                    text = "${nickName}님과 메이트가 되었어요!",
                     style = YakssokTheme.typography.subtitle1,
                     color = YakssokTheme.color.grey900
                 )
@@ -67,13 +66,13 @@ internal fun MateCompleteDialog(
                             style = YakssokTheme.typography.body2.toSpanStyle()
                                 .copy(YakssokTheme.color.grey400)
                         ) {
-                            append("${mateNickName}\n")
+                            append("${relationName}\n")
                         }
                         withStyle(
                             style = YakssokTheme.typography.body2.toSpanStyle()
                                 .copy(YakssokTheme.color.grey600)
                         ) {
-                            append(mateName)
+                            append(nickName)
                         }
                     },
                     textAlign = TextAlign.Center,

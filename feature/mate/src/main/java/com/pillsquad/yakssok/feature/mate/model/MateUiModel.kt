@@ -2,11 +2,10 @@ package com.pillsquad.yakssok.feature.mate.model
 
 data class MateUiModel(
     val curPage: Int = 0,
-    val mateId: Long = -1,
     val myCode: String = "abcdef1gh",
-    val inputCode: String = "",
-    val mateName: String = "김OO",
-    val imgUrl: String = "",
-    val mateNickName: String = "",
+    val friendCode: String = "",
+    val relationName: String = "",
+    val friendNickName: String = "김OO",
+    val friendImageUrl: String = "",
     val isEnabled: Boolean = false
 )
