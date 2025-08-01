@@ -24,6 +24,7 @@ class UserPreferences @Inject constructor(
         private val ACCESS_TOKEN_KEY = stringPreferencesKey("user_access_token")
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("user_refresh_token")
         private val OAUTH_TYPE = stringPreferencesKey("oauth_type")
+        private val INVITE_CODE = stringPreferencesKey("invite_code")
     }
 
     val userNameFlow: Flow<String> = dataStore.data
@@ -49,6 +50,9 @@ class UserPreferences @Inject constructor(
 
     val oauthTypeFlow: Flow<String> = dataStore.data
         .map { it[OAUTH_TYPE] ?: "" }
+
+    val inviteCodeFlow: Flow<String> = dataStore.data
+        .map { it[INVITE_CODE] ?: "" }
 
     suspend fun saveUserName(userName: String) {
         dataStore.edit { it[USER_NAME] = userName }
@@ -80,6 +84,10 @@ class UserPreferences @Inject constructor(
 
     suspend fun saveOauthType(oauthType: String) {
         dataStore.edit { it[OAUTH_TYPE] = oauthType }
+    }
+
+    suspend fun saveInviteCode(inviteCode: String) {
+        dataStore.edit { it[INVITE_CODE] = inviteCode }
     }
 
     suspend fun clearTokens() {

@@ -16,6 +16,8 @@ class UserLocalDataSource @Inject constructor(
     val accessTokenFlow: Flow<String> = userPreferences.accessTokenFlow
     val refreshTokenFlow: Flow<String> = userPreferences.refreshTokenFlow
     val oauthTypeFlow: Flow<String> = userPreferences.oauthTypeFlow
+    val inviteCodeFlow: Flow<String> = userPreferences.inviteCodeFlow
+
 
     suspend fun saveUserName(userName: String) {
         userPreferences.saveUserName(userName)
@@ -47,6 +49,10 @@ class UserLocalDataSource @Inject constructor(
 
     suspend fun saveOauthType(oauthType: String) {
         userPreferences.saveOauthType(oauthType)
+    }
+
+    suspend fun saveInviteCode(inviteCode: String) {
+        userPreferences.saveInviteCode(inviteCode)
     }
 
     suspend fun clearTokens() {
