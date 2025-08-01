@@ -46,9 +46,9 @@ internal fun MateRoute(
 
     if (isComplete) {
         MateCompleteDialog(
-            mateName = uiState.mateName,
-            mateNickName = uiState.mateNickName,
-            imgUrl = uiState.imgUrl,
+            nickName = uiState.friendNickName,
+            relationName = uiState.relationName,
+            imgUrl = uiState.friendImageUrl,
             onNavigateBack = {
                 isComplete = false
                 onNavigateBack()
@@ -61,13 +61,13 @@ internal fun MateRoute(
             uiState = uiState,
             updateInputCode = viewModel::updateInputCode,
             onNavigateBack = onNavigateBack,
-            onNavigatePlus = { viewModel.updateCurPage(1) }
+            onNavigatePlus = { viewModel.getFriendInfo() }
         )
 
         1 -> PlusMateScreen(
-            name = uiState.mateName,
-            nickName = uiState.mateNickName,
-            imgUrl = uiState.imgUrl,
+            nickName = uiState.friendNickName,
+            relationName = uiState.relationName,
+            profileImageUrl = uiState.friendImageUrl,
             enabled = uiState.isEnabled,
             onValueChange = viewModel::updateNickName,
             onNavigateBack = { viewModel.updateCurPage(0) },
@@ -115,10 +115,11 @@ private fun MateScreen(
                 .padding(horizontal = 32.dp)
                 .fillMaxWidth(),
             backgroundColor = YakssokTheme.color.grey50,
-            value = uiState.inputCode,
+            value = uiState.friendCode,
             onValueChange = updateInputCode,
             hint = "코드입력",
-            isSuffixEnabled = uiState.inputCode.isNotEmpty(),
+            maxLength = 9,
+            isSuffixEnabled = uiState.friendCode.isNotEmpty(),
             suffixButtonText = "추가",
             onSuffixButtonClick = onNavigatePlus,
         )
