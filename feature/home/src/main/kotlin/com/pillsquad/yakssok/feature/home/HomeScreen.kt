@@ -38,6 +38,7 @@ import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
+import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import kotlinx.datetime.DateTimeUnit
@@ -56,6 +57,7 @@ internal fun HomeRoute(
     onNavigateCalendar: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val remindState by viewModel.remindState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     var feedbackTarget by remember { mutableStateOf<User?>(null) }
@@ -70,6 +72,17 @@ internal fun HomeRoute(
                 viewModel.postFeedback(userId, message, type)
                 feedbackTarget = null
             }
+        )
+    }
+
+    remindState?.let {
+        val nickName = uiState.userList[0].nickName
+        val routineList = uiState.routineCache[0]?.get(uiState.selectedDate) ?: emptyList()
+
+        RemindDialog(
+            name = nickName,
+            routineList = routineList,
+            onDismiss = { viewModel.clearRemindState() }
         )
     }
 
