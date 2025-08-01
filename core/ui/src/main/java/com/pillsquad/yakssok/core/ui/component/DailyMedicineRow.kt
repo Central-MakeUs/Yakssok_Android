@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -35,14 +36,25 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DailyMedicineRow(
     routine: Routine,
+    isFeedback: Boolean = false,
     isCheckBoxVisible: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    val textColor = if (routine.isTaken) YakssokTheme.color.grey600 else YakssokTheme.color.grey950
+    val backgroundColor = when {
+        isFeedback -> Color.Transparent
+        else -> YakssokTheme.color.grey100
+    }
+    val textColor = when {
+        isFeedback -> YakssokTheme.color.grey950
+        routine.isTaken -> YakssokTheme.color.grey600
+        else -> YakssokTheme.color.grey950
+    }
     val rightColor =
         if (routine.isTaken) YakssokTheme.color.primary200 else YakssokTheme.color.grey200
+
     val checkIcon =
         if (routine.isTaken) R.drawable.ic_checkbox_true else R.drawable.ic_checkbox_false
+
     val formattedTime = formatLocalTime(routine.intakeTime)
     val rowHeight = if (routine.medicationName.length > 10) 72.dp else 56.dp
 
@@ -51,7 +63,18 @@ fun DailyMedicineRow(
             .fillMaxWidth()
             .height(rowHeight)
             .clip(RoundedCornerShape(16.dp))
-            .background(YakssokTheme.color.grey100),
+            .background(backgroundColor)
+            .then(
+                if (isFeedback) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = YakssokTheme.color.grey200,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
@@ -64,7 +87,7 @@ fun DailyMedicineRow(
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(YakssokTheme.color.subPurple)
+                    .background(Color(routine.medicationType.color))
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
@@ -72,7 +95,7 @@ fun DailyMedicineRow(
                 text = routine.medicationName,
                 style = YakssokTheme.typography.subtitle2,
                 color = textColor,
-                textDecoration = if (routine.isTaken) TextDecoration.LineThrough else null
+                textDecoration = if (routine.isTaken && !isFeedback) TextDecoration.LineThrough else null
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -91,25 +114,27 @@ fun DailyMedicineRow(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .width(64.dp)
-                .fillMaxHeight()
-                .background(rightColor)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick
-                )
-                .padding(end = 16.dp),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            if (isCheckBoxVisible) {
-                Icon(
-                    painter = painterResource(checkIcon),
-                    contentDescription = "check",
-                    tint = Color.Unspecified
-                )
+        if (!isFeedback) {
+            Box(
+                modifier = Modifier
+                    .width(64.dp)
+                    .fillMaxHeight()
+                    .background(rightColor)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
+                    )
+                    .padding(end = 16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                if (isCheckBoxVisible) {
+                    Icon(
+                        painter = painterResource(checkIcon),
+                        contentDescription = "check",
+                        tint = Color.Unspecified
+                    )
+                }
             }
         }
     }

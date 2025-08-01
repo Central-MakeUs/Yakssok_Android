@@ -80,6 +80,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun postFeedback(userId: Int, message: String, type: String) {
+
+    }
+
     private fun loadUserAndRoutines() {
         viewModelScope.launch {
             getUserProfileListUseCase()

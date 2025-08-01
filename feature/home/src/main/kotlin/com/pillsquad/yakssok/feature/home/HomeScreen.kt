@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +37,7 @@ import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import kotlinx.datetime.DateTimeUnit
@@ -55,6 +58,21 @@ internal fun HomeRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
+    var feedbackTarget by remember { mutableStateOf<User?>(null) }
+
+    feedbackTarget?.let {
+        FeedbackDialog(
+            user = it,
+            todayRoutineCount = uiState.userList[uiState.selectedUserIdx].notTakenCount,
+            routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate) ?: emptyList(),
+            onDismiss = { feedbackTarget = null },
+            onConfirm = { userId, message, type ->
+                viewModel.postFeedback(userId, message, type)
+                feedbackTarget = null
+            }
+        )
+    }
+
     HomeScreen(
         showFeedBackSection = uiState.showFeedBackSection,
         selectedDate = uiState.selectedDate,
@@ -69,6 +87,9 @@ internal fun HomeRoute(
             viewModel.onSelectedDate(it)
         },
         onClickRoutine = viewModel::onRoutineClick,
+        onSendMessage = {
+            feedbackTarget = it
+        },
         onNavigateMy = onNavigateMyPage,
         onNavigateMate = onNavigateMate,
         onNavigateAlert = onNavigateAlert,
