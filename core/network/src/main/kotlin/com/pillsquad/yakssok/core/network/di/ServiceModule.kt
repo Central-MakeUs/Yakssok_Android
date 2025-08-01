@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.service.AuthApi
+import com.pillsquad.yakssok.core.network.service.FeedbackApi
 import com.pillsquad.yakssok.core.network.service.FriendApi
 import com.pillsquad.yakssok.core.network.service.MedicationApi
 import com.pillsquad.yakssok.core.network.service.RoutineApi
@@ -53,4 +54,10 @@ object ServiceModule {
     fun provideRoutineApi(
         @TokenRetrofit retrofit: Retrofit
     ): RoutineApi = retrofit.create(RoutineApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFeedbackApi(
+        @TokenRetrofit retrofit: Retrofit
+    ): FeedbackApi = retrofit.create(FeedbackApi::class.java)
 }

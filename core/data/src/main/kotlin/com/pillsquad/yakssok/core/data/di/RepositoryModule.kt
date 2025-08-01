@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.core.data.di
 import com.pillsquad.yakssok.core.data.repository.FriendRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.MedicationRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.AuthRepositoryImpl
+import com.pillsquad.yakssok.core.data.repository.FeedbackRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.RoutineRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.SoundRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserRepositoryImpl
@@ -10,6 +11,7 @@ import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.domain.repository.MedicationRepository
 import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
+import com.pillsquad.yakssok.core.domain.repository.FeedbackRepository
 import com.pillsquad.yakssok.core.domain.repository.RoutineRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import dagger.Binds
@@ -52,4 +54,9 @@ abstract class RepositoryModule {
     abstract fun bindRoutineRepository(
         routineRepository: RoutineRepositoryImpl
     ): RoutineRepository
+
+    @Binds
+    abstract fun bindFeedbackRepository(
+        feedbackRepository: FeedbackRepositoryImpl
+    ): FeedbackRepository
 }

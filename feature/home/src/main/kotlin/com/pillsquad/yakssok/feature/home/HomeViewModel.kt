@@ -22,12 +22,14 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import javax.inject.Inject
 import androidx.core.util.size
+import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getUserProfileListUseCase: GetUserProfileListUseCase,
     private val getUserRoutineUseCase: GetUserRoutineUseCase,
-    private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase
+    private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
+    private val postFeedbackUseCase: PostFeedbackUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiModel())
     val uiState = _uiState.asStateFlow()
@@ -81,7 +83,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun postFeedback(userId: Int, message: String, type: String) {
-
+        viewModelScope.launch {
+            postFeedbackUseCase(userId, message, type)
+        }
     }
 
     private fun loadUserAndRoutines() {
