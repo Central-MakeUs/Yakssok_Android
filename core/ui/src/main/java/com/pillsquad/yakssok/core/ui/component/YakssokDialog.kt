@@ -32,11 +32,13 @@ fun YakssokDialog(
     enabled: Boolean = true,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    confirmContentColor: Color = YakssokTheme.color.grey50,
+    confirmBackgroundColor: Color = YakssokTheme.color.primary400,
     titleComponent: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val confirmColor = if (enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200
-    val contentColor = if (enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400
+    val confirmColor = if (enabled) confirmBackgroundColor else YakssokTheme.color.grey200
+    val contentColor = if (enabled) confirmContentColor else YakssokTheme.color.grey400
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -68,7 +70,7 @@ fun YakssokDialog(
                         .width(38.dp)
                         .background(color = Color(0xFFDBDBDB))
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(28.dp))
                 if (titleComponent == null) {
                     Text(
                         text = title,

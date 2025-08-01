@@ -22,7 +22,9 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import javax.inject.Inject
 import androidx.core.util.size
+import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
+import kotlinx.datetime.LocalTime
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -34,7 +36,11 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiModel())
     val uiState = _uiState.asStateFlow()
 
+    private val _remindState = MutableStateFlow<List<Routine>?>(null)
+    val remindState = _remindState.asStateFlow()
+
     private val today = LocalDate.today()
+    private val now = LocalTime.now()
 
     init {
         loadUserAndRoutines()
@@ -103,6 +109,7 @@ class HomeViewModel @Inject constructor(
                         startDate = startDate,
                         endDate = endDate
                     ).onSuccess { cache ->
+                        updateRemindState(cache.routineCache)
                         updateRoutineCache(0, cache)
                     }.onFailure {
                         it.printStackTrace()
@@ -147,6 +154,18 @@ class HomeViewModel @Inject constructor(
                 }
             }
         )
+    }
+
+    private fun updateRemindState(routineCache: MutableMap<LocalDate, List<Routine>>) {
+        val todayList = routineCache[today] ?: return
+        val remindList = todayList.filter { (it.intakeTime > now) && !it.isTaken }
+
+        if (remindList.isEmpty()) return
+        _remindState.value = remindList
+    }
+
+    fun clearRemindState() {
+        _remindState.value = null
     }
 
     private fun getStartEndDate(): Pair<LocalDate, LocalDate> {

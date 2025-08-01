@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,7 +41,6 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineRow
-import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 
 @Composable
 internal fun FeedbackDialog(
@@ -58,7 +55,7 @@ internal fun FeedbackDialog(
 
     val textList = if (isNagging) {
         listOf(
-            "얼른 먹어요!", "약 놓쳤어요!", "건강 챙겨요!", "먹을 때까지 숨참을게요 흡!"
+            "얼른 먹어요!", "약 놓쳤어요!", "건강 챙겨요!", "먹을 때까지 숨 참을게요 흡!"
         )
     } else {
         listOf(
@@ -249,7 +246,7 @@ private fun DialogInfoItem(
     isNagging: Boolean,
     todayRoutineCount: Int? = null
 ) {
-    val descriptionName = if (isNagging) "안먹은 약" else "오늘 먹은 약"
+    val descriptionName = if (isNagging) "안 먹은 약" else "오늘 먹은 약"
     val routineCount = if (isNagging) {
         user.notTakenCount
     } else {
