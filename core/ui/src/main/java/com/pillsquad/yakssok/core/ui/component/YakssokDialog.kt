@@ -68,7 +68,7 @@ fun YakssokDialog(
                         .width(38.dp)
                         .background(color = Color(0xFFDBDBDB))
                 )
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 if (titleComponent == null) {
                     Text(
                         text = title,

@@ -11,9 +11,7 @@ import androidx.compose.ui.unit.sp
 import com.pillsquad.yakssok.core.designsystem.R
 
 val Pretendard = FontFamily(
-    Font(R.font.pretendard_bold, FontWeight.Bold),
-    Font(R.font.pretendard_semibold, FontWeight.SemiBold),
-    Font(R.font.pretendard_medium, FontWeight.Medium),
+    Font(R.font.pretendard_std_variable, FontWeight.Normal),
 )
 
 @Stable
