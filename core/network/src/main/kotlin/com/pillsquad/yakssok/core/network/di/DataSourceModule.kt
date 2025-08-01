@@ -1,11 +1,13 @@
 package com.pillsquad.yakssok.core.network.di
 
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
+import com.pillsquad.yakssok.core.network.datasource.FeedbackDataSource
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
 import com.pillsquad.yakssok.core.network.datasource.MedicationDataSource
 import com.pillsquad.yakssok.core.network.datasource.RoutineDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.remote.AuthRetrofitDataSource
+import com.pillsquad.yakssok.core.network.remote.FeedbackRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.FriendRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.MedicationRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.RoutineRetrofitDataSource
@@ -43,4 +45,9 @@ abstract class DataSourceModule {
     abstract fun bindRoutineDataSource(
         routineRetrofitDataSource: RoutineRetrofitDataSource
     ): RoutineDataSource
+
+    @Binds
+    abstract fun bindFeedbackDataSource(
+        feedbackRetrofitDataSource: FeedbackRetrofitDataSource
+    ): FeedbackDataSource
 }
