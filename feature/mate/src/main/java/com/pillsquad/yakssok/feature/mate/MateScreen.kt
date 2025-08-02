@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.feature.mate
 
 import android.content.ClipData
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,12 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -44,7 +43,6 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.mate.component.DashedBorderBox
 import com.pillsquad.yakssok.feature.mate.component.MateCompleteDialog
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -139,7 +137,9 @@ private fun MateScreen(
 
         CodeContent(
             modifier = Modifier.weight(1f),
-            code = uiState.myCode,
+            userName = uiState.myName,
+            inviteCode = uiState.myCode,
+            inviteLink = ""
         )
     }
 }
@@ -178,7 +178,9 @@ private fun IconBox(
 @Composable
 private fun CodeContent(
     modifier: Modifier,
-    code: String,
+    userName: String,
+    inviteCode: String,
+    inviteLink: String
 ) {
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
@@ -217,7 +219,7 @@ private fun CodeContent(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = {
-                        val clipData = ClipData.newPlainText("초대코드", code)
+                        val clipData = ClipData.newPlainText("초대코드", inviteCode)
 
                         scope.launch {
                             clipboard.setClipEntry(clipData.toClipEntry())
@@ -226,7 +228,7 @@ private fun CodeContent(
                 )
             ) {
                 Text(
-                    text = code,
+                    text = inviteCode,
                     textDecoration = TextDecoration.Underline,
                     style = YakssokTheme.typography.body0,
                     color = YakssokTheme.color.grey950
@@ -236,14 +238,50 @@ private fun CodeContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        YakssokButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .imePadding(),
-            text = "내 코드 공유하기",
-            backgroundColor = YakssokTheme.color.primary400,
-            contentColor = YakssokTheme.color.grey50,
-            onClick = {},
+        ShareInviteButton(
+            userName = userName,
+            inviteCode = inviteCode,
+            inviteLink = ""
         )
     }
+}
+
+@Composable
+private fun ShareInviteButton(
+    userName: String,
+    inviteCode: String,
+    inviteLink: String
+) {
+    val context = LocalContext.current
+
+    YakssokButton(
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding(),
+        text = "내 코드 공유하기",
+        backgroundColor = YakssokTheme.color.primary400,
+        contentColor = YakssokTheme.color.grey50,
+        onClick = {
+            val sharingMessage = buildInviteMessage(userName, inviteCode, inviteLink)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, sharingMessage)
+            }
+            context.startActivity(
+                Intent.createChooser(intent, null)
+            )
+        },
+    )
+}
+
+private fun buildInviteMessage(userName: String, code: String, link: String): String {
+    return """
+        ${userName}님이 함께 약 챙기자고 해요. 가끔 잊어버릴 수도 있으니까,
+        서로 약 잘 먹고 있는지 확인하며 챙기는 건 어때요?
+        필요할 땐 잔소리도 살짝😉
+        
+        ${userName}님의 코드: $code
+        👇 여기를 들어오면 같이 챙길 수 있어요
+        $link
+    """.trimIndent()
 }

@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.feature.mate.model
 
 data class MateUiModel(
     val curPage: Int = 0,
+    val myName: String = "나",
     val myCode: String = "abcdef1gh",
     val friendCode: String = "",
     val relationName: String = "",
