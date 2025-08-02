@@ -66,3 +66,7 @@
 -dontwarn androidx.navigation.**
 -keep class androidx.datastore.** { *; }
 -dontwarn androidx.datastore.**
+
+# Firebase
+-keep class com.google.firebase.crashlytics.** { *; }
+-dontwarn com.google.firebase.crashlytics.**
