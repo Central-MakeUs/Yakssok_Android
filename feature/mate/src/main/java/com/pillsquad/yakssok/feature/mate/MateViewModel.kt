@@ -3,7 +3,7 @@ package com.pillsquad.yakssok.feature.mate
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pillsquad.yakssok.core.domain.usecase.GetMyInviteCodeUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoWithInviteCodeUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserInfoByInviteCodeUseCase
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,14 +15,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MateViewModel @Inject constructor(
-    private val getMyInviteCodeUseCase: GetMyInviteCodeUseCase,
+    private val getMyInfoWithInviteCodeUseCase: GetMyInfoWithInviteCodeUseCase,
     private val getUserInfoByInviteCodeUseCase: GetUserInfoByInviteCodeUseCase
 ): ViewModel() {
     private var _uiState = MutableStateFlow(MateUiModel())
     val uiState = _uiState.asStateFlow()
 
     init {
-        getMyInviteCode()
+        getMyInfoWithCode()
     }
 
     fun getFriendInfo() {
@@ -60,11 +60,11 @@ class MateViewModel @Inject constructor(
         }
     }
 
-    private fun getMyInviteCode() {
+    private fun getMyInfoWithCode() {
         viewModelScope.launch {
-            val code = getMyInviteCodeUseCase()
+            val (code, name) = getMyInfoWithInviteCodeUseCase()
 
-            _uiState.value = _uiState.value.copy(myCode = code)
+            _uiState.value = _uiState.value.copy(myCode = code, myName = name)
         }
     }
 
