@@ -2,6 +2,8 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.yakssok.android.application)
+    alias(libs.plugins.google)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -59,4 +61,8 @@ dependencies {
     implementation(projects.core.network)
 
     implementation(libs.kakao.user)
+
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 }
