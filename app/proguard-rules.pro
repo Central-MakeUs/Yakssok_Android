@@ -48,6 +48,7 @@
 
 # ViewModel (HiltViewModel 포함)
 -keep class * extends androidx.lifecycle.ViewModel
+-keep class **ViewModel { *; }
 
 # Jetpack Compose
 -keep class androidx.compose.** { *; }
