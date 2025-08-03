@@ -1,0 +1,5 @@
+-keep class com.pillsquad.yakssok.core.network.di.** { *; }
+-keep class com.pillsquad.yakssok.core.network.interceptor.** { *; }
+-keep class com.pillsquad.yakssok.core.network.calladapter.** { *; }
+-keep interface com.pillsquad.yakssok.core.network.service.** { *; }
+-keep @interface com.pillsquad.yakssok.core.network.di.*
