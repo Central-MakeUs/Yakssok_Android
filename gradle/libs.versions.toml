@@ -75,7 +75,7 @@ detekt = "1.23.7"
 junit = "1.2.1"
 appcompat = "1.7.0"
 material = "1.12.0"
-kakao = "2.21.5"
+kakao = "2.21.6"
 
 google="4.4.3"
 firebaseCrashlyticsPlugin = "3.0.5"
