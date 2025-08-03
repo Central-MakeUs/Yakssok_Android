@@ -82,3 +82,6 @@
 # Kakao
 -keep class com.kakao.sdk.** { *; }
 -dontwarn com.kakao.sdk.**
+-keep class com.kakao.sdk.common.model.ClientError {
+    <fields>;
+}
