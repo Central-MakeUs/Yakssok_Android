@@ -1,0 +1,1 @@
+-keep class com.pillsquad.yakssok.core.sound.di.SoundModule { *; }

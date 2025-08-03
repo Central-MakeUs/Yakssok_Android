@@ -19,22 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-# Keep Hilt modules
--keep class com.pillsquad.yakssok.core.network.di.** { *; }
-
-# Keep network service interfaces & class
--keep class com.pillsquad.yakssok.core.network.model.** { *; }
--keep class com.pillsquad.yakssok.core.network.service.** { *; }
--keep interface com.pillsquad.yakssok.core.network.service.** { *; }
-
-# Keep qualifiers (prevent renaming)
--keep class com.pillsquad.yakssok.core.network.di.TokenInterceptorHttpClient
--keep class com.pillsquad.yakssok.core.network.di.NoHeaderHttpClient
--keep class com.pillsquad.yakssok.core.network.di.TokenRetrofit
--keep class com.pillsquad.yakssok.core.network.di.NoHeaderRetrofit
-
-# Keep interceptors and call adapters
--keep class com.pillsquad.yakssok.core.network.interceptor.** { *; }
--keep interface com.pillsquad.yakssok.core.network.interceptor.** { *; }
--keep class com.pillsquad.yakssok.core.network.calladapter.** { *; }

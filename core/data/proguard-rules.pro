@@ -19,8 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-# Keep Hilt modules
--keep class com.pillsquad.yakssok.core.data.di.** { *; }
--keep class com.pillsquad.yakssok.core.data.AuthTokenProvider { *; }
--keep class com.pillsquad.yakssok.core.data.AuthTokenExpirationHandler { *; }
