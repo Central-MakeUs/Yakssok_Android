@@ -21,12 +21,22 @@
 #-renamesourcefileattribute SourceFile
 
 # Retrofit
--keep class retrofit2.** { *; }
--dontwarn retrofit2.**
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
 
 # Kotlin Serialization
 -keepclassmembers class kotlinx.serialization.** { *; }
 -keepattributes *Annotation*
+
+# Kotlin Reflection
+-keepclassmembers class kotlin.Metadata { *; }
+-keepclassmembers class ** {
+    @com.kakao.sdk.common.json.* <fields>;
+}
 
 # Coroutines
 -dontwarn kotlinx.coroutines.**
@@ -70,3 +80,6 @@
 # Firebase
 -keep class com.google.firebase.crashlytics.** { *; }
 -dontwarn com.google.firebase.crashlytics.**
+
+# Kakao
+-keep class com.kakao.sdk.**.model.* { <fields>; }
