@@ -20,10 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# keep class & interface associtaed by api
--keep class com.pillsquad.yakssok.core.network.model.** { *; }
--keep interface com.pillsquad.yakssok.core.network.service.** { *; }
-
 # Retrofit
 -keep interface retrofit2.* { *; }
 -keep class retrofit2.Response
