@@ -1,1 +1,0 @@
--keep class com.pillsquad.yakssok.datastore.di.DatastoreModule { *; }

@@ -20,64 +20,42 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Retrofit
--keep interface retrofit2.* { *; }
--keep class retrofit2.Response
+-keep class com.pillsquad.yakssok.core.network.interceptor.** { *; }
+-keep class com.pillsquad.yakssok.core.network.calladapter.** { *; }
 
-# Kotlin Serialization
--keep class kotlinx.serialization.** { *; }
--keepattributes *Annotation*
--dontwarn kotlinx.serialization.**
-
-# Kotlin Reflection
--keep class kotlin.Metadata { *; }
-
-# Coroutines
--dontwarn kotlinx.coroutines.**
-
-# OkHttp
--keep class okhttp3.Callback { *; }
--dontwarn okhttp3.**
-
-# Dagger / Hilt components
--keep class dagger.** { *; }
--keep class javax.inject.** { *; }
--keep class com.google.dagger.** { *; }
--keep class androidx.hilt.** { *; }
--keep class dagger.hilt.** { *; }
--dontwarn dagger.**
--dontwarn javax.inject.**
--dontwarn androidx.hilt.**
+-keep class com.pillsquad.yakssok.core.network.di.** { *; }
+-keep interface com.pillsquad.yakssok.core.network.service.** { *; }
+-keep @interface com.pillsquad.yakssok.core.network.di.*
+-keep class * implements dagger.internal.Factory { *; }
+-keep class * implements javax.inject.Provider { *; }
 -keep class * extends dagger.hilt.internal.GeneratedComponent { *; }
 
-# ViewModels
--keep class * extends androidx.lifecycle.ViewModel
--keep class **ViewModel { *; }
+-keep class com.pillsquad.yakssok.core.network.model.** { *; }
+-keep interface com.pillsquad.yakssok.core.network.service.** { *; }
 
-# Jetpack Compose
--keep class androidx.compose.** { *; }
--dontwarn androidx.compose.**
+# Keep Dependency Injection Framework related classes and methods
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keep class javax.annotation.** { *; }
+-keep class javax.lang.model.** { *; }
+-dontwarn javax.lang.model.**
 
-# Coil
--keep class coil.** { *; }
--keep class coil3.** { *; }
--dontwarn coil.**
+# Keep Dependency Injection Framework related classes and methods
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keep class javax.annotation.** { *; }
 
-# AndroidX Lifecycle / Navigation / DataStore
--keep class androidx.lifecycle.** { *; }
--dontwarn androidx.lifecycle.**
--keep class androidx.navigation.** { *; }
--dontwarn androidx.navigation.**
--keep class androidx.datastore.** { *; }
--dontwarn androidx.datastore.**
+-keep class com.kakao.sdk.**.model.* { <fields>; }
 
-# Firebase
--keep class com.google.firebase.crashlytics.** { *; }
--dontwarn com.google.firebase.crashlytics.**
+# https://github.com/square/okhttp/pull/6792
+-dontwarn org.bouncycastle.jsse.**
+-dontwarn org.conscrypt.*
+-dontwarn org.openjsse.**
 
-# Kakao
--keep class com.kakao.sdk.** { *; }
--dontwarn com.kakao.sdk.**
--keep class com.kakao.sdk.common.model.ClientError {
-    <fields>;
-}
+# refrofit2 (with r8 full mode)
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
