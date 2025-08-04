@@ -11,8 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "com.pillsquad.yakssok"
-        versionCode = 9
-        versionName = "0.0.9"
+        versionCode = 10
+        versionName = "0.0.10"
         targetSdk = 36
 
         buildConfigField("String", "KAKAO_API_KEY", getProperty("KAKAO_API_KEY"))
@@ -30,8 +30,8 @@ android {
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
-
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -56,9 +56,28 @@ fun getProperty(key: String): String {
 }
 
 dependencies {
-    implementation(projects.feature.main)
+    implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.core.datastore)
     implementation(projects.core.network)
+    implementation(projects.core.sound)
+
+    implementation(projects.core.navigation)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.ui)
+
+    implementation(projects.feature.main)
+    implementation(projects.feature.alert)
+    implementation(projects.feature.calendar)
+    implementation(projects.feature.home)
+    implementation(projects.feature.info)
+    implementation(projects.feature.intro)
+    implementation(projects.feature.mate)
+    implementation(projects.feature.mymate)
+    implementation(projects.feature.mypage)
+    implementation(projects.feature.myroutine)
+    implementation(projects.feature.profileEdit)
+    implementation(projects.feature.routine)
 
     implementation(libs.kakao.user)
 
