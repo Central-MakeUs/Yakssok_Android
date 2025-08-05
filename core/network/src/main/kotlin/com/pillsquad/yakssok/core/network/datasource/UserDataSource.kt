@@ -10,4 +10,6 @@ interface UserDataSource {
     suspend fun getMyInfo(): ApiResponse<MyInfoResponse>
     suspend fun getMyInviteCode(): ApiResponse<InviteCodeResponse>
     suspend fun getUserInfoByInviteCode(inviteCode: String): ApiResponse<UserInfoResponse>
+    suspend fun deleteUser(): ApiResponse<Unit>
+    suspend fun putLogout(): ApiResponse<Unit>
 }

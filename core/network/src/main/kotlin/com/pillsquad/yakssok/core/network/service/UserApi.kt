@@ -4,7 +4,9 @@ import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.response.InviteCodeResponse
 import com.pillsquad.yakssok.core.network.model.response.MyInfoResponse
 import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface UserApi {
@@ -18,4 +20,11 @@ interface UserApi {
     suspend fun getUserInfoByInviteCode(
         @Query("inviteCode") inviteCode: String
     ): ApiResponse<UserInfoResponse>
+
+    @DELETE("/api/users")
+    suspend fun deleteUser(): ApiResponse<Unit>
+
+    // auth에 들어가야 관념상 맞긴한데, AuthApi는 NoHeader이기에 UserApi에 선언
+    @PUT("/api/auth/logout")
+    suspend fun putLogout(): ApiResponse<Unit>
 }

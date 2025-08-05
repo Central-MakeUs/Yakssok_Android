@@ -74,6 +74,12 @@ internal fun MyPageRoute(
             isLogout = isLogoutShow ?: true,
             onDismiss = { isLogoutShow = null },
             onConfirm = {
+                if (isLogoutShow ?: true) {
+                    viewModel.logoutUser()
+                } else {
+                    viewModel.deleteAccount()
+                }
+
                 isCompleteShow = isLogoutShow
                 isLogoutShow = null
             }
@@ -97,7 +103,8 @@ internal fun MyPageRoute(
         onNavigateProfileEdit = onNavigateProfileEdit,
         onNavigateMyRoutine = onNavigateMyRoutine,
         onNavigateMyMate = onNavigateMyMate,
-        onNavigateInfo = onNavigateInfo
+        onNavigateInfo = onNavigateInfo,
+        onShowDialog = { isLogoutShow = it }
     )
 }
 
@@ -109,7 +116,8 @@ private fun MyPageScreen(
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
-    onNavigateInfo: (String, String) -> Unit
+    onNavigateInfo: (String, String) -> Unit,
+    onShowDialog: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100)
@@ -133,7 +141,8 @@ private fun MyPageScreen(
                     onNavigateProfileEdit = onNavigateProfileEdit,
                     onNavigateMyRoutine = onNavigateMyRoutine,
                     onNavigateMyMate = onNavigateMyMate,
-                    onNavigateInfo = onNavigateInfo
+                    onNavigateInfo = onNavigateInfo,
+                    onShowDialog = onShowDialog
                 )
             }
 
@@ -154,7 +163,8 @@ private fun SuccessContent(
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
-    onNavigateInfo: (String, String) -> Unit
+    onNavigateInfo: (String, String) -> Unit,
+    onShowDialog: (Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -223,8 +233,8 @@ private fun SuccessContent(
         Spacer(modifier = Modifier.weight(1f))
 
         MyPageBottomButtons(
-            onLogout = {},
-            onAccountCancel = {}
+            onLogout = { onShowDialog(true) },
+            onDeleteAccout = { onShowDialog(false) }
         )
     }
 }

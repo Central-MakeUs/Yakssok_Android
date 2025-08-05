@@ -11,4 +11,6 @@ interface UserRepository {
     suspend fun getMyInviteCode(): String
     suspend fun getUserInfoByInviteCode(inviteCode: String): Result<UserInfo>
     suspend fun getMyInfo(): Flow<MyInfo>
+    suspend fun putLogout(): Result<Unit>
+    suspend fun deleteAccount(): Result<Unit>
 }

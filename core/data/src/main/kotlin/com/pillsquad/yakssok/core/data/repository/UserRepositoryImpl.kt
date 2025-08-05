@@ -93,4 +93,32 @@ class UserRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override suspend fun putLogout(): Result<Unit> {
+        val result = userRetrofitDataSource.putLogout().toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.clearAllData()
+            // Todo: room 데이터 삭제
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "putLogout: $it")
+        }
+
+        return result
+    }
+
+    override suspend fun deleteAccount(): Result<Unit> {
+        val result = userRetrofitDataSource.deleteUser().toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.clearAllData()
+            // Todo: room 데이터 삭제
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "deleteUser: $it")
+        }
+
+        return result
+    }
 }
