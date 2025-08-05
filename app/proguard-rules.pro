@@ -24,11 +24,7 @@
 -keep class com.pillsquad.yakssok.core.network.calladapter.** { *; }
 
 -keep class com.pillsquad.yakssok.core.network.di.** { *; }
--keep interface com.pillsquad.yakssok.core.network.service.** { *; }
 -keep @interface com.pillsquad.yakssok.core.network.di.*
--keep class * implements dagger.internal.Factory { *; }
--keep class * implements javax.inject.Provider { *; }
--keep class * extends dagger.hilt.internal.GeneratedComponent { *; }
 
 -keep class com.pillsquad.yakssok.core.network.model.** { *; }
 -keep interface com.pillsquad.yakssok.core.network.service.** { *; }
@@ -38,12 +34,10 @@
 -keep class javax.inject.** { *; }
 -keep class javax.annotation.** { *; }
 -keep class javax.lang.model.** { *; }
+-keep class * implements dagger.internal.Factory { *; }
+-keep class * implements javax.inject.Provider { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponent { *; }
 -dontwarn javax.lang.model.**
-
-# Keep Dependency Injection Framework related classes and methods
--keep class dagger.hilt.** { *; }
--keep class javax.inject.** { *; }
--keep class javax.annotation.** { *; }
 
 -keep class com.kakao.sdk.**.model.* { <fields>; }
 
