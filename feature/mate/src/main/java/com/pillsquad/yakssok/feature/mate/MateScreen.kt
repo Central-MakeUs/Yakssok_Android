@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.feature.mate
 
 import android.content.ClipData
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +53,19 @@ internal fun MateRoute(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
+    val context = LocalContext.current
     var isComplete by remember { mutableStateOf(false) }
+
+    LaunchedEffect(event) {
+        when (event) {
+            is MateEvent.PostSuccess -> isComplete = true
+            is MateEvent.ShowToast -> {
+                Toast.makeText(context, (event as MateEvent.ShowToast).message, Toast.LENGTH_SHORT).show()
+            }
+            else -> Unit
+        }
+    }
 
     if (isComplete) {
         MateCompleteDialog(
@@ -80,7 +94,7 @@ internal fun MateRoute(
             enabled = uiState.isEnabled,
             onValueChange = viewModel::updateNickName,
             onNavigateBack = { viewModel.updateCurPage(0) },
-            onNavigateHome = { isComplete = true }
+            onNavigateHome = { viewModel.postAddFriend() }
         )
     }
 }

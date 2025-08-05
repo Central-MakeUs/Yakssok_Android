@@ -7,4 +7,5 @@ interface FriendRepository {
 
     suspend fun getFollowingList(): Result<List<User>>
     suspend fun getFeedbackTargetList(): Result<List<FeedbackTarget>>
+    suspend fun postAddFriend(inviteCode: String, relationName: String): Result<Unit>
 }

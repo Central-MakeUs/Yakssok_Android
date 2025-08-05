@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.core.network.remote
 
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
+import com.pillsquad.yakssok.core.network.model.request.FollowRequest
 import com.pillsquad.yakssok.core.network.model.response.FeedbackTargetListResponse
 import com.pillsquad.yakssok.core.network.model.response.FollowingsResponse
 import com.pillsquad.yakssok.core.network.service.FriendApi
@@ -15,4 +16,7 @@ class FriendRetrofitDataSource @Inject constructor(
 
     override suspend fun getFeedbackTargetList(): ApiResponse<FeedbackTargetListResponse> =
         friendApi.getFeedbackTargetList()
+
+    override suspend fun postAddFriend(params: FollowRequest): ApiResponse<Unit> =
+        friendApi.postAddFriend(params)
 }
