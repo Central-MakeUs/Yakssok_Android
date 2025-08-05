@@ -16,7 +16,8 @@ fun NavGraphBuilder.myPageNavGraph(
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
-    onNavigateInfo: (String, String) -> Unit
+    onNavigateInfo: (String, String) -> Unit,
+    onNavigateIntro: () -> Unit,
 ) {
     composable<Route.MyPage> {
         MyPageRoute(
@@ -24,7 +25,8 @@ fun NavGraphBuilder.myPageNavGraph(
             onNavigateProfileEdit = onNavigateProfileEdit,
             onNavigateMyRoutine = onNavigateMyRoutine,
             onNavigateMyMate = onNavigateMyMate,
-            onNavigateInfo = onNavigateInfo
+            onNavigateInfo = onNavigateInfo,
+            onNavigateIntro = onNavigateIntro
         )
     }
 }

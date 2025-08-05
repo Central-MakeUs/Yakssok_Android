@@ -15,6 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +28,9 @@ import com.pillsquad.yakssok.core.common.AppInfo
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
+import com.pillsquad.yakssok.feature.mypage.component.CompleteDialog
 import com.pillsquad.yakssok.feature.mypage.component.InfoRow
+import com.pillsquad.yakssok.feature.mypage.component.LogoutDeleteDialog
 import com.pillsquad.yakssok.feature.mypage.component.MyPageBottomButtons
 import com.pillsquad.yakssok.feature.mypage.component.PillMateRow
 import com.pillsquad.yakssok.feature.mypage.component.ProfileEditButton
@@ -39,12 +44,16 @@ internal fun MyPageRoute(
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
-    onNavigateInfo: (String, String) -> Unit
+    onNavigateInfo: (String, String) -> Unit,
+    onNavigateIntro: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
 
     val context = LocalContext.current
+
+    var isLogoutShow by remember { mutableStateOf<Boolean?>(null) }
+    var isCompleteShow by remember { mutableStateOf<Boolean?>(null) }
 
     LaunchedEffect(event) {
         when (event) {
@@ -58,6 +67,27 @@ internal fun MyPageRoute(
 
             null -> Unit
         }
+    }
+
+    if (isLogoutShow != null) {
+        LogoutDeleteDialog(
+            isLogout = isLogoutShow ?: true,
+            onDismiss = { isLogoutShow = null },
+            onConfirm = {
+                isCompleteShow = isLogoutShow
+                isLogoutShow = null
+            }
+        )
+    }
+
+    if (isCompleteShow != null) {
+        CompleteDialog(
+            isLogout = isCompleteShow ?: true,
+            onDismiss = {
+                isCompleteShow = null
+                onNavigateIntro()
+            }
+        )
     }
 
     MyPageScreen(
