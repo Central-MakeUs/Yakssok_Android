@@ -12,7 +12,7 @@ class GetUserProfileListUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(): Result<List<User>> = coroutineScope {
-        val myDataDeferred = async { userRepository.getMyInfo() }
+        val myDataDeferred = async { userRepository.getMyUser() }
         val otherDataDeferred = async { friendRepository.getFollowingList() }
         val feedbackTargetDeferred = async { friendRepository.getFeedbackTargetList() }
 
