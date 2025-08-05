@@ -4,7 +4,7 @@ import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.model.User
 import javax.inject.Inject
 
-class GetMyInfoUseCase @Inject constructor(
+class GetMyUserUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(): User = userRepository.getMyUser()
