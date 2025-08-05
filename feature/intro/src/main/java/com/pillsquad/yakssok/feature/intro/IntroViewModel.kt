@@ -9,6 +9,7 @@ import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.pillsquad.yakssok.core.domain.TestLoginUseCase
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
+import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class IntroViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val loginUseCase: LoginUseCase,
-    private val testLoginUseCase: TestLoginUseCase
+    private val testLoginUseCase: TestLoginUseCase,
+    private val getTokenFlowUseCase: GetTokenFlowUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
@@ -119,7 +121,7 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
 
-            authRepository.checkToken().collect { valid ->
+            getTokenFlowUseCase().collect { valid ->
                 _uiState.update {
                     if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
                     else it.copy(isLoading = false)

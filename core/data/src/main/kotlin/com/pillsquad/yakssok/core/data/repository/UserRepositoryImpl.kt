@@ -1,14 +1,19 @@
 package com.pillsquad.yakssok.core.data.repository
 
+import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUserInfo
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.model.MyInfo
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,12 +28,14 @@ class UserRepositoryImpl @Inject constructor(
         )
 
         result.onSuccess {
+            Log.d("UserRepositoryImpl", "postMyInfoToLocal: $it")
             userLocalDataSource.saveUserName(it.nickName)
             userLocalDataSource.saveUserProfileImg(it.profileImage)
             userLocalDataSource.saveMedicationCount(it.medicationCount)
             userLocalDataSource.saveMateCount(it.followingCount)
         }.onFailure {
             it.printStackTrace()
+            Log.e("UserRepositoryImpl", "postMyInfoToLocal: $it")
         }
     }
 
@@ -69,5 +76,21 @@ class UserRepositoryImpl @Inject constructor(
         return userRetrofitDataSource.getUserInfoByInviteCode(inviteCode).toResult(
             transform = { it.toUserInfo() }
         )
+    }
+
+    override suspend fun getMyInfo(): Flow<MyInfo> {
+        return combine(
+            userLocalDataSource.userNameFlow,
+            userLocalDataSource.userProfileImgFlow,
+            userLocalDataSource.medicationCountFlow,
+            userLocalDataSource.mateCountFlow
+        ) { nickName, profileImage, medicationCount, mateCount ->
+            MyInfo(
+                nickName = nickName,
+                profileImage = profileImage,
+                medicationCount = medicationCount,
+                followingCount = mateCount
+            )
+        }
     }
 }
