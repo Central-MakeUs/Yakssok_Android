@@ -1,8 +1,7 @@
 package com.pillsquad.yakssok.feature.mypage
 
+import android.widget.Toast
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,21 +10,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
+import com.pillsquad.yakssok.core.common.AppInfo
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
@@ -46,9 +42,27 @@ internal fun MyPageRoute(
     onNavigateInfo: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
+
+    val context = LocalContext.current
+
+    LaunchedEffect(event) {
+        when (event) {
+            is MyPageEvent.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    (event as MyPageEvent.ShowToast).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            null -> Unit
+        }
+    }
 
     MyPageScreen(
         uiState = uiState,
+        appVersion = AppInfo.APP_VERSION,
         onNavigateBack = onNavigateBack,
         onNavigateProfileEdit = onNavigateProfileEdit,
         onNavigateMyRoutine = onNavigateMyRoutine,
@@ -60,6 +74,7 @@ internal fun MyPageRoute(
 @Composable
 private fun MyPageScreen(
     uiState: MyPageUiState,
+    appVersion: String,
     onNavigateBack: () -> Unit,
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
@@ -77,19 +92,21 @@ private fun MyPageScreen(
             MyPageUiState.Loading -> {
                 Text(text = "Loading")
             }
+
             is MyPageUiState.Success -> {
                 SuccessContent(
-                    imgUrl = uiState.data.imgUrl,
-                    name = uiState.data.name,
-                    routineCount = uiState.data.routineCount,
+                    imgUrl = uiState.data.profileImageUrl,
+                    name = uiState.data.nickName,
+                    routineCount = uiState.data.medicationCount,
                     mateCount = uiState.data.mateCount,
-                    appVersion = uiState.data.appVersion,
+                    appVersion = appVersion,
                     onNavigateProfileEdit = onNavigateProfileEdit,
                     onNavigateMyRoutine = onNavigateMyRoutine,
                     onNavigateMyMate = onNavigateMyMate,
                     onNavigateInfo = onNavigateInfo
                 )
             }
+
             is MyPageUiState.Error -> {
                 Text(text = "error")
             }

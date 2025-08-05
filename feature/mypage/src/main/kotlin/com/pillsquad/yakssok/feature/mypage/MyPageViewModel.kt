@@ -1,33 +1,60 @@
 package com.pillsquad.yakssok.feature.mypage
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiModel
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class MyPageEvent {
+    data class ShowToast(val message: String) : MyPageEvent()
+}
+
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-
+    private val getMyInfoUseCase: GetMyInfoUseCase
 ): ViewModel() {
     private var _uiState = MutableStateFlow<MyPageUiState>(MyPageUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            delay(500)
+    private var _event = MutableSharedFlow<MyPageEvent>()
+    val event = _event.asSharedFlow()
 
-            _uiState.update {
-                MyPageUiState.Success(
-                    data = MyPageUiModel()
-                )
-            }
+    init {
+        observeMyInfo()
+    }
+
+    private fun observeMyInfo() {
+        viewModelScope.launch {
+            getMyInfoUseCase()
+                .map {
+                    Log.d("UserRepositoryImpl", "get: $it")
+                    MyPageUiModel(
+                        nickName = it.nickName,
+                        profileImageUrl = it.profileImage,
+                        medicationCount = it.medicationCount,
+                        mateCount = it.followingCount
+                    )
+                }
+                .catch { e ->
+                    _uiState.value = MyPageUiState.Error(e.message ?: "알 수 없는 오류")
+                    _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                }
+                .collect {
+                    _uiState.value = MyPageUiState.Success(it)
+                }
         }
     }
 }
