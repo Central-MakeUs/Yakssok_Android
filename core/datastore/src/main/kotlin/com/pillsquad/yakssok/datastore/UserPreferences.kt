@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,6 +19,8 @@ class UserPreferences @Inject constructor(
     companion object {
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_PROFILE_IMG = stringPreferencesKey("user_profile_img")
+        private val MEDICATION_COUNT = intPreferencesKey("medication_count")
+        private val MATE_COUNT = intPreferencesKey("mate_count")
         private val FCM_TOKEN = stringPreferencesKey("fcm_token")
         private val PUSH_AGREEMENT = booleanPreferencesKey("push_agreement")
         private val TUTORIAL_COMPLETE = booleanPreferencesKey("tutorial_complete")
@@ -32,6 +35,12 @@ class UserPreferences @Inject constructor(
 
     val userProfileImgFlow: Flow<String> = dataStore.data
         .map { it[USER_PROFILE_IMG] ?: "" }
+
+    val medicationCountFlow: Flow<Int> = dataStore.data
+        .map { it[MEDICATION_COUNT] ?: 0 }
+
+    val mateCountFlow: Flow<Int> = dataStore.data
+        .map { it[MATE_COUNT] ?: 0 }
 
     val fcmTokenFlow: Flow<String> = dataStore.data
         .map { it[FCM_TOKEN] ?: "" }
@@ -60,6 +69,14 @@ class UserPreferences @Inject constructor(
 
     suspend fun saveUserProfileImg(profileImg: String) {
         dataStore.edit { it[USER_PROFILE_IMG] = profileImg }
+    }
+
+    suspend fun saveMedicationCount(count: Int) {
+        dataStore.edit { it[MEDICATION_COUNT] = count }
+    }
+
+    suspend fun saveMateCount(count: Int) {
+        dataStore.edit { it[MATE_COUNT] = count }
     }
 
     suspend fun saveFcmToken(token: String) {

@@ -7,6 +7,6 @@ class GetMyInfoWithInviteCodeUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(): Pair<String, String> {
-        return userRepository.getMyInviteCode() to userRepository.getMyInfo().nickName
+        return userRepository.getMyInviteCode() to userRepository.getMyUser().nickName
     }
 }

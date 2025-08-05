@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.core.data.repository
 
-import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUserInfo
@@ -12,7 +11,6 @@ import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.fold
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
@@ -27,12 +25,14 @@ class UserRepositoryImpl @Inject constructor(
         result.onSuccess {
             userLocalDataSource.saveUserName(it.nickName)
             userLocalDataSource.saveUserProfileImg(it.profileImage)
+            userLocalDataSource.saveMedicationCount(it.medicationCount)
+            userLocalDataSource.saveMateCount(it.followingCount)
         }.onFailure {
             it.printStackTrace()
         }
     }
 
-    override suspend fun getMyInfo(): User {
+    override suspend fun getMyUser(): User {
         val name = userLocalDataSource.userNameFlow.firstOrNull().orEmpty().ifBlank { "나" }
         val image = userLocalDataSource.userProfileImgFlow.firstOrNull().orEmpty()
 
