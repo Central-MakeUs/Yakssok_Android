@@ -5,21 +5,34 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoWithInviteCodeUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserInfoByInviteCodeUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PostAddFriendUseCase
+import com.pillsquad.yakssok.core.model.HttpException
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class MateEvent {
+    data object PostSuccess: MateEvent()
+    data class ShowToast(val message: String): MateEvent()
+}
+
 @HiltViewModel
 class MateViewModel @Inject constructor(
     private val getMyInfoWithInviteCodeUseCase: GetMyInfoWithInviteCodeUseCase,
-    private val getUserInfoByInviteCodeUseCase: GetUserInfoByInviteCodeUseCase
+    private val getUserInfoByInviteCodeUseCase: GetUserInfoByInviteCodeUseCase,
+    private val postAddFriendUseCase: PostAddFriendUseCase
 ): ViewModel() {
     private var _uiState = MutableStateFlow(MateUiModel())
     val uiState = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<MateEvent>()
+    val event = _event.asSharedFlow()
 
     init {
         getMyInfoWithCode()
@@ -38,6 +51,28 @@ class MateViewModel @Inject constructor(
                 }.onFailure {
                     it.printStackTrace()
                     Log.e("MateViewModel", "getFriendInfo: ${it.message}")
+
+                    val message = if (it is HttpException && it.code == 4000L) {
+                        "이미 추가된 친구입니다."
+                    } else {
+                        "네트워크 환경을 확인하세요."
+                    }
+
+                    _event.emit(MateEvent.ShowToast(message))
+                }
+        }
+    }
+
+    fun postAddFriend() {
+        viewModelScope.launch {
+            postAddFriendUseCase(_uiState.value.friendCode, _uiState.value.relationName)
+                .onSuccess {
+                    _event.emit(MateEvent.PostSuccess)
+                }
+                .onFailure {
+                    _event.emit(MateEvent.ShowToast(it.message ?: "알 수 없는 오류가 발생했습니다."))
+                    it.printStackTrace()
+                    Log.e("MateViewModel", "postAddFriend: ${it.message}")
                 }
         }
     }

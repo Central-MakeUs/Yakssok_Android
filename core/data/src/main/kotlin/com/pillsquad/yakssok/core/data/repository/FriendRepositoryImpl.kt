@@ -7,6 +7,7 @@ import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
+import com.pillsquad.yakssok.core.network.model.request.FollowRequest
 import javax.inject.Inject
 
 class FriendRepositoryImpl @Inject constructor(
@@ -28,5 +29,17 @@ class FriendRepositoryImpl @Inject constructor(
                 response.feedbackTargetResponseList.map { it.toFeedBackTarget() }
             }
         )
+    }
+
+    override suspend fun postAddFriend(
+        inviteCode: String,
+        relationName: String
+    ): Result<Unit> {
+        val params = FollowRequest(
+            inviteCode = inviteCode,
+            relationName = relationName
+        )
+
+        return friendDataSource.postAddFriend(params).toResult()
     }
 }
