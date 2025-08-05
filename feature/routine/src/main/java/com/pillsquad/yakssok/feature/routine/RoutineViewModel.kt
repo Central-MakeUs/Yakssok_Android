@@ -3,7 +3,7 @@ package com.pillsquad.yakssok.feature.routine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetMyUserUseCase
 import com.pillsquad.yakssok.core.domain.usecase.sound.InitSoundPoolUseCase
 import com.pillsquad.yakssok.core.domain.usecase.sound.PlayAlarmSoundUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostMedicationUseCase
@@ -37,7 +37,7 @@ class RoutineViewModel @Inject constructor(
     private val stopAlarmSoundUseCase: StopAlarmSoundUseCase,
     private val releaseSoundPoolUseCase: ReleaseSoundPoolUseCase,
     private val initSoundPoolUseCase: InitSoundPoolUseCase,
-    private val getMyInfoUseCase: GetMyInfoUseCase
+    private val getMyUserUseCase: GetMyUserUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
@@ -109,7 +109,7 @@ class RoutineViewModel @Inject constructor(
     private fun getUserName() {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(userName = getMyInfoUseCase().nickName)
+                it.copy(userName = getMyUserUseCase().nickName)
             }
         }
     }
