@@ -19,4 +19,8 @@ class UserRetrofitDataSource @Inject constructor(
 
     override suspend fun getUserInfoByInviteCode(inviteCode: String): ApiResponse<UserInfoResponse> =
         userApi.getUserInfoByInviteCode(inviteCode)
+
+    override suspend fun deleteUser(): ApiResponse<Unit> = userApi.deleteUser()
+
+    override suspend fun putLogout(): ApiResponse<Unit> = userApi.putLogout()
 }

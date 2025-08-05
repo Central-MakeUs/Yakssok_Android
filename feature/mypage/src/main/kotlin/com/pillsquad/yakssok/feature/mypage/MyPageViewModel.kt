@@ -3,7 +3,9 @@ package com.pillsquad.yakssok.feature.mypage
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.DeleteAccountUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
+import com.pillsquad.yakssok.core.domain.usecase.LogoutUserUseCase
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiModel
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +26,9 @@ sealed class MyPageEvent {
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val getMyInfoUseCase: GetMyInfoUseCase
+    private val getMyInfoUseCase: GetMyInfoUseCase,
+    private val logoutUserUseCase: LogoutUserUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase
 ): ViewModel() {
     private var _uiState = MutableStateFlow<MyPageUiState>(MyPageUiState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -34,6 +38,18 @@ class MyPageViewModel @Inject constructor(
 
     init {
         observeMyInfo()
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            logoutUserUseCase()
+        }
+    }
+
+    fun deleteAccount() {
+        viewModelScope.launch {
+            deleteAccountUseCase()
+        }
     }
 
     private fun observeMyInfo() {

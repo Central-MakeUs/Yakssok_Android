@@ -68,4 +68,8 @@ class UserLocalDataSource @Inject constructor(
     suspend fun clearTokens() {
         userPreferences.clearTokens()
     }
+
+    suspend fun clearAllData() {
+        userPreferences.clearAllData()
+    }
 }

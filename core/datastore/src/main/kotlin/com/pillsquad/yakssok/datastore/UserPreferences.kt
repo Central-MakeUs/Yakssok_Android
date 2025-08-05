@@ -113,4 +113,10 @@ class UserPreferences @Inject constructor(
             it.remove(REFRESH_TOKEN_KEY)
         }
     }
+
+    suspend fun clearAllData() {
+        dataStore.edit {
+            it.clear()
+        }
+    }
 }
