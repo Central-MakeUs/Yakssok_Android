@@ -7,10 +7,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.ContactsContract
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +53,7 @@ import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.NotificationAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
+import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
 
 @Composable
 internal fun IntroRoute(
@@ -56,6 +61,8 @@ internal fun IntroRoute(
     onNavigateHome: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    var isTestDialogShow by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val context = LocalContext.current
@@ -92,12 +99,22 @@ internal fun IntroRoute(
                 showSetting = false
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                        putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
                     }
                     pendingCheck = true
                     activity.startActivity(intent)
                 }
+            }
+        )
+    }
+
+    if (isTestDialogShow) {
+        TestAccountDialog(
+            onDismiss = { isTestDialogShow = false },
+            onConfirm = {
+                isTestDialogShow = false
+                viewModel.testLoginUser()
             }
         )
     }
@@ -190,7 +207,8 @@ internal fun IntroRoute(
 
         else -> {
             LoginScreen(
-                onClick = { viewModel.handleSignIn(context) }
+                onClick = { viewModel.handleSignIn(context) },
+                onLongClick = { isTestDialogShow = true }
             )
         }
     }
@@ -198,7 +216,8 @@ internal fun IntroRoute(
 
 @Composable
 private fun LoginScreen(
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey50)
@@ -210,7 +229,14 @@ private fun LoginScreen(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                modifier = Modifier.width(92.dp),
+                modifier = Modifier
+                    .width(92.dp)
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = onLongClick,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ),
                 painter = painterResource(R.drawable.img_login_logo),
                 contentDescription = "yakssok logo",
                 tint = Color.Unspecified

@@ -12,4 +12,5 @@ interface AuthRepository {
     suspend fun loginUser(accessToken: String): Result<Boolean>
 
     fun checkToken(): Flow<Boolean>
+    suspend fun testLoginUser()
 }

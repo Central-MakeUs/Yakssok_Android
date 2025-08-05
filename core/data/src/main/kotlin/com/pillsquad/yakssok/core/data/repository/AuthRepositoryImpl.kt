@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.data.repository
 
+import com.pillsquad.yakssok.core.data.BuildConfig
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toResultForLogin
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
@@ -45,6 +46,11 @@ class AuthRepositoryImpl @Inject constructor(
         }
 
         return response.toResultForLogin()
+    }
+
+    override suspend fun testLoginUser() {
+        userLocalDataSource.saveAccessToken(BuildConfig.MASTER_ACCESS)
+        userLocalDataSource.saveRefreshToken(BuildConfig.MASTER_REFRESH)
     }
 
     override fun checkToken(): Flow<Boolean> {

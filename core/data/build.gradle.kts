@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.pillsquad.yakssok.setNamespace
 
 plugins {
@@ -6,6 +7,23 @@ plugins {
 }
 
 setNamespace("core.data")
+
+android {
+    buildTypes {
+        debug {
+            buildConfigField("String", "MASTER_ACCESS", getProperty("MASTER_ACCESS"))
+            buildConfigField("String", "MASTER_REFRESH", getProperty("MASTER_REFRESH"))
+        }
+        release {
+            buildConfigField("String", "MASTER_ACCESS", getProperty("MASTER_ACCESS"))
+            buildConfigField("String", "MASTER_REFRESH", getProperty("MASTER_REFRESH"))
+        }
+    }
+}
+
+fun getProperty(key: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(key)
+}
 
 dependencies {
     implementation(projects.core.common)
