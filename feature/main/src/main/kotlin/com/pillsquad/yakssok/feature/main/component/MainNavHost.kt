@@ -63,7 +63,8 @@ internal fun MainNavHost(
                 onNavigateProfileEdit = navigator::navigateProfileEdit,
                 onNavigateMyRoutine = navigator::navigateMyRoutine,
                 onNavigateMyMate = navigator::navigateMyMate,
-                onNavigateInfo = navigator::navigateInfo
+                onNavigateInfo = navigator::navigateInfo,
+                onNavigateIntro = navigator::navigateIntro
             )
 
             myRoutineNavGraph(
