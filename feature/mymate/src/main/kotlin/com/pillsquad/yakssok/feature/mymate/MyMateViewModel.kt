@@ -26,7 +26,7 @@ class MyMateViewModel @Inject constructor(
         getMateList()
     }
 
-    private fun getMateList() {
+    fun getMateList() {
         viewModelScope.launch {
             val followingDeferred = async {
                 getFollowingListUseCase()

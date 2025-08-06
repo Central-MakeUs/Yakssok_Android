@@ -21,6 +21,7 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 
 @Composable
@@ -30,6 +31,10 @@ internal fun MyMateRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    OnResumeEffect {
+        viewModel.getMateList()
+    }
 
     MyMateScreen(
         followingList = uiState.followingList,
