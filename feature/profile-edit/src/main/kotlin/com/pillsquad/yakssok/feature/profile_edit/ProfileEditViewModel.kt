@@ -63,13 +63,10 @@ class ProfileEditViewModel @Inject constructor(
                 }
                 return@launch
             }
-            Log.e("ProfileEditViewModel", "fileImageUrl: $fileImageUrl")
 
             val result = if (oldImageUrl.isEmpty()) {
-                Log.d("ProfileEditViewModel", "post: $fileImageUrl")
                 postImageUrlUseCase(fileImageUrl)
             } else {
-                Log.d("ProfileEditViewModel", "put: $fileImageUrl")
                 putImageUrlUseCase(fileImageUrl)
             }
 
@@ -82,7 +79,6 @@ class ProfileEditViewModel @Inject constructor(
                     it.copy(enabled = true)
                 }
                 e.printStackTrace()
-                Log.e("ProfileEditViewModel", "error: $e")
                 _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
             }
         }

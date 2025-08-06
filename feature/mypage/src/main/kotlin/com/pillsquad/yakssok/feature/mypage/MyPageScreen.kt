@@ -36,6 +36,7 @@ import com.pillsquad.yakssok.feature.mypage.component.PillMateRow
 import com.pillsquad.yakssok.feature.mypage.component.ProfileEditButton
 import com.pillsquad.yakssok.feature.mypage.component.ProfileRow
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiState
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 internal fun MyPageRoute(
@@ -48,24 +49,19 @@ internal fun MyPageRoute(
     onNavigateIntro: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
 
     val context = LocalContext.current
 
     var isLogoutShow by remember { mutableStateOf<Boolean?>(null) }
     var isCompleteShow by remember { mutableStateOf<Boolean?>(null) }
 
-    LaunchedEffect(event) {
-        when (event) {
-            is MyPageEvent.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    (event as MyPageEvent.ShowToast).message,
-                    Toast.LENGTH_SHORT
-                ).show()
+    LaunchedEffect(Unit) {
+        viewModel.event.collectLatest { event ->
+            when (event) {
+                is MyPageEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
             }
-
-            null -> Unit
         }
     }
 
