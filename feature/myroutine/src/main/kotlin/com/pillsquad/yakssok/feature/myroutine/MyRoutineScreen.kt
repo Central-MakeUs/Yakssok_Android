@@ -21,31 +21,29 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationStatus
-import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.feature.myroutine.component.EndRoutineDialog
 import com.pillsquad.yakssok.feature.myroutine.component.InfoCard
 import com.pillsquad.yakssok.feature.myroutine.component.OptionalDialog
 import com.pillsquad.yakssok.feature.myroutine.component.RoutinePlusButton
 import com.pillsquad.yakssok.feature.myroutine.model.PillUiModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,15 +56,31 @@ internal fun MyRoutineRoute(
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val tabs = listOf("전체", "복약 전", "복약 중", "복약 종료")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val tabIndex = pagerState.currentPage
 
-    CollectEvent(viewModel.event) { event ->
-        when (event) {
-            is MyRoutineEvent.ShowToast -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.getMyRoutineList()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(true) {
+        viewModel.event.collectLatest { event ->
+            when (event) {
+                is MyRoutineEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -121,14 +135,16 @@ private fun MyRoutineScreen(
     onNavigateBack: () -> Unit,
     onEndRoutine: (Int) -> Unit
 ) {
+    val modifier = Modifier.padding(horizontal = 16.dp)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(YakssokTheme.color.grey100)
             .systemBarsPadding()
-            .padding(horizontal = 16.dp)
     ) {
         YakssokTopAppBar(
+            modifier = modifier,
             title = "내 복약",
             onBackClick = onNavigateBack,
         )
@@ -136,7 +152,9 @@ private fun MyRoutineScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         SecondaryTabRow(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             containerColor = YakssokTheme.color.grey100,
             contentColor = YakssokTheme.color.grey950,
             selectedTabIndex = tabIndex,
@@ -192,7 +210,9 @@ private fun RoutineList(
     onEndRoutine: (Int) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
