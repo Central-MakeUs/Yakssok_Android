@@ -66,7 +66,7 @@ internal fun MyRoutineRoute(
         viewModel.getMyRoutineList()
     }
 
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.event.collectLatest { event ->
             when (event) {
                 is MyRoutineEvent.ShowToast -> {
