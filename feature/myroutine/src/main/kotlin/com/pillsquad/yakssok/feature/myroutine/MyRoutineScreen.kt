@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationStatus
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.myroutine.component.EndRoutineDialog
 import com.pillsquad.yakssok.feature.myroutine.component.InfoCard
 import com.pillsquad.yakssok.feature.myroutine.component.OptionalDialog
@@ -56,23 +57,13 @@ internal fun MyRoutineRoute(
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     val tabs = listOf("전체", "복약 전", "복약 중", "복약 종료")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val tabIndex = pagerState.currentPage
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.getMyRoutineList()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    OnResumeEffect {
+        viewModel.getMyRoutineList()
     }
 
     LaunchedEffect(true) {
