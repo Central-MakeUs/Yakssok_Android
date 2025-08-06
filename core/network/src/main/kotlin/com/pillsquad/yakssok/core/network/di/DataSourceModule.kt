@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.network.di
 
+import android.content.Context
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
 import com.pillsquad.yakssok.core.network.datasource.FeedbackDataSource
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
@@ -14,9 +15,12 @@ import com.pillsquad.yakssok.core.network.remote.ImageRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.MedicationRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.RoutineRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.UserRetrofitDataSource
+import com.pillsquad.yakssok.core.network.service.ImageApi
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
@@ -53,8 +57,13 @@ abstract class DataSourceModule {
         feedbackRetrofitDataSource: FeedbackRetrofitDataSource
     ): FeedbackDataSource
 
-    @Binds
-    abstract fun bindImageDataSource(
-        imageRetrofitDataSource: ImageRetrofitDataSource
-    ): ImageDataSource
+    companion object {
+        @Provides
+        fun provideImageDataSource(
+            @ApplicationContext context: Context,
+            imageApi: ImageApi
+        ): ImageDataSource {
+            return ImageRetrofitDataSource(context, imageApi)
+        }
+    }
 }

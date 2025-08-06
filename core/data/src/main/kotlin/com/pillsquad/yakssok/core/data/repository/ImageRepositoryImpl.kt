@@ -74,7 +74,7 @@ class ImageRepositoryImpl @Inject constructor(
             )
             val rotatedBitmap = rotateBitmap(decodedBitmap, exifOrientation)
 
-            val file = File(context.cacheDir, "photo_${System.currentTimeMillis()}")
+            val file = File(context.cacheDir, "photo_${System.currentTimeMillis()}.webp")
             FileOutputStream(file).use { outputStream ->
                 rotatedBitmap.compress(Bitmap.CompressFormat.WEBP, 60, outputStream)
             }
