@@ -80,7 +80,7 @@ class MyRoutineViewModel @Inject constructor(
         }
     }
 
-    private fun getMyRoutineList() {
+    fun getMyRoutineList() {
         viewModelScope.launch {
             getMyRoutineListUseCase().onSuccess { response ->
                 _uiState.update { model ->
