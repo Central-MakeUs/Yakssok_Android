@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.domain
+package com.pillsquad.yakssok.core.domain.usecase
 
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository

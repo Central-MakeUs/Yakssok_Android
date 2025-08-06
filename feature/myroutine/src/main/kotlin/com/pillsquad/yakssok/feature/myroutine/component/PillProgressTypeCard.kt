@@ -10,12 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.model.PillProgressType
+import com.pillsquad.yakssok.core.model.MedicationStatus
 import com.pillsquad.yakssok.feature.myroutine.toColor
 
 @Composable
 internal fun PillProgressTypeCard(
-    progressType: PillProgressType
+    progressType: MedicationStatus
 ) {
     val (bgColor, txtColor) = progressType.toColor()
 
