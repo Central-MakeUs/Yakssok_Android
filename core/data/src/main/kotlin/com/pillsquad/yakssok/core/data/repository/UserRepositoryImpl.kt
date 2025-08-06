@@ -9,6 +9,7 @@ import com.pillsquad.yakssok.core.model.MyInfo
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
+import com.pillsquad.yakssok.core.network.model.request.MyInfoRequest
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -55,7 +56,12 @@ class UserRepositoryImpl @Inject constructor(
         nickName: String,
         profileImage: String
     ): Result<Unit> {
-        val result = userRetrofitDataSource.putLogout().toResult(transform = { it })
+        val params = MyInfoRequest(
+            nickname = nickName,
+            profileImageUrl = profileImage
+        )
+
+        val result = userRetrofitDataSource.putMyInfo(params).toResult(transform = { it })
 
         result.onSuccess {
             userLocalDataSource.saveUserName(nickName)
