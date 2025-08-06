@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.data.repository
 
 import com.pillsquad.yakssok.core.data.mapper.toFeedBackTarget
+import com.pillsquad.yakssok.core.data.mapper.toFollowUser
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUser
 import com.pillsquad.yakssok.core.domain.repository.FriendRepository
@@ -13,12 +14,28 @@ import javax.inject.Inject
 class FriendRepositoryImpl @Inject constructor(
     private val friendDataSource: FriendDataSource,
 ) : FriendRepository {
-    override suspend fun getFollowingList(): Result<List<User>> {
+    override suspend fun getFollowingList(
+        isHome: Boolean,
+    ): Result<List<User>> {
         // Todo: Local Data와 연동
 
         return friendDataSource.getFollowingList().toResult(
             transform = { response ->
-                response.followingInfoResponses.map { it.toUser() }
+                response.followingInfoResponses.map {
+                    if(isHome) {
+                        it.toUser()
+                    } else {
+                        it.toFollowUser()
+                    }
+                }
+            }
+        )
+    }
+
+    override suspend fun getFollowerList(): Result<List<User>> {
+        return friendDataSource.getFollowerList().toResult(
+            transform = { response ->
+                response.followerInfoResponses.map { it.toUser() }
             }
         )
     }
