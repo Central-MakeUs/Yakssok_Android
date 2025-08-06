@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationStatus
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.myroutine.component.EndRoutineDialog
 import com.pillsquad.yakssok.feature.myroutine.component.InfoCard
@@ -66,12 +67,10 @@ internal fun MyRoutineRoute(
         viewModel.getMyRoutineList()
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.event.collectLatest { event ->
-            when (event) {
-                is MyRoutineEvent.ShowToast -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
+    CollectEvent(viewModel.event) {
+        when (it) {
+            is MyRoutineEvent.ShowToast -> {
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
