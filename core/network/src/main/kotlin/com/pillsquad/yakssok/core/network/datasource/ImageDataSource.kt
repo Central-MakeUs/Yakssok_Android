@@ -2,7 +2,6 @@ package com.pillsquad.yakssok.core.network.datasource
 
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.response.ImageResponse
-import okhttp3.MultipartBody
 
 interface ImageDataSource {
     suspend fun putImage(oldImageUrl: String, newImageUrl: String): ApiResponse<ImageResponse>

@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.profile_edit
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -11,15 +12,14 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,7 +38,26 @@ internal fun ProfileEditRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
+
+    val context = LocalContext.current
     val imagePickerLauncher = rememberImagePickerLauncher()
+
+    LaunchedEffect(event) {
+        when(event) {
+            ProfileEditEvent.CompleteEdit -> {
+                onNavigateBack()
+            }
+            is ProfileEditEvent.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    (event as ProfileEditEvent.ShowToast).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            null -> Unit
+        }
+    }
 
     ProfileEditScreen(
         uiState = uiState,
@@ -48,7 +67,7 @@ internal fun ProfileEditRoute(
             }
         },
         onValueChange = viewModel::updateName,
-        onNavigateBack = onNavigateBack
+        onComplete = viewModel::completeEdit
     )
 }
 
@@ -57,7 +76,7 @@ private fun ProfileEditScreen(
     uiState: ProfileEditUiModel,
     onImageUpdate: () -> Unit,
     onValueChange: (String) -> Unit,
-    onNavigateBack: () -> Unit
+    onComplete: () -> Unit
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100),
@@ -65,7 +84,7 @@ private fun ProfileEditScreen(
     ) {
         YakssokTopAppBar(
             title = "프로필",
-            onBackClick = onNavigateBack
+            onBackClick = onComplete
         )
 
         Spacer(modifier = Modifier.height(27.dp))
@@ -114,7 +133,7 @@ private fun ProfileEditScreen(
             enabled = uiState.enabled,
             backgroundColor = if (uiState.enabled) YakssokTheme.color.primary400 else YakssokTheme.color.grey200,
             contentColor = if (uiState.enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400,
-            onClick = onNavigateBack,
+            onClick = onComplete,
         )
     }
 }

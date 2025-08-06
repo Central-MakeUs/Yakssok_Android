@@ -1,19 +1,45 @@
 package com.pillsquad.yakssok.feature.profile_edit
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.domain.usecase.ChangeImageUrlUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PostImageUrlUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PutImageUrlUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PutMyInfoUseCase
 import com.pillsquad.yakssok.feature.profile_edit.model.ProfileEditUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class ProfileEditEvent {
+    data object CompleteEdit : ProfileEditEvent()
+    data class ShowToast(val message: String) : ProfileEditEvent()
+}
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
-
-): ViewModel() {
+    private val getMyInfoUseCase: GetMyInfoUseCase,
+    private val putImageUrlUseCase: PutImageUrlUseCase,
+    private val postImageUrlUseCase: PostImageUrlUseCase,
+    private val putMyInfoUseCase: PutMyInfoUseCase,
+    private val changeImageUrlUseCase: ChangeImageUrlUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditUiModel())
     val uiState = _uiState.asStateFlow()
+
+    private val _event = MutableSharedFlow<ProfileEditEvent>()
+    val event = _event.asSharedFlow()
+
+    init {
+        getMyInfo()
+    }
 
     fun updateName(newName: String) {
         _uiState.update {
@@ -22,8 +48,70 @@ class ProfileEditViewModel @Inject constructor(
     }
 
     fun updateImgUrl(newImgUrl: String) {
+        val oldImageUrl = uiState.value.imgUrl
+
         _uiState.update {
-            it.copy(imgUrl = newImgUrl)
+            it.copy(enabled = false)
+        }
+
+        viewModelScope.launch {
+            val fileImageUrl = changeImageUrlUseCase(newImgUrl)
+            if (fileImageUrl == null) {
+                _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
+                _uiState.update {
+                    it.copy(enabled = true)
+                }
+                return@launch
+            }
+            Log.e("ProfileEditViewModel", "fileImageUrl: $fileImageUrl")
+
+            val result = if (oldImageUrl.isEmpty()) {
+                Log.d("ProfileEditViewModel", "post: $fileImageUrl")
+                postImageUrlUseCase(fileImageUrl)
+            } else {
+                Log.d("ProfileEditViewModel", "put: $fileImageUrl")
+                putImageUrlUseCase(fileImageUrl)
+            }
+
+            result.onSuccess { imageUrl ->
+                _uiState.update {
+                    it.copy(imgUrl = imageUrl, enabled = true)
+                }
+            }.onFailure { e ->
+                _uiState.update {
+                    it.copy(enabled = true)
+                }
+                e.printStackTrace()
+                Log.e("ProfileEditViewModel", "error: $e")
+                _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
+            }
+        }
+    }
+
+    fun completeEdit() {
+        viewModelScope.launch {
+            putMyInfoUseCase(uiState.value.name, uiState.value.imgUrl)
+                .onSuccess {
+                    Log.d("ProfileEditViewModel", "completeEdit: $it")
+                    _event.emit(ProfileEditEvent.CompleteEdit)
+                }.onFailure {
+                    Log.d("ProfileEditViewModel", "failure: $it")
+                    _event.emit(ProfileEditEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                }
+        }
+    }
+
+    private fun getMyInfo() {
+        viewModelScope.launch {
+            getMyInfoUseCase().collect {
+                _uiState.update { uiState ->
+                    uiState.copy(
+                        name = it.nickName,
+                        imgUrl = it.profileImage,
+                        enabled = validateNickName(it.nickName)
+                    )
+                }
+            }
         }
     }
 
