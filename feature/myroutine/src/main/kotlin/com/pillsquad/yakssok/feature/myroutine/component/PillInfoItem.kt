@@ -31,6 +31,7 @@ import com.pillsquad.yakssok.feature.myroutine.model.PillUiModel
 @Composable
 internal fun InfoCard(
     uiModel: PillUiModel,
+    onMenuClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -45,7 +46,7 @@ internal fun InfoCard(
             pillName = uiModel.pillName,
             intakeDays = uiModel.intakeDays,
             progressType = uiModel.medicationStatus,
-            onMenuClick = {}
+            onMenuClick = onMenuClick
         )
 
         HorizontalDivider(thickness = 1.dp, color = YakssokTheme.color.grey100)
