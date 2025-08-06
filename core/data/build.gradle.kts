@@ -37,4 +37,6 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.exifinterface)
+
+    implementation(libs.androidx.paging.runtime)
 }

@@ -5,6 +5,7 @@ import com.pillsquad.yakssok.core.network.service.FeedbackApi
 import com.pillsquad.yakssok.core.network.service.FriendApi
 import com.pillsquad.yakssok.core.network.service.ImageApi
 import com.pillsquad.yakssok.core.network.service.MedicationApi
+import com.pillsquad.yakssok.core.network.service.NotificationApi
 import com.pillsquad.yakssok.core.network.service.RoutineApi
 import com.pillsquad.yakssok.core.network.service.TokenApi
 import com.pillsquad.yakssok.core.network.service.UserApi
@@ -67,4 +68,10 @@ object ServiceModule {
     fun provideImageApi(
         @TokenRetrofit retrofit: Retrofit
     ): ImageApi = retrofit.create(ImageApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNotificationApi(
+        @TokenRetrofit retrofit: Retrofit
+    ): NotificationApi = retrofit.create(NotificationApi::class.java)
 }

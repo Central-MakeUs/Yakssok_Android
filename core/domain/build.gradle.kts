@@ -12,4 +12,6 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.androidx.paging.common)
 }

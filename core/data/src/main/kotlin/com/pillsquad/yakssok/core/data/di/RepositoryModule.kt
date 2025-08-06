@@ -6,6 +6,7 @@ import com.pillsquad.yakssok.core.data.repository.MedicationRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.AuthRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.FeedbackRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.ImageRepositoryImpl
+import com.pillsquad.yakssok.core.data.repository.NotificationRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.RoutineRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.SoundRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserRepositoryImpl
@@ -15,6 +16,7 @@ import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.repository.FeedbackRepository
 import com.pillsquad.yakssok.core.domain.repository.ImageRepository
+import com.pillsquad.yakssok.core.domain.repository.NotificationRepository
 import com.pillsquad.yakssok.core.domain.repository.RoutineRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.network.datasource.ImageDataSource
@@ -66,6 +68,11 @@ abstract class RepositoryModule {
     abstract fun bindFeedbackRepository(
         feedbackRepository: FeedbackRepositoryImpl
     ): FeedbackRepository
+
+    @Binds
+    abstract fun bindNotificationRepository(
+        notificationRepository: NotificationRepositoryImpl
+    ): NotificationRepository
 
     companion object {
         @Provides
