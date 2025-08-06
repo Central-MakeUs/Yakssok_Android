@@ -28,9 +28,11 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.profileEdit.R
 import com.pillsquad.yakssok.feature.profile_edit.model.ProfileEditUiModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 internal fun ProfileEditRoute(
@@ -38,12 +40,11 @@ internal fun ProfileEditRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
 
     val context = LocalContext.current
     val imagePickerLauncher = rememberImagePickerLauncher()
 
-    LaunchedEffect(event) {
+    CollectEvent(viewModel.event) { event ->
         when(event) {
             ProfileEditEvent.CompleteEdit -> {
                 onNavigateBack()
@@ -51,11 +52,10 @@ internal fun ProfileEditRoute(
             is ProfileEditEvent.ShowToast -> {
                 Toast.makeText(
                     context,
-                    (event as ProfileEditEvent.ShowToast).message,
+                    event.message,
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            null -> Unit
         }
     }
 
@@ -67,7 +67,8 @@ internal fun ProfileEditRoute(
             }
         },
         onValueChange = viewModel::updateName,
-        onComplete = viewModel::completeEdit
+        onComplete = viewModel::completeEdit,
+        onNavigateBack = onNavigateBack
     )
 }
 
@@ -76,7 +77,8 @@ private fun ProfileEditScreen(
     uiState: ProfileEditUiModel,
     onImageUpdate: () -> Unit,
     onValueChange: (String) -> Unit,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100),
@@ -84,7 +86,7 @@ private fun ProfileEditScreen(
     ) {
         YakssokTopAppBar(
             title = "프로필",
-            onBackClick = onComplete
+            onBackClick = onNavigateBack
         )
 
         Spacer(modifier = Modifier.height(27.dp))
