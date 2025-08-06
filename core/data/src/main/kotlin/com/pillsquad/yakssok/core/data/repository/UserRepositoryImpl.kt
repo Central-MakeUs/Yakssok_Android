@@ -51,6 +51,23 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun putMyInfo(
+        nickName: String,
+        profileImage: String
+    ): Result<Unit> {
+        val result = userRetrofitDataSource.putLogout().toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.saveUserName(nickName)
+            userLocalDataSource.saveUserProfileImg(profileImage)
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "putMyInfo: $it")
+        }
+
+        return result
+    }
+
     override suspend fun getMyInviteCode(): String {
         val localCode = userLocalDataSource.inviteCodeFlow.firstOrNull()
 

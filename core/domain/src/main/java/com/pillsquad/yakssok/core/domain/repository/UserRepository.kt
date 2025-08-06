@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
     suspend fun postMyInfoToLocal()
     suspend fun getMyUser(): User
+    suspend fun putMyInfo(nickName: String, profileImage: String): Result<Unit>
     suspend fun getMyInviteCode(): String
     suspend fun getUserInfoByInviteCode(inviteCode: String): Result<UserInfo>
     suspend fun getMyInfo(): Flow<MyInfo>
