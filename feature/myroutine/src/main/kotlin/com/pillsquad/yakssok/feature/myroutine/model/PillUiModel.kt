@@ -6,6 +6,12 @@ import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.MyRoutine
 import com.pillsquad.yakssok.core.model.WeekType
 
+data class RoutineUiModel(
+    val pillList: List<PillUiModel> = listOf(),
+    val optionalShowId: Int? = null,
+    val routineEndId: Int? = null
+)
+
 data class PillUiModel(
     val id: Int = 0,
     val pillName: String = "",

@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.myroutine
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,12 +29,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationStatus
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.feature.myroutine.component.EndRoutineDialog
 import com.pillsquad.yakssok.feature.myroutine.component.InfoCard
 import com.pillsquad.yakssok.feature.myroutine.component.OptionalDialog
@@ -49,46 +55,43 @@ internal fun MyRoutineRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event by viewModel.event.collectAsStateWithLifecycle(null)
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val tabs = listOf("전체", "복약 전", "복약 중", "복약 종료")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val tabIndex = pagerState.currentPage
 
-    var optionalShowId by remember { mutableStateOf<Int?>(null) }
-    var routineEndId by remember { mutableStateOf<Int?>(null) }
-
-    LaunchedEffect(event) {
-        when(event) {
+    CollectEvent(viewModel.event) { event ->
+        when (event) {
             is MyRoutineEvent.ShowToast -> {
-                optionalShowId = null
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
-            null -> {}
         }
     }
 
-    if (optionalShowId != null) {
+    if (uiState.optionalShowId != null) {
         OptionalDialog(
             onClick = {
-                routineEndId = optionalShowId
-                optionalShowId = null
+                uiState.optionalShowId?.let {
+                    viewModel.checkEndRoutine(it)
+                }
             },
-            onDismiss = { optionalShowId = null }
+            onDismiss = { viewModel.updateDialogId(optional = null) }
         )
     }
 
-    if (routineEndId != null) {
+    if (uiState.routineEndId != null) {
         EndRoutineDialog(
-            onDismiss = { routineEndId = null },
             onConfirm = {
-                routineEndId?.let {
+                uiState.routineEndId?.let {
                     viewModel.endRoutine(it)
                 }
 
-                routineEndId = null
-            }
+                viewModel.updateDialogId(routineEnd = null)
+            },
+            onDismiss = { viewModel.updateDialogId(routineEnd = null) }
         )
     }
 
@@ -97,11 +100,11 @@ internal fun MyRoutineRoute(
         tabIndex = tabIndex,
         pagerState = pagerState,
         scope = scope,
-        fullList = uiState,
+        fullList = uiState.pillList,
         onNavigateRoutine = onNavigateRoutine,
         onNavigateBack = onNavigateBack,
         onEndRoutine = {
-            optionalShowId = it
+            viewModel.updateDialogId(optional = it)
         }
     )
 }
