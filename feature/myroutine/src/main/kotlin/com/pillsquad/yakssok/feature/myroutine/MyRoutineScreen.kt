@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.model.MedicationStatus
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.myroutine.component.InfoCard
 import com.pillsquad.yakssok.feature.myroutine.component.RoutinePlusButton
@@ -48,24 +49,16 @@ internal fun MyRoutineRoute(
     val tabs = listOf("전체", "복약 전", "복약 중", "복약 종료")
 
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(
-        pageCount = { tabs.size },
-        initialPageOffsetFraction = 0f,
-        initialPage = 0,
-    )
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
 
     val tabIndex = pagerState.currentPage
-
-    LaunchedEffect(tabIndex) {
-        viewModel.updateList(tabIndex)
-    }
 
     MyRoutineScreen(
         tabs = tabs,
         tabIndex = tabIndex,
         pagerState = pagerState,
         scope = scope,
-        itemList = uiState.value,
+        fullList = uiState.value,
         onNavigateRoutine = onNavigateRoutine,
         onNavigateBack = onNavigateBack
     )
@@ -78,7 +71,7 @@ private fun MyRoutineScreen(
     tabIndex: Int,
     pagerState: PagerState,
     scope: CoroutineScope,
-    itemList: List<PillUiModel>,
+    fullList: List<PillUiModel>,
     onNavigateRoutine: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -101,7 +94,7 @@ private fun MyRoutineScreen(
             containerColor = YakssokTheme.color.grey100,
             contentColor = YakssokTheme.color.grey950,
             selectedTabIndex = tabIndex,
-            indicator = @Composable{
+            indicator = {
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabIndex),
                     color = YakssokTheme.color.grey950
@@ -109,16 +102,12 @@ private fun MyRoutineScreen(
             }
         ) {
             tabs.forEachIndexed { idx, value ->
-                val isSelected = tabIndex == idx
-
                 Tab(
-                    selected = isSelected,
+                    selected = tabIndex == idx,
                     selectedContentColor = YakssokTheme.color.grey950,
                     unselectedContentColor = YakssokTheme.color.grey400,
                     onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(idx)
-                        }
+                        scope.launch { pagerState.animateScrollToPage(idx) }
                     }
                 ) {
                     Text(
@@ -133,28 +122,44 @@ private fun MyRoutineScreen(
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),
             state = pagerState
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        RoutinePlusButton(onClick = onNavigateRoutine)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                items(itemList) {
-                    InfoCard(it)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+        ) { page ->
+            val filteredList = when (page) {
+                1 -> fullList.filter { it.medicationStatus == MedicationStatus.PLANNED }
+                2 -> fullList.filter { it.medicationStatus == MedicationStatus.TAKING }
+                3 -> fullList.filter { it.medicationStatus == MedicationStatus.ENDED }
+                else -> fullList
             }
+
+            RoutineList(
+                items = filteredList,
+                onNavigateRoutine = onNavigateRoutine
+            )
+        }
+    }
+}
+
+@Composable
+private fun RoutineList(
+    items: List<PillUiModel>,
+    onNavigateRoutine: () -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                RoutinePlusButton(onClick = onNavigateRoutine)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        items(items) {
+            InfoCard(it)
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

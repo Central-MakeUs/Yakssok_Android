@@ -3,8 +3,8 @@ package com.pillsquad.yakssok.feature.mymate
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pillsquad.yakssok.core.domain.GetFollowerListUseCase
-import com.pillsquad.yakssok.core.domain.GetFollowingListUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetFollowerListUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetFollowingListUseCase
 import com.pillsquad.yakssok.feature.mymate.model.MyMateUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async

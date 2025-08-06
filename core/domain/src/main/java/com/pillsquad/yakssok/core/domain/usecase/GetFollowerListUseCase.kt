@@ -1,12 +1,12 @@
-package com.pillsquad.yakssok.core.domain
+package com.pillsquad.yakssok.core.domain.usecase
 
 import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.model.User
 import javax.inject.Inject
 
-class GetFollowingListUseCase @Inject constructor(
+class GetFollowerListUseCase @Inject constructor(
     private val friendRepository: FriendRepository
 ) {
     suspend operator fun invoke(): Result<List<User>> =
-        friendRepository.getFollowingList(false)
+        friendRepository.getFollowerList()
 }

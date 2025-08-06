@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.formatKotlinxTime
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.ui.component.PillTypeCard
@@ -28,7 +29,6 @@ import com.pillsquad.yakssok.core.ui.component.WeekRow
 import com.pillsquad.yakssok.core.ui.component.YakssokDialog
 import com.pillsquad.yakssok.feature.routine.R
 import com.pillsquad.yakssok.feature.routine.model.RoutineUiModel
-import com.pillsquad.yakssok.feature.routine.util.formatKotlinxTime
 
 @Composable
 internal fun CompleteDialog(

@@ -7,7 +7,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.pillsquad.yakssok.core.domain.TestLoginUseCase
+import com.pillsquad.yakssok.core.domain.usecase.TestLoginUseCase
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase

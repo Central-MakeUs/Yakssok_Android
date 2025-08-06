@@ -4,6 +4,7 @@ import com.pillsquad.yakssok.core.network.datasource.MedicationDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.PostMedicationRequest
 import com.pillsquad.yakssok.core.network.model.response.MedicationCardResponse
+import com.pillsquad.yakssok.core.network.model.response.MyMedicationListResponse
 import com.pillsquad.yakssok.core.network.service.MedicationApi
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ class MedicationRetrofitDataSource @Inject constructor(
     override suspend fun putEndMedication(medicationId: Long): ApiResponse<Unit> =
         medicationApi.putEndMedication(medicationId)
 
-    override suspend fun getMyMedications(status: String): ApiResponse<List<MedicationCardResponse>> =
+    override suspend fun getMyMedications(status: String?): ApiResponse<MyMedicationListResponse> =
         medicationApi.getMyMedications(status)
 
     override suspend fun postMedication(params: PostMedicationRequest): ApiResponse<Unit> =

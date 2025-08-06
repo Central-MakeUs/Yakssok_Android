@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.core.network.service
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.PostMedicationRequest
 import com.pillsquad.yakssok.core.network.model.response.MedicationCardResponse
+import com.pillsquad.yakssok.core.network.model.response.MyMedicationListResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -19,8 +20,8 @@ interface MedicationApi {
 
     @GET("/api/medications")
     suspend fun getMyMedications(
-        @Query("status") status: String
-    ): ApiResponse<List<MedicationCardResponse>>
+        @Query("status") status: String?
+    ): ApiResponse<MyMedicationListResponse>
 
     @POST("/api/medications")
     suspend fun postMedication(

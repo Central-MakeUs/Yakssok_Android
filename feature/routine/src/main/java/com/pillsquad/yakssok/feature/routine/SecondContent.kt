@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.formatKotlinxTime
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.WeekType
 import com.pillsquad.yakssok.feature.routine.component.RoutineText
-import com.pillsquad.yakssok.feature.routine.util.formatKotlinxTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format

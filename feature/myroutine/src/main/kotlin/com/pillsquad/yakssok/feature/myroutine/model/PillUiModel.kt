@@ -1,14 +1,16 @@
 package com.pillsquad.yakssok.feature.myroutine.model
 
-import com.pillsquad.yakssok.core.model.AlarmType
-import com.pillsquad.yakssok.core.model.PillProgressType
+import com.pillsquad.yakssok.core.common.formatKotlinxTime
+import com.pillsquad.yakssok.core.model.MedicationStatus
 import com.pillsquad.yakssok.core.model.MedicationType
+import com.pillsquad.yakssok.core.model.MyRoutine
 import com.pillsquad.yakssok.core.model.WeekType
 
 data class PillUiModel(
+    val id: Int = 0,
     val pillName: String = "",
     val medicationType: MedicationType = MedicationType.OTHER,
-    val pillProgressType: PillProgressType = PillProgressType.BEFORE,
+    val medicationStatus: MedicationStatus = MedicationStatus.PLANNED,
     val intakeCount: Int = 1,
     val intakeDays: List<WeekType> = listOf(
         WeekType.MONDAY,
@@ -20,5 +22,15 @@ data class PillUiModel(
         WeekType.SUNDAY
     ),
     val intakeTimes: String = "",
-    val alarmType: AlarmType = AlarmType.SCOLD
 )
+
+internal fun MyRoutine.toPillUiModel(): PillUiModel =
+    PillUiModel(
+        id = id,
+        pillName = name,
+        medicationType = type,
+        medicationStatus = status,
+        intakeCount = intakeCount,
+        intakeDays = intakeDays,
+        intakeTimes = intakeTime.joinToString(" / ") { formatKotlinxTime(it) },
+    )
