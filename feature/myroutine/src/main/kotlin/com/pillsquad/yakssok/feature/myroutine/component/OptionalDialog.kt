@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.core.ui.component
+package com.pillsquad.yakssok.feature.myroutine.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,25 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 
 @Composable
-fun YakssokDialog(
-    title: String = "",
-    cancelText: String? = null,
-    confirmText: String = "선택",
-    enabled: Boolean = true,
+internal fun OptionalDialog(
+    onClick: () -> Unit,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    confirmContentColor: Color = YakssokTheme.color.grey50,
-    confirmBackgroundColor: Color = YakssokTheme.color.primary400,
-    titleComponent: (@Composable () -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
 ) {
-    val confirmColor = if (enabled) confirmBackgroundColor else YakssokTheme.color.grey200
-    val contentColor = if (enabled) confirmContentColor else YakssokTheme.color.grey400
-
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -83,40 +73,34 @@ fun YakssokDialog(
                         .width(38.dp)
                         .background(color = Color(0xFFDBDBDB))
                 )
+
                 Spacer(modifier = Modifier.height(28.dp))
-                if (titleComponent == null) {
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            onClick = onClick,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = title,
+                        text = "종료하기",
                         style = YakssokTheme.typography.subtitle1,
                         color = YakssokTheme.color.grey900
                     )
-                } else {
-                    titleComponent()
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                content()
-                Spacer(modifier = Modifier.height(60.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    if (cancelText != null) {
-                        YakssokButton(
-                            modifier = Modifier.weight(1f),
-                            text = cancelText,
-                            backgroundColor = YakssokTheme.color.grey100,
-                            onClick = onDismiss
-                        )
-                    }
-                    YakssokButton(
-                        modifier = Modifier.weight(1f),
-                        text = confirmText,
-                        contentColor = contentColor,
-                        backgroundColor = confirmColor,
-                        enabled = enabled,
-                        onClick = onConfirm
+
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = YakssokTheme.color.grey400
                     )
                 }
+
+                Spacer(modifier = Modifier.height(60.dp))
             }
         }
     }
