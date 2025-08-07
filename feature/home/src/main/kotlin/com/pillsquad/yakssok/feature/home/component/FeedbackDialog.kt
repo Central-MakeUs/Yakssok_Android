@@ -45,12 +45,12 @@ import com.pillsquad.yakssok.core.ui.component.DailyMedicineRow
 @Composable
 internal fun FeedbackDialog(
     user: User,
-    todayRoutineCount: Int? = null,
+    todayRoutineCount: Int = user.notTakenCount ?: 0,
     routineList: List<Routine>,
     onDismiss: () -> Unit,
     onConfirm: (Int, String, String) -> Unit
 ) {
-    val isNagging = todayRoutineCount == null
+    val isNagging = todayRoutineCount != 0
     val hintText = if (isNagging) "한 줄 잔소리" else "한 줄 칭찬"
 
     val textList = if (isNagging) {
@@ -89,12 +89,23 @@ internal fun FeedbackDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Transparent),
+                .background(Color.Transparent)
+                .imePadding()
+                .clickable(
+                    onClick = onDismiss,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ),
             contentAlignment = Alignment.BottomCenter
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth(0.92f)
+                    .clickable(
+                        onClick = {},
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    )
                     .background(
                         color = YakssokTheme.color.grey50,
                         shape = RoundedCornerShape(24.dp)
@@ -112,7 +123,11 @@ internal fun FeedbackDialog(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                DialogInfoItem(user, isNagging, todayRoutineCount)
+                DialogInfoItem(
+                    user = user,
+                    isNagging = isNagging,
+                    takenCount = routineList.size - todayRoutineCount
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -176,7 +191,9 @@ private fun DialogContent(
     onFeedbackMessageChange: (String) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding()
     ) {
         if (routineList.size > 3) {
             val itemHeight = 56.dp
@@ -244,13 +261,13 @@ private fun DialogContent(
 private fun DialogInfoItem(
     user: User,
     isNagging: Boolean,
-    todayRoutineCount: Int? = null
+    takenCount: Int? = null
 ) {
     val descriptionName = if (isNagging) "안 먹은 약" else "오늘 먹은 약"
     val routineCount = if (isNagging) {
         user.notTakenCount
     } else {
-        todayRoutineCount
+        takenCount
     }
 
     Row(

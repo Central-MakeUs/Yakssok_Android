@@ -62,11 +62,12 @@ internal fun HomeRoute(
 
     var feedbackTarget by remember { mutableStateOf<User?>(null) }
 
-    feedbackTarget?.let {
+    feedbackTarget?.let { user ->
+        val idx = uiState.userList.indexOfFirst { it.id == user.id }
+
         FeedbackDialog(
-            user = it,
-            todayRoutineCount = uiState.userList[uiState.selectedUserIdx].notTakenCount,
-            routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate) ?: emptyList(),
+            user = user,
+            routineList = uiState.routineCache[idx]?.get(uiState.selectedDate) ?: emptyList(),
             onDismiss = { feedbackTarget = null },
             onConfirm = { userId, message, type ->
                 viewModel.postFeedback(userId, message, type)
