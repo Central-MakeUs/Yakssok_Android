@@ -24,6 +24,7 @@ import javax.inject.Inject
 import androidx.core.util.size
 import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
+import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalTime
 
 @HiltViewModel
@@ -91,6 +92,21 @@ class HomeViewModel @Inject constructor(
     fun postFeedback(userId: Int, message: String, type: String) {
         viewModelScope.launch {
             postFeedbackUseCase(userId, message, type)
+            _uiState.update {
+                val newList = it.userList.map { user ->
+                    if (user.id == userId) {
+                        user.copy(notTakenCount = null)
+                    } else {
+                        user
+                    }
+                }
+                val showFeedBackSection = newList.any { target -> target.notTakenCount != null }
+
+                it.copy(
+                    userList = newList,
+                    showFeedBackSection = showFeedBackSection
+                )
+            }
         }
     }
 
