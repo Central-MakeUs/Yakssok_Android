@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.feature.home
 
 import android.util.SparseArray
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +41,8 @@ import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
@@ -47,6 +53,7 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
@@ -58,9 +65,26 @@ internal fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val remindState by viewModel.remindState.collectAsStateWithLifecycle()
+
     val scrollState = rememberScrollState()
 
+    var isRefreshing by remember { mutableStateOf(false) }
+    val refreshState = rememberPullToRefreshState()
+    val scaleFraction = {
+        if (isRefreshing) 1f
+        else LinearOutSlowInEasing.transform(refreshState.distanceFraction).coerceIn(0f, 1f)
+    }
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        viewModel.loadUserAndRoutines()
+        isRefreshing = false
+    }
+
     var feedbackTarget by remember { mutableStateOf<User?>(null) }
+
+    OnResumeEffect {
+        viewModel.loadUserAndRoutines()
+    }
 
     feedbackTarget?.let { user ->
         val idx = uiState.userList.indexOfFirst { it.id == user.id }
@@ -88,12 +112,16 @@ internal fun HomeRoute(
     }
 
     HomeScreen(
+        isRefreshing = isRefreshing,
+        scaleFraction = scaleFraction,
+        refreshState = refreshState,
         showFeedBackSection = uiState.showFeedBackSection,
         selectedDate = uiState.selectedDate,
         userProfileList = uiState.userList,
         routineCache = uiState.routineCache,
-        scrollState = scrollState,
         selectedUserIdx = uiState.selectedUserIdx,
+        scrollState = scrollState,
+        onRefresh = onRefresh,
         onClickUser = {
             viewModel.onMateClick(it)
         },
@@ -112,14 +140,19 @@ internal fun HomeRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
+    isRefreshing: Boolean = false,
+    scaleFraction: () -> Float = { 1f },
+    refreshState: PullToRefreshState = rememberPullToRefreshState(),
     showFeedBackSection: Boolean = false,
     selectedDate: LocalDate = LocalDate.today(),
     userProfileList: List<User> = emptyList(),
     routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>> = SparseArray(),
     selectedUserIdx: Int = 0,
     scrollState: ScrollState = rememberScrollState(),
+    onRefresh: () -> Unit = {},
     onClickUser: (Int) -> Unit = {},
     onSelectDate: (LocalDate) -> Unit = {},
     onClickRoutine: (Int) -> Unit = {},
@@ -130,19 +163,20 @@ private fun HomeScreen(
     onNavigateRoutine: () -> Unit = {},
     onNavigateCalendar: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(YakssokTheme.color.grey50)
-            .systemBarsPadding()
+    PullToRefreshColumn(
+        refreshState = refreshState,
+        isRefreshing = isRefreshing,
+        scaleFraction = scaleFraction,
+        onRefresh = onRefresh,
+        topBar = {
+            YakssokTopAppBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                isLogo = true,
+                onNavigateAlert = onNavigateAlert,
+                onNavigateMy = onNavigateMy
+            )
+        }
     ) {
-        YakssokTopAppBar(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            isLogo = true,
-            onNavigateAlert = onNavigateAlert,
-            onNavigateMy = onNavigateMy
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -200,6 +234,77 @@ private fun HomeScreen(
             )
         }
     }
+
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(YakssokTheme.color.grey50)
+//            .systemBarsPadding()
+//    ) {
+//        YakssokTopAppBar(
+//            modifier = Modifier.padding(horizontal = 16.dp),
+//            isLogo = true,
+//            onNavigateAlert = onNavigateAlert,
+//            onNavigateMy = onNavigateMy
+//        )
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(YakssokTheme.color.grey100)
+//                .verticalScroll(scrollState)
+//        ) {
+//
+//
+//            if (showFeedBackSection) {
+//                Spacer(modifier = Modifier.height(16.dp))
+//
+//                LazyRow(
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    item {
+//                        Spacer(modifier = Modifier.width(16.dp))
+//                    }
+//                    items(userProfileList.size) { index ->
+//                        val user = userProfileList[index]
+//
+//                        if (user.notTakenCount != null) {
+//                            UserInfoCard(
+//                                id = user.id,
+//                                nickName = user.nickName,
+//                                relationName = user.relationName,
+//                                profileUrl = user.profileImage,
+//                                remainedMedicine = user.notTakenCount ?: 0,
+//                                onClick = {
+//                                    onSendMessage(user)
+//                                }
+//                            )
+//                            Spacer(modifier = Modifier.width(16.dp))
+//                        }
+//                    }
+//
+//                }
+//
+//                Spacer(modifier = Modifier.height(16.dp))
+//            }
+//
+//            HomeContent(
+//                modifier = Modifier,
+//                userProfileList = userProfileList,
+//                routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList(),
+//                selectedDate = selectedDate,
+//                selectedUserIdx = selectedUserIdx,
+//                isRounded = showFeedBackSection,
+//                isNotMedicine = userProfileList[selectedUserIdx].isNotMedicine,
+//                onClickUser = onClickUser,
+//                onSelectDate = onSelectDate,
+//                onClickRoutine = onClickRoutine,
+//                onNavigateMate = onNavigateMate,
+//                onNavigateRoutine = onNavigateRoutine,
+//                onNavigateCalendar = onNavigateCalendar
+//            )
+//        }
+//    }
 }
 
 @Composable
