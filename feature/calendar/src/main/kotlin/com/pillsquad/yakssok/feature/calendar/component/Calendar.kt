@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -31,6 +32,7 @@ internal fun Calendar(
     takenCache: Map<LocalDate, Boolean>,
     config: CalendarConfig = CalendarConfig(),
     onDateSelected: (LocalDate) -> Unit,
+    onLoadDataForPage: (Int) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
 
@@ -44,6 +46,8 @@ internal fun Calendar(
     )
     var currentPage by remember { mutableIntStateOf(initialPage) }
 
+    val loadedPages = remember { mutableStateSetOf(currentPage) }
+
     val currentYearMonth by remember(pagerState.currentPage) {
         derivedStateOf {
             val year = config.yearRange.first + (pagerState.currentPage / 12)
@@ -53,10 +57,21 @@ internal fun Calendar(
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != currentPage) {
+        val pagesToLoad = listOf(
+            pagerState.currentPage,
+            pagerState.currentPage - 1,
+            pagerState.currentPage + 1
+        ).filter { it in 0 until totalPages }
+
+        for (page in pagesToLoad) {
+            if (!loadedPages.contains(page)) {
+                onLoadDataForPage(page)
+                loadedPages.add(page)
+            }
+        }
+
+        if (currentPage != pagerState.currentPage) {
             currentPage = pagerState.currentPage
-            // TODO: pagerState에 따라서 범위에 따른 데이터 값을 미리 불러오는 로직
-//            loadDataForPage(currentPage)
         }
     }
 
