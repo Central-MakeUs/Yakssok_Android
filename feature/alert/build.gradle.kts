@@ -8,4 +8,7 @@ setNamespace("feature.alert")
 
 dependencies {
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 }

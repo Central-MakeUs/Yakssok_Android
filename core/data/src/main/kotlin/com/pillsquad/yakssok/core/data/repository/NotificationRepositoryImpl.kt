@@ -12,8 +12,8 @@ import javax.inject.Inject
 
 class NotificationRepositoryImpl @Inject constructor(
     private val notificationDataSource: NotificationDataSource
-): NotificationRepository {
-    override suspend fun getAlarmPager(): Flow<PagingData<AlarmPagerItem>> {
+) : NotificationRepository {
+    override fun getAlarmPager(): Flow<PagingData<AlarmPagerItem>> {
         return PagingDataSource.createPager(
             pageSize = 20,
             keySelector = { it.notificationId.toString() },

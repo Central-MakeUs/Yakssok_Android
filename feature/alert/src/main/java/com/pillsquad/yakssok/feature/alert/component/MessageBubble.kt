@@ -17,6 +17,7 @@ import com.pillsquad.yakssok.feature.alert.util.RightMessageBubbleShape
 
 @Composable
 internal fun MessageBubble(
+    modifier: Modifier,
     text: String,
     bgColor: Color,
     textColor: Color,
@@ -30,7 +31,7 @@ internal fun MessageBubble(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .widthIn(max = 283.dp)
             .clip(shape)
             .background(bgColor)
