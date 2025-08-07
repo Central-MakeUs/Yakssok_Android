@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface NotificationRepository {
 
-    suspend fun getAlarmPager(): Flow<PagingData<AlarmPagerItem>>
+    fun getAlarmPager(): Flow<PagingData<AlarmPagerItem>>
 }

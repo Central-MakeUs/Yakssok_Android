@@ -1,13 +1,17 @@
 package com.pillsquad.yakssok.core.common
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 fun LocalTime.Companion.now(): LocalTime {
@@ -31,4 +35,29 @@ fun formatKotlinxTime(time: LocalTime): String {
     }
 
     return "$amPm ${time.format(timeFormatter)}"
+}
+
+@OptIn(ExperimentalTime::class)
+fun getTimeDifferenceString(target: LocalDateTime): String {
+    val timeZone = TimeZone.currentSystemDefault()
+    val now = Clock.System.now()
+    val targetInstant = target.toInstant(timeZone)
+
+    val diffInMinutes = (now - targetInstant).inWholeMinutes
+
+    return when {
+        diffInMinutes < 1 -> "방금 전"
+        diffInMinutes < 60 -> "${diffInMinutes}분 전"
+        diffInMinutes < 60 * 24 -> "${diffInMinutes / 60}시간 전"
+        else -> "${diffInMinutes / (60 * 24)}일 전"
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+fun String.toLocalTimeByTimeZone(): LocalDateTime {
+    val timeZone = TimeZone.currentSystemDefault()
+    val safeInstantString = if (this.endsWith("Z")) this else "${this}Z"
+    val instant = Instant.parse(safeInstantString)
+
+    return instant.toLocalDateTime(timeZone)
 }
