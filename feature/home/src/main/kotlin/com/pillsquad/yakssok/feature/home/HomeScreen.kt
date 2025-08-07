@@ -122,12 +122,8 @@ internal fun HomeRoute(
         selectedUserIdx = uiState.selectedUserIdx,
         scrollState = scrollState,
         onRefresh = onRefresh,
-        onClickUser = {
-            viewModel.onMateClick(it)
-        },
-        onSelectDate = {
-            viewModel.onSelectedDate(it)
-        },
+        onClickUser = viewModel::onMateClick,
+        onSelectDate = viewModel::onSelectedDate,
         onClickRoutine = viewModel::onRoutineClick,
         onSendMessage = {
             feedbackTarget = it
@@ -234,77 +230,6 @@ private fun HomeScreen(
             )
         }
     }
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(YakssokTheme.color.grey50)
-//            .systemBarsPadding()
-//    ) {
-//        YakssokTopAppBar(
-//            modifier = Modifier.padding(horizontal = 16.dp),
-//            isLogo = true,
-//            onNavigateAlert = onNavigateAlert,
-//            onNavigateMy = onNavigateMy
-//        )
-//
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .background(YakssokTheme.color.grey100)
-//                .verticalScroll(scrollState)
-//        ) {
-//
-//
-//            if (showFeedBackSection) {
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                LazyRow(
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    item {
-//                        Spacer(modifier = Modifier.width(16.dp))
-//                    }
-//                    items(userProfileList.size) { index ->
-//                        val user = userProfileList[index]
-//
-//                        if (user.notTakenCount != null) {
-//                            UserInfoCard(
-//                                id = user.id,
-//                                nickName = user.nickName,
-//                                relationName = user.relationName,
-//                                profileUrl = user.profileImage,
-//                                remainedMedicine = user.notTakenCount ?: 0,
-//                                onClick = {
-//                                    onSendMessage(user)
-//                                }
-//                            )
-//                            Spacer(modifier = Modifier.width(16.dp))
-//                        }
-//                    }
-//
-//                }
-//
-//                Spacer(modifier = Modifier.height(16.dp))
-//            }
-//
-//            HomeContent(
-//                modifier = Modifier,
-//                userProfileList = userProfileList,
-//                routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList(),
-//                selectedDate = selectedDate,
-//                selectedUserIdx = selectedUserIdx,
-//                isRounded = showFeedBackSection,
-//                isNotMedicine = userProfileList[selectedUserIdx].isNotMedicine,
-//                onClickUser = onClickUser,
-//                onSelectDate = onSelectDate,
-//                onClickRoutine = onClickRoutine,
-//                onNavigateMate = onNavigateMate,
-//                onNavigateRoutine = onNavigateRoutine,
-//                onNavigateCalendar = onNavigateCalendar
-//            )
-//        }
-//    }
 }
 
 @Composable

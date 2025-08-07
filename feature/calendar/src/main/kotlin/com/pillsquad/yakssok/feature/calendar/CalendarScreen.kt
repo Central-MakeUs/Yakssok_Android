@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.calendar
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,11 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.util.isEmpty
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.calendar.component.Calendar
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
 import kotlinx.datetime.LocalDate
@@ -37,12 +37,17 @@ internal fun CalendarRoute(
     onNavigateMyPage: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
+
+    OnResumeEffect {
+        viewModel.loadUserAndRoutines()
+    }
 
     CalendarScreen(
         uiState = uiState,
-        scrollState = scrollState,
         onUpdateSelectedDate = viewModel::updateSelectedDate,
+        onClickUser = viewModel::onMateClick,
+        onLoadDataForPage = viewModel::loadDataForPage,
+        onRoutineClick = viewModel::onRoutineClick,
         onNavigateBack = onNavigateBack,
         onNavigateRoutine = onNavigateRoutine,
         onNavigateAlert = onNavigateAlert,
@@ -54,8 +59,10 @@ internal fun CalendarRoute(
 @Composable
 internal fun CalendarScreen(
     uiState: CalendarUiModel = CalendarUiModel(),
-    scrollState: ScrollState = rememberScrollState(),
     onUpdateSelectedDate: (LocalDate) -> Unit = {},
+    onClickUser: (Int) -> Unit = {},
+    onLoadDataForPage: (Int) -> Unit = {},
+    onRoutineClick: (Int) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateRoutine: () -> Unit = {},
     onNavigateAlert: () -> Unit = {},
@@ -63,6 +70,7 @@ internal fun CalendarScreen(
     onNavigateMyPage: () -> Unit = {},
 ) {
     val modifier = Modifier.padding(horizontal = 16.dp)
+    val today = LocalDate.today()
 
     Column(
         modifier = Modifier
@@ -88,10 +96,10 @@ internal fun CalendarScreen(
             item {
                 MateLazyRow(
                     modifier = modifier,
-                    userList = uiState.userLists,
-                    selectedUserIdx = uiState.selectedMate,
+                    userList = uiState.userList,
+                    selectedUserIdx = uiState.selectedUserIdx,
                     onNavigateMate = onNavigateMate,
-                    onMateClick = {}
+                    onMateClick = onClickUser
                 )
             }
 
@@ -103,8 +111,9 @@ internal fun CalendarScreen(
                 Calendar(
                     modifier = modifier,
                     selectedDate = uiState.selectedDate,
-                    takenCache = uiState.takenCache[uiState.selectedMate] ?: emptyMap(),
-                    onDateSelected = onUpdateSelectedDate
+                    takenCache = uiState.takenCache[uiState.selectedUserIdx] ?: emptyMap(),
+                    onDateSelected = onUpdateSelectedDate,
+                    onLoadDataForPage = onLoadDataForPage
                 )
             }
 
@@ -134,10 +143,13 @@ internal fun CalendarScreen(
                         onNavigateToRoutine = onNavigateRoutine
                     )
                 } else {
+                    val isCheckBoxVisible = (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
+
                     DailyMedicineList(
                         modifier = modifier,
-                        routineList = uiState.routineCache[uiState.selectedMate]!!.values.flatten(),
-                        onItemClick = {},
+                        isCheckBoxVisible = isCheckBoxVisible,
+                        routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate) ?: emptyList(),
+                        onItemClick = onRoutineClick,
                         onNavigateToRoute = onNavigateRoutine
                     )
                 }
