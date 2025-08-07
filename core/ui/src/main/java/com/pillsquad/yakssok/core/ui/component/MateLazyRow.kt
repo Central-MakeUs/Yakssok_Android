@@ -49,6 +49,7 @@ fun MateLazyRow(
             val user = userList[idx]
 
             MateItem(
+                id = user.id,
                 user = user,
                 imgSize = imgSize,
                 onMateClick = { onMateClick(idx) },
@@ -73,6 +74,7 @@ fun MateLazyRow(
 
 @Composable
 private fun MateItem(
+    id: Int,
     user: User,
     imgSize: Int = 52,
     onMateClick: () -> Unit,
@@ -85,6 +87,7 @@ private fun MateItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(
+            flag = id,
             modifier = Modifier.size(imgSize.dp),
             imageUrl = user.profileImage,
             isStroke = isClicked

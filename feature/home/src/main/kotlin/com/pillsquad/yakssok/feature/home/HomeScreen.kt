@@ -160,14 +160,17 @@ private fun HomeScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                     }
                     items(userProfileList.size) { index ->
-                        if (userProfileList[index].notTakenCount != null) {
+                        val user = userProfileList[index]
+
+                        if (user.notTakenCount != null) {
                             UserInfoCard(
-                                nickName = userProfileList[index].nickName,
-                                relationName = userProfileList[index].relationName,
-                                profileUrl = userProfileList[index].profileImage,
-                                remainedMedicine = userProfileList[index].notTakenCount ?: 0,
+                                id = user.id,
+                                nickName = user.nickName,
+                                relationName = user.relationName,
+                                profileUrl = user.profileImage,
+                                remainedMedicine = user.notTakenCount ?: 0,
                                 onClick = {
-                                    onSendMessage(userProfileList[index])
+                                    onSendMessage(user)
                                 }
                             )
                             Spacer(modifier = Modifier.width(16.dp))

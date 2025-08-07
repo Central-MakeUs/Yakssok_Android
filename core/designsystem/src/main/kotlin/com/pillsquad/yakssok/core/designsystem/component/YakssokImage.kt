@@ -20,11 +20,17 @@ import com.pillsquad.yakssok.core.designsystem.util.shadow
 @Composable
 fun YakssokImage(
     modifier: Modifier = Modifier,
+    flag: Int = 0,
     imageUrl: String,
     contentDescription: String? = null,
     isStroke: Boolean = false,
 ) {
     val shape = CircleShape
+    val errorProfile = when(flag % 3) {
+        0 -> R.drawable.img_default_profile1
+        1 -> R.drawable.img_default_profile2
+        else -> R.drawable.img_default_profile3
+    }
 
     AsyncImage(
         modifier = modifier
@@ -53,6 +59,6 @@ fun YakssokImage(
         model = imageUrl,
         contentScale = ContentScale.Crop,
         contentDescription = contentDescription ?: stringResource(R.string.yakssok_image),
-        error = painterResource(R.drawable.img_default_profile)
+        error = painterResource(errorProfile)
     )
 }

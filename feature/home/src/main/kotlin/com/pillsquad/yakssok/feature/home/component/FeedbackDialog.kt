@@ -258,6 +258,7 @@ private fun DialogInfoItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         YakssokImage(
+            flag = user.id,
             modifier = Modifier.size(52.dp),
             imageUrl = user.profileImage
         )

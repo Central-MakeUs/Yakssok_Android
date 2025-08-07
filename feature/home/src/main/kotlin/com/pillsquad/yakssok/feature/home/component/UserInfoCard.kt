@@ -30,6 +30,7 @@ import com.pillsquad.yakssok.feature.home.R
 
 @Composable
 internal fun UserInfoCard(
+    id: Int,
     nickName: String,
     relationName: String,
     profileUrl: String,
@@ -53,6 +54,7 @@ internal fun UserInfoCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             YakssokImage(
+                flag = id,
                 modifier = Modifier.size(52.dp),
                 imageUrl = profileUrl,
             )
