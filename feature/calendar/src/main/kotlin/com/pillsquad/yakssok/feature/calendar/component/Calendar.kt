@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.calendar.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -76,7 +77,7 @@ internal fun Calendar(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
     ) {
         CalendarHeader(
             yearMonth = currentYearMonth,
@@ -102,7 +103,7 @@ internal fun Calendar(
 
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),
-            state = pagerState
+            state = pagerState,
         ) { page ->
             val date = YearMonth(
                 year = config.yearRange.first + (page / 12),
