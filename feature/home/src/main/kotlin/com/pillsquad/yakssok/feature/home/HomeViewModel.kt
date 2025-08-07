@@ -110,7 +110,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserAndRoutines() {
+    fun loadUserAndRoutines() {
         viewModelScope.launch {
             getUserProfileListUseCase()
                 .onSuccess { users ->
