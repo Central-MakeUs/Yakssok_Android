@@ -9,10 +9,13 @@ import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
 import com.pillsquad.yakssok.core.network.model.request.FollowRequest
+import com.pillsquad.yakssok.datastore.UserLocalDataSource
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class FriendRepositoryImpl @Inject constructor(
     private val friendDataSource: FriendDataSource,
+    private val userLocalDataSource: UserLocalDataSource
 ) : FriendRepository {
     override suspend fun getFollowingList(
         isHome: Boolean,
@@ -57,6 +60,15 @@ class FriendRepositoryImpl @Inject constructor(
             relationName = relationName
         )
 
-        return friendDataSource.postAddFriend(params).toResult()
+        val result = friendDataSource.postAddFriend(params).toResult(
+            transform = { it }
+        )
+
+        result.onSuccess {
+            val currentCount = userLocalDataSource.mateCountFlow.firstOrNull() ?: 0
+            userLocalDataSource.saveMateCount(currentCount + 1)
+        }
+
+        return result
     }
 }
