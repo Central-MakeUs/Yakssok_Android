@@ -12,6 +12,7 @@ class UserLocalDataSource @Inject constructor(
     val userProfileImgFlow: Flow<String> = userPreferences.userProfileImgFlow
     val medicationCountFlow: Flow<Int> = userPreferences.medicationCountFlow
     val mateCountFlow: Flow<Int> = userPreferences.mateCountFlow
+    val deviceIdFlow: Flow<String> = userPreferences.deviceIdFlow
     val fcmTokenFlow: Flow<String> = userPreferences.fcmTokenFlow
     val pushAgreementFlow: Flow<Boolean> = userPreferences.pushAgreementFlow
     val tutorialCompleteFlow: Flow<Boolean> = userPreferences.tutorialCompleteFlow
@@ -35,6 +36,10 @@ class UserLocalDataSource @Inject constructor(
 
     suspend fun saveMateCount(count: Int) {
         userPreferences.saveMateCount(count)
+    }
+
+    suspend fun saveDeviceId(deviceId: String) {
+        userPreferences.saveDeviceId(deviceId)
     }
 
     suspend fun saveFcmToken(token: String) {

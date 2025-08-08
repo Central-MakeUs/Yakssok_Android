@@ -32,6 +32,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.datastore)
     implementation(projects.core.sound)
+    implementation(projects.core.firebase)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
