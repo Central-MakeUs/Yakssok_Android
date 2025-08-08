@@ -21,6 +21,7 @@ class UserPreferences @Inject constructor(
         private val USER_PROFILE_IMG = stringPreferencesKey("user_profile_img")
         private val MEDICATION_COUNT = intPreferencesKey("medication_count")
         private val MATE_COUNT = intPreferencesKey("mate_count")
+        private val DEVICE_ID = stringPreferencesKey("device_id")
         private val FCM_TOKEN = stringPreferencesKey("fcm_token")
         private val PUSH_AGREEMENT = booleanPreferencesKey("push_agreement")
         private val TUTORIAL_COMPLETE = booleanPreferencesKey("tutorial_complete")
@@ -41,6 +42,9 @@ class UserPreferences @Inject constructor(
 
     val mateCountFlow: Flow<Int> = dataStore.data
         .map { it[MATE_COUNT] ?: 0 }
+
+    val deviceIdFlow: Flow<String> = dataStore.data
+        .map { it[DEVICE_ID] ?: "" }
 
     val fcmTokenFlow: Flow<String> = dataStore.data
         .map { it[FCM_TOKEN] ?: "" }
@@ -77,6 +81,10 @@ class UserPreferences @Inject constructor(
 
     suspend fun saveMateCount(count: Int) {
         dataStore.edit { it[MATE_COUNT] = count }
+    }
+
+    suspend fun saveDeviceId(deviceId: String) {
+        dataStore.edit { it[DEVICE_ID] = deviceId }
     }
 
     suspend fun saveFcmToken(token: String) {
