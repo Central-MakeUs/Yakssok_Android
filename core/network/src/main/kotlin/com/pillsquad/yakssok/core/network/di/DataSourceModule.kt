@@ -9,6 +9,7 @@ import com.pillsquad.yakssok.core.network.datasource.MedicationDataSource
 import com.pillsquad.yakssok.core.network.datasource.NotificationDataSource
 import com.pillsquad.yakssok.core.network.datasource.RoutineDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
+import com.pillsquad.yakssok.core.network.datasource.UserDevicesDataSource
 import com.pillsquad.yakssok.core.network.remote.AuthRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.FeedbackRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.FriendRetrofitDataSource
@@ -16,6 +17,7 @@ import com.pillsquad.yakssok.core.network.remote.ImageRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.MedicationRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.NotificationRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.RoutineRetrofitDataSource
+import com.pillsquad.yakssok.core.network.remote.UserDevicesRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.UserRetrofitDataSource
 import com.pillsquad.yakssok.core.network.service.ImageApi
 import dagger.Binds
@@ -63,6 +65,11 @@ abstract class DataSourceModule {
     abstract fun bindNotificationDataSource(
         notificationRetrofitDataSource: NotificationRetrofitDataSource
     ): NotificationDataSource
+
+    @Binds
+    abstract fun bindUserDevicesDataSource(
+        userDevicesRetrofitDataSource: UserDevicesRetrofitDataSource
+    ): UserDevicesDataSource
 
     companion object {
         @Provides

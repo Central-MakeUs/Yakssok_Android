@@ -9,6 +9,7 @@ import com.pillsquad.yakssok.core.network.service.NotificationApi
 import com.pillsquad.yakssok.core.network.service.RoutineApi
 import com.pillsquad.yakssok.core.network.service.TokenApi
 import com.pillsquad.yakssok.core.network.service.UserApi
+import com.pillsquad.yakssok.core.network.service.UserDevicesApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -74,4 +75,10 @@ object ServiceModule {
     fun provideNotificationApi(
         @TokenRetrofit retrofit: Retrofit
     ): NotificationApi = retrofit.create(NotificationApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUserDevicesApi(
+        @TokenRetrofit retrofit: Retrofit
+    ): UserDevicesApi = retrofit.create(UserDevicesApi::class.java)
 }
