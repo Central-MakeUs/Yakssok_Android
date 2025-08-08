@@ -1,5 +1,7 @@
 package com.pillsquad.yakssok.core.designsystem.component
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +18,7 @@ import coil3.compose.AsyncImage
 import com.pillsquad.yakssok.core.designsystem.R
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
+import androidx.core.net.toUri
 
 @Composable
 fun YakssokImage(
@@ -26,11 +29,13 @@ fun YakssokImage(
     isStroke: Boolean = false,
 ) {
     val shape = CircleShape
-    val errorProfile = when(flag % 3) {
-        0 -> R.drawable.img_default_profile1
-        1 -> R.drawable.img_default_profile2
-        else -> R.drawable.img_default_profile3
-    }
+    val errorProfile = painterResource(
+        when (flag % 3) {
+            0 -> R.drawable.img_default_profile1
+            1 -> R.drawable.img_default_profile2
+            else -> R.drawable.img_default_profile3
+        }
+    )
 
     AsyncImage(
         modifier = modifier
@@ -56,9 +61,22 @@ fun YakssokImage(
                         shape = shape,
                     ) else Modifier
             ),
-        model = imageUrl,
+        model = imageUrl.toHttpsOrNull(),
         contentScale = ContentScale.Crop,
         contentDescription = contentDescription ?: stringResource(R.string.yakssok_image),
-        error = painterResource(errorProfile)
+        placeholder = errorProfile,
+        error = errorProfile,
     )
+}
+
+fun String?.toHttpsOrNull(): String? {
+    if (this.isNullOrBlank()) return null
+    return try {
+        val uri = this.toUri()
+        if (uri.scheme.equals("http", ignoreCase = true)) {
+            uri.buildUpon().scheme("https").build().toString()
+        } else this
+    } catch (_: Exception) {
+        null
+    }
 }
