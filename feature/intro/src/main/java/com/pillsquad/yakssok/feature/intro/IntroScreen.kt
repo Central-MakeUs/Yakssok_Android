@@ -40,11 +40,10 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
-import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
-import com.pillsquad.yakssok.feature.intro.util.isNotificationGranted
+import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
 
 @Composable
 internal fun IntroRoute(

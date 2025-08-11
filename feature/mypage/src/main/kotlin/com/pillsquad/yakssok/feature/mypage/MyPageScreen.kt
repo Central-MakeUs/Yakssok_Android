@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.mypage
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.AppInfo
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
+import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.mypage.component.CompleteDialog
 import com.pillsquad.yakssok.feature.mypage.component.InfoRow
@@ -49,11 +52,20 @@ internal fun MyPageRoute(
     onNavigateIntro: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val context = LocalContext.current
+
+    var permissionGranted by remember { mutableStateOf(isNotificationGranted(context)) }
 
     var isLogoutShow by remember { mutableStateOf<Boolean?>(null) }
     var isCompleteShow by remember { mutableStateOf<Boolean?>(null) }
+
+    OnResumeEffect {
+        val now = isNotificationGranted(context)
+        Log.d("MyPageRoute", "onResume: $now, $permissionGranted")
+
+        permissionGranted = now
+        if (!now) viewModel.forceAgreementFalseIfNeeded()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.event.collectLatest { event ->
@@ -95,6 +107,7 @@ internal fun MyPageRoute(
     MyPageScreen(
         uiState = uiState,
         appVersion = AppInfo.APP_VERSION,
+        notificationPermissionGranted = permissionGranted,
         onNavigateBack = onNavigateBack,
         onNavigateProfileEdit = onNavigateProfileEdit,
         onNavigateMyRoutine = onNavigateMyRoutine,
@@ -109,13 +122,14 @@ internal fun MyPageRoute(
 private fun MyPageScreen(
     uiState: MyPageUiState,
     appVersion: String,
+    notificationPermissionGranted: Boolean,
     onNavigateBack: () -> Unit,
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
     onNavigateInfo: (String, String) -> Unit,
     onShowDialog: (Boolean) -> Unit,
-    onUpdateAgreement: () -> Unit
+    onUpdateAgreement: () -> Unit,
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100)
@@ -137,6 +151,7 @@ private fun MyPageScreen(
                     mateCount = uiState.data.mateCount,
                     isAgreement = uiState.data.isAgreement,
                     appVersion = appVersion,
+                    notificationPermissionGranted = notificationPermissionGranted,
                     onNavigateProfileEdit = onNavigateProfileEdit,
                     onNavigateMyRoutine = onNavigateMyRoutine,
                     onNavigateMyMate = onNavigateMyMate,
@@ -161,6 +176,7 @@ private fun SuccessContent(
     mateCount: Int,
     isAgreement: Boolean,
     appVersion: String,
+    notificationPermissionGranted: Boolean,
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
@@ -209,6 +225,7 @@ private fun SuccessContent(
 
         InfoRow(
             title = "약 알람 받기",
+            isGranted = notificationPermissionGranted,
             checked = isAgreement,
             onCheckedChange = { onUpdateAgreement() }
         )

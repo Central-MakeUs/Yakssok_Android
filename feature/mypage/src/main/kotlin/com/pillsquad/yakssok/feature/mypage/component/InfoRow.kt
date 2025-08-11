@@ -81,52 +81,68 @@ internal fun InfoRow(
 @Composable
 internal fun InfoRow(
     title: String,
+    isGranted: Boolean,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val thumbColor = if (checked) YakssokTheme.color.primary400 else YakssokTheme.color.grey300
-
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = YakssokTheme.color.grey150,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = title,
-            style = YakssokTheme.typography.body1,
-            color = YakssokTheme.color.grey900
-        )
-
-        Switch(
+        Row(
             modifier = Modifier
-                .width(45.dp)
-                .height(24.dp),
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            thumbContent = {
-                Box(
-                    modifier = Modifier
-                        .size(18.dp)
-                        .background(
-                            color = thumbColor,
-                            shape = CircleShape
-                        )
+                .fillMaxWidth()
+                .background(
+                    color = YakssokTheme.color.grey150,
+                    shape = RoundedCornerShape(12.dp)
                 )
-            },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.Transparent,
-                checkedTrackColor = YakssokTheme.color.grey50,
-                checkedBorderColor = YakssokTheme.color.grey200,
-                uncheckedThumbColor = Color.Transparent,
-                uncheckedTrackColor = YakssokTheme.color.grey50,
-                uncheckedBorderColor = YakssokTheme.color.grey200
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = YakssokTheme.typography.body1,
+                color = YakssokTheme.color.grey900
             )
-        )
+
+            Switch(
+                modifier = Modifier
+                    .width(45.dp)
+                    .height(24.dp),
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                enabled = isGranted,
+                thumbContent = {
+                    Box(
+                        modifier = Modifier
+                            .size(18.dp)
+                            .background(
+                                color = if (checked) YakssokTheme.color.primary400 else YakssokTheme.color.grey300,
+                                shape = CircleShape
+                            )
+                    )
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.Transparent,
+                    checkedTrackColor = YakssokTheme.color.grey50,
+                    checkedBorderColor = YakssokTheme.color.grey200,
+                    uncheckedThumbColor = Color.Transparent,
+                    uncheckedTrackColor = YakssokTheme.color.grey50,
+                    uncheckedBorderColor = YakssokTheme.color.grey200
+                )
+            )
+        }
+
+        if (!isGranted) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = YakssokTheme.color.grey500.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            )
+        }
     }
 }
