@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.DeleteAccountUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LogoutUserUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PostUserDevicesUseCase
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiModel
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,6 +27,7 @@ sealed class MyPageEvent {
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val getMyInfoUseCase: GetMyInfoUseCase,
+    private val postUserDevicesUseCase: PostUserDevicesUseCase,
     private val logoutUserUseCase: LogoutUserUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase
 ): ViewModel() {
@@ -36,6 +39,30 @@ class MyPageViewModel @Inject constructor(
 
     init {
         observeMyInfo()
+    }
+
+    fun updateAgreement() {
+        viewModelScope.launch {
+            val cur = (uiState.value as? MyPageUiState.Success)?.data ?: return@launch
+            val target = !cur.isAgreement
+
+            _uiState.update { state ->
+                if (state is MyPageUiState.Success) {
+                    MyPageUiState.Success(state.data.copy(isAgreement = target))
+                } else state
+            }
+
+            postUserDevicesUseCase(target)
+                .onFailure { e ->
+                    _uiState.update { state ->
+                        if (state is MyPageUiState.Success) {
+                            MyPageUiState.Success(state.data.copy(isAgreement = !target))
+                        } else state
+                    }
+                    _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                    e.printStackTrace()
+                }
+        }
     }
 
     fun logoutUser() {
@@ -54,12 +81,12 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             getMyInfoUseCase()
                 .map {
-                    Log.d("UserRepositoryImpl", "get: $it")
                     MyPageUiModel(
                         nickName = it.nickName,
                         profileImageUrl = it.profileImage,
                         medicationCount = it.medicationCount,
-                        mateCount = it.followingCount
+                        mateCount = it.followingCount,
+                        isAgreement = it.isAgreement
                     )
                 }
                 .catch { e ->

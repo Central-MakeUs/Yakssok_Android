@@ -4,5 +4,6 @@ data class MyInfo(
     val nickName: String,
     val profileImage: String,
     val medicationCount: Int,
-    val followingCount: Int
+    val followingCount: Int,
+    val isAgreement: Boolean
 )

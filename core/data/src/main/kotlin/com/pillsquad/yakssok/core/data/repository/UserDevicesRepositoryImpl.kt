@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.data.repository
 
+import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.domain.repository.UserDevicesRepository
 import com.pillsquad.yakssok.core.firebase.DeviceIdProvider
@@ -16,7 +17,7 @@ class UserDevicesRepositoryImpl @Inject constructor(
     private val userLocalDataSource: UserLocalDataSource,
     private val deviceIdProvider: DeviceIdProvider,
     private val fcmTokenProvider: FcmTokenProvider
-): UserDevicesRepository {
+) : UserDevicesRepository {
 
     override suspend fun postUserDevices(alertOn: Boolean): Result<Unit> {
         val deviceId = userLocalDataSource.deviceIdFlow.firstOrNull()
@@ -34,6 +35,15 @@ class UserDevicesRepositoryImpl @Inject constructor(
             alertOn = alertOn
         )
 
-        return userDevicesDataSource.postUserDevices(request).toResult()
+        val result = userDevicesDataSource.postUserDevices(request).toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.savePushAgreement(alertOn)
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserDevicesRepositoryImpl", "postUserDevices: $it")
+        }
+
+        return result
     }
 }
