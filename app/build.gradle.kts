@@ -61,6 +61,7 @@ dependencies {
     implementation(projects.core.datastore)
     implementation(projects.core.network)
     implementation(projects.core.sound)
+    implementation(projects.core.firebase)
 
     implementation(projects.core.navigation)
     implementation(projects.core.designsystem)

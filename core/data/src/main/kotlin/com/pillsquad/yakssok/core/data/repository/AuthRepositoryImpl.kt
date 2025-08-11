@@ -1,8 +1,8 @@
 package com.pillsquad.yakssok.core.data.repository
 
+import android.util.Log
 import com.pillsquad.yakssok.core.data.BuildConfig
 import com.pillsquad.yakssok.core.data.mapper.toResult
-import com.pillsquad.yakssok.core.data.mapper.toResultForLogin
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
@@ -41,11 +41,28 @@ class AuthRepositoryImpl @Inject constructor(
         val response = authRetrofitDataSource.loginUser(params = params)
 
         if (response is ApiResponse.Success) {
+            userLocalDataSource.saveInitialized(response.data.isInitialized)
             userLocalDataSource.saveAccessToken(response.data.accessToken)
             userLocalDataSource.saveRefreshToken(response.data.refreshToken)
         }
 
-        return response.toResultForLogin()
+        return response.toResult(
+            transform = { it.isInitialized }
+        )
+    }
+
+    override suspend fun putLogout(): Result<Unit> {
+        val result = authRetrofitDataSource.logoutUser().toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.clearAllData()
+            // Todo: room 데이터 삭제
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "putLogout: $it")
+        }
+
+        return result
     }
 
     override suspend fun testLoginUser() {
@@ -56,9 +73,10 @@ class AuthRepositoryImpl @Inject constructor(
     override fun checkToken(): Flow<Boolean> {
         return combine(
             userLocalDataSource.accessTokenFlow,
-            userLocalDataSource.refreshTokenFlow
-        ) { accessToken, refreshToken ->
-            accessToken.isNotBlank() && refreshToken.isNotBlank()
+            userLocalDataSource.refreshTokenFlow,
+            userLocalDataSource.isInitializedFlow
+        ) { accessToken, refreshToken, initialized ->
+            accessToken.isNotBlank() && refreshToken.isNotBlank() && initialized
         }
     }
 }

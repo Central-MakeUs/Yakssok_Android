@@ -10,6 +10,7 @@ import com.pillsquad.yakssok.core.network.datasource.NotificationDataSource
 import com.pillsquad.yakssok.core.network.datasource.RoutineDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDevicesDataSource
+import com.pillsquad.yakssok.core.network.fake.UserDevicesFakeDataSource
 import com.pillsquad.yakssok.core.network.remote.AuthRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.FeedbackRetrofitDataSource
 import com.pillsquad.yakssok.core.network.remote.FriendRetrofitDataSource
@@ -26,6 +27,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class FakeUserDevices
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class RetrofitUserDevices
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -67,8 +77,15 @@ abstract class DataSourceModule {
     ): NotificationDataSource
 
     @Binds
-    abstract fun bindUserDevicesDataSource(
+    @RetrofitUserDevices
+    abstract fun bindRetrofitUserDevicesDataSource(
         userDevicesRetrofitDataSource: UserDevicesRetrofitDataSource
+    ): UserDevicesDataSource
+
+    @Binds
+    @FakeUserDevices
+    abstract fun bindFakeUserDevicesDataSource(
+        userDevicesFakeDataSource: UserDevicesFakeDataSource
     ): UserDevicesDataSource
 
     companion object {
