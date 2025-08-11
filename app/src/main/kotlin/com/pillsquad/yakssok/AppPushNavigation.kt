@@ -1,9 +1,10 @@
-package com.pillsquad.yakssok.feature.main
+package com.pillsquad.yakssok
 
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.pillsquad.yakssok.core.push.PushNavigation
+import com.pillsquad.yakssok.feature.main.MainActivity
 import javax.inject.Inject
 import javax.inject.Singleton
 
