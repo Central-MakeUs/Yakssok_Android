@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.mypage
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.DeleteAccountUseCase
@@ -15,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,7 +29,7 @@ class MyPageViewModel @Inject constructor(
     private val postUserDevicesUseCase: PostUserDevicesUseCase,
     private val logoutUserUseCase: LogoutUserUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase
-): ViewModel() {
+) : ViewModel() {
     private var _uiState = MutableStateFlow<MyPageUiState>(MyPageUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -68,16 +65,9 @@ class MyPageViewModel @Inject constructor(
     }
 
     fun forceAgreementFalseIfNeeded() {
-        Log.e("MyPage", "start")
-
         viewModelScope.launch {
-            val cur = uiState
-                .filterIsInstance<MyPageUiState.Success>()
-                .first()
-                .data
+            val cur = (uiState.value as? MyPageUiState.Success)?.data ?: return@launch
             if (!cur.isAgreement) return@launch
-
-            Log.e("MyPage", "forceAgreementFalseIfNeeded: $cur")
 
             _uiState.value = MyPageUiState.Success(cur.copy(isAgreement = false))
 

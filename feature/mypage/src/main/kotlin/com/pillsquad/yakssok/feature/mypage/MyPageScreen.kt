@@ -61,7 +61,6 @@ internal fun MyPageRoute(
 
     OnResumeEffect {
         val now = isNotificationGranted(context)
-        Log.d("MyPageRoute", "onResume: $now, $permissionGranted")
 
         permissionGranted = now
         if (!now) viewModel.forceAgreementFalseIfNeeded()
