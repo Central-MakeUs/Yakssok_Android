@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.sound.di
 
 import android.content.Context
+import com.pillsquad.yakssok.core.sound.NotificationSoundResolver
 import com.pillsquad.yakssok.core.sound.SoundManager
 import dagger.Module
 import dagger.Provides
@@ -18,4 +19,10 @@ object SoundModule {
     fun provideSoundManager(
         @ApplicationContext context: Context,
     ): SoundManager = SoundManager(context)
+
+    @Provides
+    @Singleton
+    fun provideNotificationSoundResolver(
+        @ApplicationContext context: Context,
+    ): NotificationSoundResolver = NotificationSoundResolver(context)
 }
