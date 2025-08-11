@@ -100,7 +100,8 @@ internal fun MyPageRoute(
         onNavigateMyRoutine = onNavigateMyRoutine,
         onNavigateMyMate = onNavigateMyMate,
         onNavigateInfo = onNavigateInfo,
-        onShowDialog = { isLogoutShow = it }
+        onShowDialog = { isLogoutShow = it },
+        onUpdateAgreement = viewModel::updateAgreement
     )
 }
 
@@ -113,7 +114,8 @@ private fun MyPageScreen(
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
     onNavigateInfo: (String, String) -> Unit,
-    onShowDialog: (Boolean) -> Unit
+    onShowDialog: (Boolean) -> Unit,
+    onUpdateAgreement: () -> Unit
 ) {
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100)
@@ -133,12 +135,14 @@ private fun MyPageScreen(
                     name = uiState.data.nickName,
                     routineCount = uiState.data.medicationCount,
                     mateCount = uiState.data.mateCount,
+                    isAgreement = uiState.data.isAgreement,
                     appVersion = appVersion,
                     onNavigateProfileEdit = onNavigateProfileEdit,
                     onNavigateMyRoutine = onNavigateMyRoutine,
                     onNavigateMyMate = onNavigateMyMate,
                     onNavigateInfo = onNavigateInfo,
-                    onShowDialog = onShowDialog
+                    onShowDialog = onShowDialog,
+                    onUpdateAgreement = onUpdateAgreement
                 )
             }
 
@@ -155,12 +159,14 @@ private fun SuccessContent(
     name: String,
     routineCount: Int,
     mateCount: Int,
+    isAgreement: Boolean,
     appVersion: String,
     onNavigateProfileEdit: () -> Unit,
     onNavigateMyRoutine: () -> Unit,
     onNavigateMyMate: () -> Unit,
     onNavigateInfo: (String, String) -> Unit,
     onShowDialog: (Boolean) -> Unit,
+    onUpdateAgreement: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -197,6 +203,14 @@ private fun SuccessContent(
             iconRes = R.drawable.ic_error,
             title = "이용약관",
             onClick = { onNavigateInfo("이용정책", BuildConfig.USAGE_POLICY) }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        InfoRow(
+            title = "약 알람 받기",
+            checked = isAgreement,
+            onCheckedChange = { onUpdateAgreement() }
         )
 
         Spacer(modifier = Modifier.height(16.dp))

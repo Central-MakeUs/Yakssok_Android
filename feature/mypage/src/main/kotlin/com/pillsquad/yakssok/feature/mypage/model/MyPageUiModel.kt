@@ -5,4 +5,5 @@ data class MyPageUiModel(
     val profileImageUrl: String,
     val medicationCount: Int,
     val mateCount: Int,
+    val isAgreement: Boolean
 )

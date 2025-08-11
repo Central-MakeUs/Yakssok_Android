@@ -1,7 +1,6 @@
 package com.pillsquad.yakssok.core.data.repository
 
 import android.util.Log
-import com.pillsquad.yakssok.core.data.mapper.toMyInfo
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUserInfo
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
@@ -15,7 +14,6 @@ import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,14 +23,11 @@ class UserRepositoryImpl @Inject constructor(
     private val userLocalDataSource: UserLocalDataSource
 ) : UserRepository {
     override suspend fun postMyInfoToLocal() {
-        val result = userRetrofitDataSource.getMyInfo().toResult(
-            transform = { it.toMyInfo() }
-        )
+        val result = userRetrofitDataSource.getMyInfo().toResult(transform = { it })
 
         result.onSuccess {
-            Log.d("UserRepositoryImpl", "postMyInfoToLocal: $it")
             userLocalDataSource.saveUserName(it.nickName)
-            userLocalDataSource.saveUserProfileImg(it.profileImage)
+            userLocalDataSource.saveUserProfileImg(it.profileImage ?: "")
             userLocalDataSource.saveMedicationCount(it.medicationCount)
             userLocalDataSource.saveMateCount(it.followingCount)
         }.onFailure {
@@ -122,13 +117,15 @@ class UserRepositoryImpl @Inject constructor(
             userLocalDataSource.userNameFlow,
             userLocalDataSource.userProfileImgFlow,
             userLocalDataSource.medicationCountFlow,
-            userLocalDataSource.mateCountFlow
-        ) { nickName, profileImage, medicationCount, mateCount ->
+            userLocalDataSource.mateCountFlow,
+            userLocalDataSource.pushAgreementFlow
+        ) { nickName, profileImage, medicationCount, mateCount, pushAgreement ->
             MyInfo(
                 nickName = nickName,
                 profileImage = profileImage,
                 medicationCount = medicationCount,
-                followingCount = mateCount
+                followingCount = mateCount,
+                isAgreement = pushAgreement
             )
         }
     }
