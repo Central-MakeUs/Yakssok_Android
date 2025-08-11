@@ -62,6 +62,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.sound)
     implementation(projects.core.firebase)
+    implementation(projects.core.push)
 
     implementation(projects.core.navigation)
     implementation(projects.core.designsystem)

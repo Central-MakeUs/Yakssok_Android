@@ -33,7 +33,7 @@ class YakssokFirebaseMessagingService : FirebaseMessagingService() {
         channelRegistry.ensureChannels()
 
         m.notification?.let { n ->
-            val pi = pushNavigation.defaultPendingIntent(this)
+            val pi = pushNavigation.appLaunchPendingIntent(this)
             notificationFactory.notifyNow(
                 notificationFactory.build(n.title.orEmpty(), n.body.orEmpty(), AlarmType.FEEL_GOOD, pi)
             )
@@ -51,8 +51,9 @@ class YakssokFirebaseMessagingService : FirebaseMessagingService() {
                 "VIBRATION" -> AlarmType.VIBRATION
                 else -> AlarmType.FEEL_GOOD
             }
-            val pi = pushNavigation.medicationPendingIntent(this, m.data)
-            notificationFactory.notifyNow(notificationFactory.build(title, body, type, pi))
+            val pendingIntent = pushNavigation.appLaunchPendingIntent(this)
+            val notification = notificationFactory.build(title, body, type, pendingIntent)
+            notificationFactory.notifyNow(notification)
         }
     }
 }
