@@ -18,12 +18,13 @@ class ChannelRegistry @Inject constructor(
     private val resolver: NotificationSoundResolver
 ) {
     fun ensureChannels() {
-        createIfNeeded(YakssokChannel.FEEL_GOOD,  "기분좋음", AlarmType.FEEL_GOOD)
+        createIfNeeded(YakssokChannel.FEEL_GOOD, "기분좋음", AlarmType.FEEL_GOOD)
         createIfNeeded(YakssokChannel.PILL_SHAKE, "약통흔들", AlarmType.PILL_SHAKE)
-        createIfNeeded(YakssokChannel.SCOLD,      "잔소리",   AlarmType.SCOLD)
-        createIfNeeded(YakssokChannel.CALL,       "전화벨",   AlarmType.CALL)
-        createIfNeeded(YakssokChannel.VIBRATION,  "진동",     AlarmType.VIBRATION)
-        createDefaultIfNeeded()    }
+        createIfNeeded(YakssokChannel.SCOLD, "잔소리", AlarmType.SCOLD)
+        createIfNeeded(YakssokChannel.CALL, "전화벨", AlarmType.CALL)
+        createIfNeeded(YakssokChannel.VIBRATION, "진동", AlarmType.VIBRATION)
+        createDefaultIfNeeded()
+    }
 
     private fun nm() = context.getSystemService(NotificationManager::class.java)
 
@@ -32,8 +33,10 @@ class ChannelRegistry @Inject constructor(
         if (manager.getNotificationChannel(id) != null) return
         val ch = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH).apply {
             resolver.uriFor(type.toSoundType())?.let { uri ->
-                setSound(uri, AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+                setSound(
+                    uri, AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
+                )
             }
             enableVibration(true)
         }
@@ -44,7 +47,11 @@ class ChannelRegistry @Inject constructor(
         val manager = nm()
         if (manager.getNotificationChannel(YakssokChannel.DEFAULT) != null) return
         manager.createNotificationChannel(
-            NotificationChannel(YakssokChannel.DEFAULT, "기본 알림", NotificationManager.IMPORTANCE_DEFAULT)
+            NotificationChannel(
+                YakssokChannel.DEFAULT,
+                "기본 알림",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
         )
     }
 }
