@@ -3,31 +3,26 @@ package com.pillsquad.yakssok.feature.intro
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.provider.ContactsContract
 import android.provider.Settings
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -49,11 +39,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.ui.component.YakssokDialog
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
-import com.pillsquad.yakssok.feature.intro.component.NotificationAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
+import com.pillsquad.yakssok.feature.intro.util.isNotificationGranted
 
 @Composable
 internal fun IntroRoute(
@@ -69,19 +60,62 @@ internal fun IntroRoute(
     val activity = LocalView.current.context as Activity
 
     var showSetting by remember { mutableStateOf(false) }
-    var isPermissionGranted by remember { mutableStateOf(false) }
     var pendingCheck by remember { mutableStateOf(false) }
 
+    var permissionRequested by rememberSaveable { mutableStateOf(false) }
+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when {
-                isGranted -> isPermissionGranted = true
-                else -> showSetting = true
+            if (granted) {
+                viewModel.postPushAgreement(true)
+            } else {
+                showSetting = true
             }
         } else {
-            isPermissionGranted = true
+            viewModel.postPushAgreement(true)
+        }
+    }
+
+    BackHandler {
+        if (uiState.isHaveToSignup && !uiState.isLoading) {
+            viewModel.deleteLoginInfo()
+        }
+    }
+
+    CollectEvent(viewModel.event) {
+        when(it) {
+            IntroEvent.NavigateHome -> onNavigateHome()
+            is IntroEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && pendingCheck) {
+                pendingCheck = false
+                viewModel.postPushAgreement(isNotificationGranted(context))
+            }
+        }
+        lifecycleOwner?.lifecycle?.addObserver(observer)
+        onDispose { lifecycleOwner?.lifecycle?.removeObserver(observer) }
+    }
+
+    LaunchedEffect(uiState.loginSuccess) {
+        if (!uiState.loginSuccess) return@LaunchedEffect
+        if (permissionRequested) return@LaunchedEffect
+
+        if (isNotificationGranted(context)) {
+            viewModel.postPushAgreement(true)
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionRequested = true
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                permissionRequested = true
+                viewModel.postPushAgreement(true)
+            }
         }
     }
 
@@ -89,15 +123,10 @@ internal fun IntroRoute(
         SettingAlertDialog(
             onDismiss = {
                 showSetting = false
-                if (uiState.loginSuccess) {
-                    onNavigateHome()
-                } else {
-                    viewModel.signupUser(false)
-                }
+                viewModel.postPushAgreement(false)
             },
             onConfirm = {
                 showSetting = false
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                         putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
@@ -117,62 +146,6 @@ internal fun IntroRoute(
                 viewModel.testLoginUser()
             }
         )
-    }
-
-    BackHandler {
-        if (uiState.isHaveToSignup && !uiState.isLoading) {
-            viewModel.deleteLoginInfo()
-        }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME && pendingCheck) {
-                pendingCheck = false
-
-                val isGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED
-                } else {
-                    true
-                }
-
-                Log.d("PermissionCheck", "After settings, granted = $isGranted")
-
-                if (uiState.loginSuccess) {
-                    onNavigateHome()
-                } else {
-                    viewModel.signupUser(isGranted)
-                }
-            }
-        }
-
-        lifecycleOwner?.lifecycle?.addObserver(observer)
-        onDispose {
-            lifecycleOwner?.lifecycle?.removeObserver(observer)
-        }
-    }
-
-    LaunchedEffect(uiState.loginSuccess) {
-        if (uiState.loginSuccess) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                onNavigateHome()
-            }
-        }
-    }
-
-    LaunchedEffect(isPermissionGranted) {
-        if (!isPermissionGranted) return@LaunchedEffect
-
-        if (uiState.loginSuccess) {
-            onNavigateHome()
-        } else {
-            viewModel.signupUser(true)
-        }
     }
 
     when {
@@ -195,13 +168,7 @@ internal fun IntroRoute(
                 onValueChange = viewModel::changeNickName,
                 enabled = uiState.isEnabled,
                 onBackClick = viewModel::deleteLoginInfo,
-                onSignupClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        viewModel.signupUser(true)
-                    }
-                }
+                onSignupClick = viewModel::putUserInitial
             )
         }
 
