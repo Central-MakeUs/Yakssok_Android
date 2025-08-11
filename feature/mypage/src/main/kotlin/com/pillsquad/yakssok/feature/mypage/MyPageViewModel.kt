@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,8 +37,15 @@ class MyPageViewModel @Inject constructor(
     private var _event = MutableSharedFlow<MyPageEvent>()
     val event = _event.asSharedFlow()
 
+    private val notificationGranted = MutableStateFlow<Boolean?>(null)
+    fun setNotificationPermission(granted: Boolean) {
+        notificationGranted.value = granted
+    }
+
+    private var lastForcedOffKey: Boolean = false
+
     init {
-        observeMyInfo()
+        observeMyInfoCombined()
     }
 
     fun updateAgreement() {
@@ -64,36 +72,13 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    fun forceAgreementFalseIfNeeded() {
+    fun logoutUser() { viewModelScope.launch { logoutUserUseCase() } }
+
+    fun deleteAccount() { viewModelScope.launch { deleteAccountUseCase() } }
+
+    private fun observeMyInfoCombined() {
         viewModelScope.launch {
-            val cur = (uiState.value as? MyPageUiState.Success)?.data ?: return@launch
-            if (!cur.isAgreement) return@launch
-
-            _uiState.value = MyPageUiState.Success(cur.copy(isAgreement = false))
-
-            postUserDevicesUseCase(false)
-                .onFailure {
-                    _uiState.value = MyPageUiState.Success(cur)
-                    _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
-                }
-        }
-    }
-
-    fun logoutUser() {
-        viewModelScope.launch {
-            logoutUserUseCase()
-        }
-    }
-
-    fun deleteAccount() {
-        viewModelScope.launch {
-            deleteAccountUseCase()
-        }
-    }
-
-    private fun observeMyInfo() {
-        viewModelScope.launch {
-            getMyInfoUseCase()
+            val intoFlow = getMyInfoUseCase()
                 .map {
                     MyPageUiModel(
                         nickName = it.nickName,
@@ -107,9 +92,36 @@ class MyPageViewModel @Inject constructor(
                     _uiState.value = MyPageUiState.Error(e.message ?: "알 수 없는 오류")
                     _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
                 }
-                .collect {
-                    _uiState.value = MyPageUiState.Success(it)
+
+            combine(
+                intoFlow,
+                notificationGranted,
+            ) { model, grantedOrNull ->
+                val granted = grantedOrNull
+
+                val effectiveAgreement = when (granted) {
+                    null -> model.isAgreement
+                    true -> true
+                    false -> false
                 }
+                Triple(model, granted, effectiveAgreement)
+            }.collect { (model, granted, effectiveAgreement) ->
+                _uiState.value = MyPageUiState.Success(model.copy(isAgreement = effectiveAgreement))
+
+                val needForceOff = (granted == false && model.isAgreement)
+                if (needForceOff && !lastForcedOffKey) {
+                    lastForcedOffKey = true
+                    viewModelScope.launch {
+                        postUserDevicesUseCase(false)
+                            .onFailure {
+                                _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                                lastForcedOffKey = false
+                            }
+                    }
+                }
+
+                if (granted == true) lastForcedOffKey = false
+            }
         }
     }
 }
