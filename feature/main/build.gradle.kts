@@ -21,8 +21,6 @@ fun getProperty(key: String): String {
 dependencies {
     implementation(libs.kotlinx.immutable)
 
-    implementation(projects.core.push)
-
     implementation(projects.feature.home)
     implementation(projects.feature.intro)
     implementation(projects.feature.routine)

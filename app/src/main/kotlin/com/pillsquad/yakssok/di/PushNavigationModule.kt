@@ -1,7 +1,7 @@
-package com.pillsquad.yakssok.feature.main.di
+package com.pillsquad.yakssok.di
 
 import com.pillsquad.yakssok.core.push.PushNavigation
-import com.pillsquad.yakssok.feature.main.AppPushNavigation
+import com.pillsquad.yakssok.AppPushNavigation
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
