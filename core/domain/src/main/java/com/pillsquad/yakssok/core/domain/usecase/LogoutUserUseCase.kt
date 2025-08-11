@@ -1,10 +1,10 @@
 package com.pillsquad.yakssok.core.domain.usecase
 
-import com.pillsquad.yakssok.core.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class LogoutUserUseCase @Inject constructor(
-    private val userRepository: UserRepository
+    private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke() = userRepository.putLogout()
+    suspend operator fun invoke() = authRepository.putLogout()
 }

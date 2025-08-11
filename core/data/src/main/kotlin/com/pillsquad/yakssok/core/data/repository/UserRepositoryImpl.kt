@@ -10,6 +10,7 @@ import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.model.request.MyInfoRequest
+import com.pillsquad.yakssok.core.network.model.request.UserInitialRequest
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -74,6 +75,21 @@ class UserRepositoryImpl @Inject constructor(
         return result
     }
 
+    override suspend fun putUserInitial(nickName: String): Result<Unit> {
+        val params = UserInitialRequest(nickName)
+        val result = userRetrofitDataSource.putUserInitial(params).toResult(transform = { it })
+
+        result.onSuccess {
+            userLocalDataSource.saveUserName(nickName)
+            userLocalDataSource.saveInitialized(true)
+        }.onFailure {
+            it.printStackTrace()
+            Log.e("UserRepositoryImpl", "putUserInitial: $it")
+        }
+
+        return result
+    }
+
     override suspend fun getMyInviteCode(): String {
         val localCode = userLocalDataSource.inviteCodeFlow.firstOrNull()
 
@@ -115,20 +131,6 @@ class UserRepositoryImpl @Inject constructor(
                 followingCount = mateCount
             )
         }
-    }
-
-    override suspend fun putLogout(): Result<Unit> {
-        val result = userRetrofitDataSource.putLogout().toResult(transform = { it })
-
-        result.onSuccess {
-            userLocalDataSource.clearAllData()
-            // Todo: room 데이터 삭제
-        }.onFailure {
-            it.printStackTrace()
-            Log.e("UserRepositoryImpl", "putLogout: $it")
-        }
-
-        return result
     }
 
     override suspend fun deleteAccount(): Result<Unit> {

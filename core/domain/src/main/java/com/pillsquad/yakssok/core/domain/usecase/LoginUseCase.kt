@@ -9,11 +9,14 @@ class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) {
+
     suspend operator fun invoke(accessToken: String): Result<Boolean> {
         val result = authRepository.loginUser(accessToken)
 
-        result.onSuccess {
-            userRepository.postMyInfoToLocal()
+        result.onSuccess { flag ->
+            if (flag) {
+                userRepository.postMyInfoToLocal()
+            }
         }.onFailure {
             it.printStackTrace()
             Log.e("UserRepositoryImpl", "invoke: $it")

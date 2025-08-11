@@ -8,19 +8,27 @@ import javax.inject.Singleton
 class UserLocalDataSource @Inject constructor(
     private val userPreferences: UserPreferences
 ) {
+    val isInitializedFlow: Flow<Boolean> = userPreferences.isInitializedFlow
+
     val userNameFlow: Flow<String> = userPreferences.userNameFlow
     val userProfileImgFlow: Flow<String> = userPreferences.userProfileImgFlow
     val medicationCountFlow: Flow<Int> = userPreferences.medicationCountFlow
     val mateCountFlow: Flow<Int> = userPreferences.mateCountFlow
+
     val deviceIdFlow: Flow<String> = userPreferences.deviceIdFlow
     val fcmTokenFlow: Flow<String> = userPreferences.fcmTokenFlow
     val pushAgreementFlow: Flow<Boolean> = userPreferences.pushAgreementFlow
+
     val tutorialCompleteFlow: Flow<Boolean> = userPreferences.tutorialCompleteFlow
+
     val accessTokenFlow: Flow<String> = userPreferences.accessTokenFlow
     val refreshTokenFlow: Flow<String> = userPreferences.refreshTokenFlow
-    val oauthTypeFlow: Flow<String> = userPreferences.oauthTypeFlow
+
     val inviteCodeFlow: Flow<String> = userPreferences.inviteCodeFlow
 
+    suspend fun saveInitialized(isInitialized: Boolean) {
+        userPreferences.saveInitialized(isInitialized)
+    }
 
     suspend fun saveUserName(userName: String) {
         userPreferences.saveUserName(userName)
@@ -60,10 +68,6 @@ class UserLocalDataSource @Inject constructor(
 
     suspend fun saveRefreshToken(token: String) {
         userPreferences.saveRefreshToken(token)
-    }
-
-    suspend fun saveOauthType(oauthType: String) {
-        userPreferences.saveOauthType(oauthType)
     }
 
     suspend fun saveInviteCode(inviteCode: String) {

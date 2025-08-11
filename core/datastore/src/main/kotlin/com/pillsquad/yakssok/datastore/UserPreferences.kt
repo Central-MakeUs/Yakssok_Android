@@ -17,19 +17,27 @@ class UserPreferences @Inject constructor(
 ) {
 
     companion object {
+        private val IS_INITIALIZED = booleanPreferencesKey("is_initialized")
+
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_PROFILE_IMG = stringPreferencesKey("user_profile_img")
         private val MEDICATION_COUNT = intPreferencesKey("medication_count")
         private val MATE_COUNT = intPreferencesKey("mate_count")
+
         private val DEVICE_ID = stringPreferencesKey("device_id")
         private val FCM_TOKEN = stringPreferencesKey("fcm_token")
         private val PUSH_AGREEMENT = booleanPreferencesKey("push_agreement")
+
         private val TUTORIAL_COMPLETE = booleanPreferencesKey("tutorial_complete")
+
         private val ACCESS_TOKEN_KEY = stringPreferencesKey("user_access_token")
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("user_refresh_token")
-        private val OAUTH_TYPE = stringPreferencesKey("oauth_type")
+
         private val INVITE_CODE = stringPreferencesKey("invite_code")
     }
+
+    val isInitializedFlow: Flow<Boolean> = dataStore.data
+        .map { it[IS_INITIALIZED] ?: false }
 
     val userNameFlow: Flow<String> = dataStore.data
         .map { it[USER_NAME] ?: "" }
@@ -61,11 +69,12 @@ class UserPreferences @Inject constructor(
     val refreshTokenFlow: Flow<String> = dataStore.data
         .map { it[REFRESH_TOKEN_KEY] ?: "" }
 
-    val oauthTypeFlow: Flow<String> = dataStore.data
-        .map { it[OAUTH_TYPE] ?: "" }
-
     val inviteCodeFlow: Flow<String> = dataStore.data
         .map { it[INVITE_CODE] ?: "" }
+
+    suspend fun saveInitialized(isInitialized: Boolean) {
+        dataStore.edit { it[IS_INITIALIZED] = isInitialized }
+    }
 
     suspend fun saveUserName(userName: String) {
         dataStore.edit { it[USER_NAME] = userName }
@@ -105,10 +114,6 @@ class UserPreferences @Inject constructor(
 
     suspend fun saveRefreshToken(token: String) {
         dataStore.edit { it[REFRESH_TOKEN_KEY] = token }
-    }
-
-    suspend fun saveOauthType(oauthType: String) {
-        dataStore.edit { it[OAUTH_TYPE] = oauthType }
     }
 
     suspend fun saveInviteCode(inviteCode: String) {

@@ -10,7 +10,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class DeviceIdProviderImpl @Inject constructor(
-    @field:ApplicationContext val context: Context
+    @param:ApplicationContext private val context: Context
 ): DeviceIdProvider {
     override suspend fun getStableDeviceId(): String {
         val appSetId = getAppSetId()

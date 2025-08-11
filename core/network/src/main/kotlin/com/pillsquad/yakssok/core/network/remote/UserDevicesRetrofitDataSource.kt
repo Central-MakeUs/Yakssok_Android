@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.network.remote
 
+import android.util.Log
 import com.pillsquad.yakssok.core.network.datasource.UserDevicesDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.DeviceRequest
