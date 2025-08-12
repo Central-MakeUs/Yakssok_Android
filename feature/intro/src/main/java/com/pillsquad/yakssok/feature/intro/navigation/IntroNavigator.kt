@@ -12,11 +12,13 @@ fun NavController.navigateIntro(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.introNavGraph(
-    onNavigateHome: () -> Unit
+    onNavigateHome: () -> Unit,
+    onNavigateMate: () -> Unit
 ) {
     composable<Route.Intro> {
         IntroRoute(
-            onNavigateHome = onNavigateHome
+            onNavigateHome = onNavigateHome,
+            onNavigateMate = onNavigateMate
         )
     }
 }

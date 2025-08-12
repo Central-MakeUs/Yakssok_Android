@@ -48,7 +48,8 @@ import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
 @Composable
 internal fun IntroRoute(
     viewModel: IntroViewModel = hiltViewModel(),
-    onNavigateHome: () -> Unit = {}
+    onNavigateHome: () -> Unit = {},
+    onNavigateMate: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -86,6 +87,10 @@ internal fun IntroRoute(
     CollectEvent(viewModel.event) {
         when(it) {
             IntroEvent.NavigateHome -> onNavigateHome()
+            IntroEvent.NavigateHomeThenMate -> {
+                onNavigateHome()
+                onNavigateMate()
+            }
             is IntroEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -116,6 +121,11 @@ internal fun IntroRoute(
                 viewModel.postPushAgreement(true)
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        val fromOneLink = activity.intent?.data?.host.equals("yakssok.onelink.me", ignoreCase = true)
+        viewModel.markLaunchedFromOneLink(fromOneLink)
     }
 
     if (showSetting) {

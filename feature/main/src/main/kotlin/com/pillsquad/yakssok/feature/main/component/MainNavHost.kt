@@ -43,7 +43,10 @@ internal fun MainNavHost(
                 onNavigateCalendar = navigator::navigateCalendar
             )
 
-            introNavGraph(onNavigateHome = navigator::navigateHome)
+            introNavGraph(
+                onNavigateHome = navigator::navigateHome,
+                onNavigateMate = navigator::navigateMate
+            )
 
             routineNavGraph(onNavigateBack = navigator::popBackStack)
 
