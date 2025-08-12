@@ -124,7 +124,10 @@ internal fun IntroRoute(
     }
 
     LaunchedEffect(Unit) {
-        val fromOneLink = activity.intent?.data?.host.equals("yakssok.onelink.me", ignoreCase = true)
+        val uri = activity.intent?.data
+        val fromOneLink =
+            uri?.host.equals("yakssok.onelink.me", ignoreCase = true) ||
+                    uri?.scheme.equals("yakssok", ignoreCase = true)
         viewModel.markLaunchedFromOneLink(fromOneLink)
     }
 
