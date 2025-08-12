@@ -4,8 +4,9 @@
     <application>
         <activity
             android:name="com.pillsquad.yakssok.feature.main.MainActivity"
-            android:configChanges="uiMode"
             android:exported="true"
+            android:launchMode="singleTop"
+            android:configChanges="uiMode"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Yakssok.TransparentSystemBar">
 
@@ -16,13 +17,21 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
                     android:host="oauth"
                     android:scheme="@string/KAKAO_REDIRECT_URI" />
+            </intent-filter>
+
+            <intent-filter  android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="yakssok.onelink.me" />
             </intent-filter>
         </activity>
     </application>

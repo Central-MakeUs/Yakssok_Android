@@ -26,6 +26,7 @@ import javax.inject.Inject
 
 sealed class IntroEvent {
     data object NavigateHome: IntroEvent()
+    data object NavigateHomeThenMate: IntroEvent()
     data class ShowToast(val message: String): IntroEvent()
 }
 
@@ -42,6 +43,11 @@ class IntroViewModel @Inject constructor(
 
     private val _event = MutableSharedFlow<IntroEvent>()
     val event = _event.asSharedFlow()
+
+    private var launchFromOneLink: Boolean = false
+    fun markLaunchedFromOneLink(fromOneLink: Boolean) {
+        launchFromOneLink = fromOneLink
+    }
 
     init {
         checkToken()
@@ -81,6 +87,7 @@ class IntroViewModel @Inject constructor(
             postUserDevicesUseCase(pushAgreement)
                 .onSuccess {
                     _event.emit(IntroEvent.NavigateHome)
+                    launchFromOneLink = false
                 }.onFailure {
                     showToast("네트워크 환경을 확인해주세요.")
                     it.printStackTrace()
