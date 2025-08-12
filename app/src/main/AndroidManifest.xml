@@ -18,6 +18,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Yakssok"
         tools:targetApi="31">
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true"
+            tools:node="merge"
+            tools:replace="exported">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:scheme="@string/KAKAO_REDIRECT_URI" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

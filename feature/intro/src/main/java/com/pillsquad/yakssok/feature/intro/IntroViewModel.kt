@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.intro
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -100,8 +101,8 @@ class IntroViewModel @Inject constructor(
         }
     }
 
-    fun handleSignIn(context: Context) {
-        val kakaoInstance = UserApiClient.instance
+    fun handleSignIn(activity: Activity) {
+        val kakao = UserApiClient.instance
 
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null || token == null) {
@@ -111,21 +112,20 @@ class IntroViewModel @Inject constructor(
             }
         }
 
-        if (kakaoInstance.isKakaoTalkLoginAvailable(context)) {
-            kakaoInstance.loginWithKakaoTalk(context) { token, error ->
-                // 로그인 실패 처리
+        if (!launchFromOneLink && kakao.isKakaoTalkLoginAvailable(activity)) {
+            kakao.loginWithKakaoTalk(activity) { token, error ->
                 if (error != null || token == null) {
                     if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
                         showToast("카카오 로그인 실패")
                         return@loginWithKakaoTalk
                     }
-                    UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+                    UserApiClient.instance.loginWithKakaoAccount(activity, callback = callback)
                 } else {
                     loginUser(token.accessToken)
                 }
             }
         } else {
-            kakaoInstance.loginWithKakaoAccount(context, callback = callback)
+            kakao.loginWithKakaoAccount(activity, callback = callback)
         }
     }
 

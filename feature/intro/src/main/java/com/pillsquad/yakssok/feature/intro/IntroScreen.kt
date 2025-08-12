@@ -186,7 +186,7 @@ internal fun IntroRoute(
 
         else -> {
             LoginScreen(
-                onClick = { viewModel.handleSignIn(context) },
+                onClick = { viewModel.handleSignIn(activity) },
                 onLongClick = { isTestDialogShow = true }
             )
         }

@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.pillsquad.yakssok.setNamespace
 
 plugins {
@@ -6,17 +5,6 @@ plugins {
 }
 
 setNamespace("feature.main")
-
-android {
-    defaultConfig {
-        buildConfigField("String", "KAKAO_API_KEY", getProperty("KAKAO_API_KEY"))
-        resValue("string", "KAKAO_REDIRECT_URI", getProperty("KAKAO_REDIRECT_URI"))
-    }
-}
-
-fun getProperty(key: String): String {
-    return gradleLocalProperties(rootDir, providers).getProperty(key)
-}
 
 dependencies {
     implementation(libs.kotlinx.immutable)
