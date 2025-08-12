@@ -153,7 +153,6 @@ private fun MateScreen(
             modifier = Modifier.weight(1f),
             userName = uiState.myName,
             inviteCode = uiState.myCode,
-            inviteLink = ""
         )
     }
 }
@@ -194,7 +193,6 @@ private fun CodeContent(
     modifier: Modifier,
     userName: String,
     inviteCode: String,
-    inviteLink: String
 ) {
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
@@ -255,7 +253,6 @@ private fun CodeContent(
         ShareInviteButton(
             userName = userName,
             inviteCode = inviteCode,
-            inviteLink = ""
         )
     }
 }
@@ -264,7 +261,7 @@ private fun CodeContent(
 private fun ShareInviteButton(
     userName: String,
     inviteCode: String,
-    inviteLink: String
+    inviteLink: String = "https://yakssok.onelink.me/ggOB/uvut58xg"
 ) {
     val context = LocalContext.current
 
@@ -290,11 +287,13 @@ private fun ShareInviteButton(
 
 private fun buildInviteMessage(userName: String, code: String, link: String): String {
     return """
-        ${userName}님이 함께 약 챙기자고 해요. 가끔 잊어버릴 수도 있으니까,
+        ${userName}님이 함께 약 챙기자고 해요.
+        가끔 잊어버릴 수도 있으니까,
         서로 약 잘 먹고 있는지 확인하며 챙기는 건 어때요?
         필요할 땐 잔소리도 살짝😉
         
         ${userName}님의 코드: $code
+        
         👇 여기를 들어오면 같이 챙길 수 있어요
         $link
     """.trimIndent()
