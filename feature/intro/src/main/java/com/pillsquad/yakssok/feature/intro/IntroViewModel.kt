@@ -86,8 +86,12 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             postUserDevicesUseCase(pushAgreement)
                 .onSuccess {
-                    _event.emit(IntroEvent.NavigateHome)
-                    launchFromOneLink = false
+                    if (launchFromOneLink) {
+                        _event.emit(IntroEvent.NavigateHomeThenMate)
+                        launchFromOneLink = false
+                    } else {
+                        _event.emit(IntroEvent.NavigateHome)
+                    }
                 }.onFailure {
                     showToast("네트워크 환경을 확인해주세요.")
                     it.printStackTrace()
