@@ -114,9 +114,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun refresh() {
-        viewModelScope.launch {
-            _uiState.value = HomeUiState.Loading
-        }
+        viewModelScope.launch { refreshTrigger.emit(Unit) }
     }
 
     fun onSelectedDate(date: LocalDate) {
