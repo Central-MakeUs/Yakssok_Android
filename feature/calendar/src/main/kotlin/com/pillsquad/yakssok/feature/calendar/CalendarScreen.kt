@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.feature.calendar
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.util.isEmpty
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +24,7 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.calendar.component.Calendar
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
@@ -37,9 +40,14 @@ internal fun CalendarRoute(
     onNavigateMyPage: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     OnResumeEffect {
         viewModel.loadUserAndRoutines()
+    }
+
+    CollectEvent(viewModel.errorFlow) {
+        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
     }
 
     CalendarScreen(
