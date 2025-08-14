@@ -101,7 +101,7 @@ class CalendarViewModel @Inject constructor(
                 }
                 .onFailure {
                     Log.e("CalendarViewModel", "getUserProfileList failed", it)
-                    // TODO: Toast
+                    _errorFlow.emit("네트워크 환경을 확인해주세요.")
                 }
         }
     }
@@ -143,7 +143,7 @@ class CalendarViewModel @Inject constructor(
             updateUserListWithRoutineEmptyState(userIdx, cache)
         }.onFailure {
             Log.e("CalendarViewModel", "getRoutine failed for userId=$userId", it)
-            // TODO: Toast
+            _errorFlow.emit("네트워크 환경을 확인해주세요.")
         }
     }
 
