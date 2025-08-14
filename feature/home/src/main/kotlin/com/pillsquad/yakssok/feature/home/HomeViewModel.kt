@@ -138,6 +138,9 @@ class HomeViewModel @Inject constructor(
         val userIdx = state.selectedUserIdx
         val date = state.selectedDate
         val currentMap = state.routineCache[userIdx] ?: return
+
+        if (userIdx != 0 || date != today) return
+
         val updated = currentMap[date]?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return

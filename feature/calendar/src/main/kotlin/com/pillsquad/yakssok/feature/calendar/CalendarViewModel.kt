@@ -1,8 +1,11 @@
 package com.pillsquad.yakssok.feature.calendar
 
 import android.util.Log
+import android.util.SparseArray
+import androidx.core.util.size
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
@@ -11,8 +14,11 @@ import com.pillsquad.yakssok.feature.calendar.model.CalendarCacheManager
 import com.pillsquad.yakssok.feature.calendar.model.CalendarConfig
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -30,7 +36,13 @@ class CalendarViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalendarUiModel())
     val uiState = _uiState.asStateFlow()
 
+    private val _errorFlow = MutableSharedFlow<String>()
+    val errorFlow = _errorFlow.asSharedFlow()
+
     private val config = CalendarConfig()
+
+    private val today: LocalDate
+        get() = LocalDate.today()
 
     private val cacheManager
         get() = CalendarCacheManager(
@@ -53,16 +65,22 @@ class CalendarViewModel @Inject constructor(
     fun onRoutineClick(routineId: Int) {
         val userIdx = uiState.value.selectedUserIdx
         val date = uiState.value.selectedDate
+        val currentMap = uiState.value.routineCache[userIdx] ?: return
 
-        val currentRoutines = uiState.value.routineCache[userIdx]?.get(date) ?: return
-        val updated = currentRoutines.map {
+        if (userIdx != 0 || date != today) return
+
+        val updated = currentMap[date]?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
-        }
+        } ?: return
 
-        cacheManager.updateRoutine(userIdx, date, updated)
+        val newUserMap = currentMap.toMutableMap().apply { put(date, updated) }
+        val newCache = uiState.value.routineCache.copyAndPut(userIdx, newUserMap)
+
+        _uiState.update { it.copy(routineCache = newCache) }
 
         viewModelScope.launch {
             updateRoutineTakenUseCase(routineId)
+                .onFailure { _errorFlow.emit("네트워크 환경을 확인해주세요.") }
         }
     }
 
@@ -74,10 +92,8 @@ class CalendarViewModel @Inject constructor(
 
                     val (startDate, endDate) = getStartEndDate()
 
-                    // 내 루틴
                     loadUserRoutine(userId = null, userIdx = 0, startDate, endDate)
 
-                    // 친구 루틴
                     users.drop(1).forEachIndexed { index, friend ->
                         val userIdx = index + 1
                         loadUserRoutine(userId = friend.id, userIdx, startDate, endDate)
@@ -149,5 +165,12 @@ class CalendarViewModel @Inject constructor(
         val endDate = startDate.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
 
         return startDate to endDate
+    }
+
+    private fun <V> SparseArray<V>.copyAndPut(key: Int, value: V): SparseArray<V> {
+        return SparseArray<V>(this.size + 1).also { newArr ->
+            for (i in 0 until this.size) newArr.put(this.keyAt(i), this.valueAt(i))
+            newArr.put(key, value)
+        }
     }
 }

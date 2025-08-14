@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.feature.home
 
 import android.util.SparseArray
+import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +46,7 @@ import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
@@ -69,6 +72,7 @@ internal fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val refreshState = rememberPullToRefreshState()
 
@@ -88,6 +92,10 @@ internal fun HomeRoute(
 
     OnResumeEffect {
         viewModel.refresh()
+    }
+
+    CollectEvent(viewModel.errorFlow) {
+        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
     }
 
     LaunchedEffect(uiState) {
