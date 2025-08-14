@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,9 +70,9 @@ internal fun HomeRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
-    var isRefreshing by remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
-    val scope = rememberCoroutineScope()
+
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val scaleFraction = {
         if (isRefreshing) 1f
@@ -79,17 +80,20 @@ internal fun HomeRoute(
     }
 
     val onRefresh: () -> Unit = {
-        scope.launch {
-            isRefreshing = true
-            viewModel.refresh()
-            isRefreshing = false
-        }
+        isRefreshing = true
+        viewModel.refresh()
     }
 
     var feedbackTarget by remember { mutableStateOf<User?>(null) }
 
     OnResumeEffect {
         viewModel.refresh()
+    }
+
+    LaunchedEffect(uiState) {
+        if (uiState is HomeUiState.Success) {
+            isRefreshing = false
+        }
     }
 
     feedbackTarget?.let { user ->
