@@ -7,8 +7,8 @@ import javax.inject.Inject
 class UpdateRoutineTakenUseCase @Inject constructor(
     private val routineRepository: RoutineRepository
 ) {
-    suspend operator fun invoke(scheduleId: Int) {
-        routineRepository.putTakeRoutine(scheduleId = scheduleId)
+    suspend operator fun invoke(scheduleId: Int): Result<Unit> {
+        return routineRepository.putTakeRoutine(scheduleId = scheduleId)
             .onFailure {
                 it.printStackTrace()
                 Log.e("UpdateRoutineTakenUseCase", "invoke: $it")

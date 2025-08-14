@@ -7,8 +7,8 @@ import javax.inject.Inject
 class PostFeedbackUseCase @Inject constructor(
     private val feedbackRepository: FeedbackRepository
 ) {
-    suspend operator fun invoke(userId: Int, message: String, type: String) {
-        feedbackRepository.postFeedback(userId, message, type)
+    suspend operator fun invoke(userId: Int, message: String, type: String): Result<Unit> {
+        return feedbackRepository.postFeedback(userId, message, type)
             .onSuccess {
                 Log.d("PostFeedbackUseCase", "Feedback posted successfully")
             }.onFailure {

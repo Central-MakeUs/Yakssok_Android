@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,8 @@ import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
+import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
@@ -64,34 +67,35 @@ internal fun HomeRoute(
     onNavigateCalendar: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val remindState by viewModel.remindState.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
-
     var isRefreshing by remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
+    val scope = rememberCoroutineScope()
+
     val scaleFraction = {
         if (isRefreshing) 1f
         else LinearOutSlowInEasing.transform(refreshState.distanceFraction).coerceIn(0f, 1f)
     }
+
     val onRefresh: () -> Unit = {
-        isRefreshing = true
-        viewModel.loadUserAndRoutines()
-        isRefreshing = false
+        scope.launch {
+            isRefreshing = true
+            viewModel.refresh()
+            isRefreshing = false
+        }
     }
 
     var feedbackTarget by remember { mutableStateOf<User?>(null) }
 
     OnResumeEffect {
-        viewModel.loadUserAndRoutines()
+        viewModel.refresh()
     }
 
     feedbackTarget?.let { user ->
-        val idx = uiState.userList.indexOfFirst { it.id == user.id }
-
         FeedbackDialog(
             user = user,
-            routineList = viewModel.getFeedbackList(idx),
+            routineList = viewModel.getFeedbackList(user.id),
             onDismiss = { feedbackTarget = null },
             onConfirm = { userId, message, type ->
                 viewModel.postFeedback(userId, message, type)
@@ -100,40 +104,46 @@ internal fun HomeRoute(
         )
     }
 
-    remindState?.let {
-        val nickName = uiState.userList[0].nickName
-        val routineList = uiState.routineCache[0]?.get(uiState.selectedDate) ?: emptyList()
+    when (val state = uiState) {
+        HomeUiState.Loading -> {
+            // 스켈레톤 UI가 짱인데..
+        }
+        is HomeUiState.Success -> {
+            if (state.remindList.isNotEmpty()) {
+                val nickName = state.userList[0].nickName
 
-        RemindDialog(
-            name = nickName,
-            routineList = routineList,
-            onDismiss = { viewModel.clearRemindState() }
-        )
+                RemindDialog(
+                    name = nickName,
+                    routineList = state.remindList,
+                    onDismiss = { viewModel.clearRemindState() }
+                )
+            }
+
+            HomeScreen(
+                isRefreshing = isRefreshing,
+                scaleFraction = scaleFraction,
+                refreshState = refreshState,
+                showFeedBackSection = state.showFeedBackSection,
+                selectedDate = state.selectedDate,
+                userProfileList = state.userList,
+                routineCache = state.routineCache,
+                selectedUserIdx = state.selectedUserIdx,
+                scrollState = scrollState,
+                onRefresh = onRefresh,
+                onClickUser = viewModel::onMateClick,
+                onSelectDate = viewModel::onSelectedDate,
+                onClickRoutine = viewModel::onRoutineClick,
+                onSendMessage = {
+                    feedbackTarget = it
+                },
+                onNavigateMy = onNavigateMyPage,
+                onNavigateMate = onNavigateMate,
+                onNavigateAlert = onNavigateAlert,
+                onNavigateRoutine = onNavigateRoutine,
+                onNavigateCalendar = onNavigateCalendar
+            )
+        }
     }
-
-    HomeScreen(
-        isRefreshing = isRefreshing,
-        scaleFraction = scaleFraction,
-        refreshState = refreshState,
-        showFeedBackSection = uiState.showFeedBackSection,
-        selectedDate = uiState.selectedDate,
-        userProfileList = uiState.userList,
-        routineCache = uiState.routineCache,
-        selectedUserIdx = uiState.selectedUserIdx,
-        scrollState = scrollState,
-        onRefresh = onRefresh,
-        onClickUser = viewModel::onMateClick,
-        onSelectDate = viewModel::onSelectedDate,
-        onClickRoutine = viewModel::onRoutineClick,
-        onSendMessage = {
-            feedbackTarget = it
-        },
-        onNavigateMy = onNavigateMyPage,
-        onNavigateMate = onNavigateMate,
-        onNavigateAlert = onNavigateAlert,
-        onNavigateRoutine = onNavigateRoutine,
-        onNavigateCalendar = onNavigateCalendar
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -8,4 +8,6 @@ data class Routine(
     val medicationType: MedicationType,
     val intakeTime: LocalTime,
     val isTaken: Boolean,
-)
+) {
+    fun isFeedbackRoutine(now: LocalTime): Boolean = (this.intakeTime <= now) && !this.isTaken
+}
