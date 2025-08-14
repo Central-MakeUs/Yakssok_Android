@@ -40,8 +40,10 @@ class HomeViewModel @Inject constructor(
     private val _remindState = MutableStateFlow<List<Routine>?>(null)
     val remindState = _remindState.asStateFlow()
 
-    private val today = LocalDate.today()
-    private val now = LocalTime.now()
+    private val today: LocalDate
+        get() = LocalDate.today()
+    private val now: LocalTime
+        get() = LocalTime.now()
 
     init {
         loadUserAndRoutines()
@@ -154,6 +156,15 @@ class HomeViewModel @Inject constructor(
                     // Todo: Toast
                     Log.e("HomeViewModel", "getUserProfileList: $it")
                 }
+        }
+    }
+
+    fun getFeedbackList(idx: Int): List<Routine> {
+        val state = uiState.value
+        val feedbackList = state.routineCache[idx]?.get(today).orEmpty()
+
+        return feedbackList.filter {
+            !it.isTaken && (it.intakeTime < now)
         }
     }
 
