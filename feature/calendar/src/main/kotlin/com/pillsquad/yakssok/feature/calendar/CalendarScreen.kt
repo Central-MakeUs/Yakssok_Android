@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +25,7 @@ import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
+import com.pillsquad.yakssok.core.ui.ext.customInsets
 import com.pillsquad.yakssok.feature.calendar.component.Calendar
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
 import kotlinx.datetime.LocalDate
@@ -84,7 +84,7 @@ internal fun CalendarScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(YakssokTheme.color.grey50)
-            .systemBarsPadding()
+            .customInsets(top = true, bottom = true)
     ) {
         YakssokTopAppBar(
             modifier = modifier,
