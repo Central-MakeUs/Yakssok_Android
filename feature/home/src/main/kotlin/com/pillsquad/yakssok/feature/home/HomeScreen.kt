@@ -91,7 +91,7 @@ internal fun HomeRoute(
 
         FeedbackDialog(
             user = user,
-            routineList = uiState.routineCache[idx]?.get(uiState.selectedDate) ?: emptyList(),
+            routineList = viewModel.getFeedbackList(idx),
             onDismiss = { feedbackTarget = null },
             onConfirm = { userId, message, type ->
                 viewModel.postFeedback(userId, message, type)
