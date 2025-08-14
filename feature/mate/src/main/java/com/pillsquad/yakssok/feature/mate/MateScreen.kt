@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -42,6 +40,7 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.ext.customInsets
 import com.pillsquad.yakssok.feature.mate.component.DashedBorderBox
 import com.pillsquad.yakssok.feature.mate.component.MateCompleteDialog
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
@@ -61,8 +60,10 @@ internal fun MateRoute(
         when (event) {
             is MateEvent.PostSuccess -> isComplete = true
             is MateEvent.ShowToast -> {
-                Toast.makeText(context, (event as MateEvent.ShowToast).message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, (event as MateEvent.ShowToast).message, Toast.LENGTH_SHORT)
+                    .show()
             }
+
             else -> Unit
         }
     }
@@ -110,7 +111,7 @@ private fun MateScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(YakssokTheme.color.grey100)
-            .statusBarsPadding()
+            .customInsets(top = true)
     ) {
         YakssokTopAppBar(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -204,7 +205,7 @@ private fun CodeContent(
                 color = YakssokTheme.color.grey50,
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
             )
-            .navigationBarsPadding()
+            .customInsets(bottom = true)
             .padding(start = 16.dp, end = 16.dp, top = 44.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
