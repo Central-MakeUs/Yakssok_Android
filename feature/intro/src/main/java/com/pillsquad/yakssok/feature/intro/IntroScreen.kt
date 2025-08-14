@@ -81,17 +81,21 @@ internal fun IntroRoute(
     BackHandler {
         if (uiState.isHaveToSignup && !uiState.isLoading) {
             viewModel.deleteLoginInfo()
+        } else if (!uiState.loginSuccess || !uiState.token.isBlank()) {
+            activity.finish()
         }
     }
 
     CollectEvent(viewModel.event) {
-        when(it) {
+        when (it) {
             IntroEvent.NavigateHome -> onNavigateHome()
             IntroEvent.NavigateHomeThenMate -> {
                 onNavigateHome()
                 onNavigateMate()
             }
-            is IntroEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+
+            is IntroEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
