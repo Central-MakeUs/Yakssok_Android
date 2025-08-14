@@ -52,8 +52,8 @@ class MateViewModel @Inject constructor(
                     it.printStackTrace()
                     Log.e("MateViewModel", "getFriendInfo: ${it.message}")
 
-                    val message = if (it is HttpException && it.code == 4000L) {
-                        "이미 추가된 친구입니다."
+                    val message = if (it is HttpException && it.code == 3001L) {
+                        it.message
                     } else {
                         "네트워크 환경을 확인하세요."
                     }
