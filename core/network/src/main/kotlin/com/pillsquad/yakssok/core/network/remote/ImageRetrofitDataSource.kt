@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.core.network.remote
 
-import android.content.Context
 import androidx.core.net.toUri
 import com.pillsquad.yakssok.core.network.datasource.ImageDataSource
 import com.pillsquad.yakssok.core.network.model.ApiResponse
@@ -16,7 +15,6 @@ import java.io.IOException
 import javax.inject.Inject
 
 class ImageRetrofitDataSource @Inject constructor(
-    private val context: Context,
     private val imageApi: ImageApi
 ) : ImageDataSource {
     override suspend fun putImage(
