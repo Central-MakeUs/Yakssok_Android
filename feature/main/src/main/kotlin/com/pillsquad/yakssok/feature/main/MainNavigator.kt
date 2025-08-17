@@ -40,7 +40,9 @@ internal class MainNavigator(
     }
 
     fun popBackStack() {
-        navController.popBackStack()
+        navController.previousBackStackEntry?.let {
+            navController.popBackStack()
+        }
     }
 
     fun navigateHome() {
