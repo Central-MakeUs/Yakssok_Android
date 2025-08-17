@@ -180,9 +180,15 @@ class HomeViewModel @Inject constructor(
         val state = _uiState.value
         if (state !is HomeUiState.Success) return emptyList()
         val idx = state.userList.indexOfFirst { it.id == userId }
+        val user = state.userList[idx]
 
         val feedbackList = state.routineCache[idx]?.get(today).orEmpty()
-        return feedbackList.filter { it.isFeedbackRoutine(now) }
+
+        return if (user.notTakenCount == 0) {
+            feedbackList
+        } else {
+            feedbackList.filter { it.isFeedbackRoutine(now) }
+        }
     }
 
     fun clearRemindState() {
