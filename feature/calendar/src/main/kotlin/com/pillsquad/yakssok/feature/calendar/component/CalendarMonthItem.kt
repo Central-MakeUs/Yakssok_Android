@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,6 +29,7 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.calendar.R
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.isoDayNumber
 
 @Composable
 internal fun CalendarMonthItem(
@@ -37,7 +39,7 @@ internal fun CalendarMonthItem(
     takenCache: Map<LocalDate, Boolean>,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val firstDayOfWeek = currentYearMonth.firstDay.dayOfWeek.ordinal // 0(일) ~ 6(토)
+    val firstDayOfWeek = currentYearMonth.firstDay.dayOfWeek.isoDayNumber % 7
     val daysInMonth = currentYearMonth.numberOfDays
     val paddedDates = buildList {
         // 앞쪽 공백 (첫 주 요일 위치 맞추기)
@@ -161,8 +163,8 @@ private fun CalendarDay(
             Box(
                 modifier = Modifier
                     .alpha(0.9f)
-                    .padding(start = 7.dp, end = 7.dp, bottom = 4.dp)
-                    .fillMaxWidth()
+                    .padding(start = (6.5).dp, end = (6.5).dp, bottom = 4.dp)
+                    .size(37.dp)
                     .aspectRatio(1f)
                     .background(
                         color = YakssokTheme.color.grey100,
@@ -173,7 +175,7 @@ private fun CalendarDay(
             Icon(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 4.dp, end = 5.dp),
+                    .padding(start = 4.dp, end = 5.dp, bottom = 1.dp),
                 painter = painterResource(resourceMatcher(isAllTaken, date.day)),
                 contentDescription = "day icon",
                 tint = Color.Unspecified
