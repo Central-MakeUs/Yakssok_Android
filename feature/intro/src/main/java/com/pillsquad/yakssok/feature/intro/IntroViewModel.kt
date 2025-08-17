@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -93,10 +94,11 @@ class IntroViewModel @Inject constructor(
                     } else {
                         _event.emit(IntroEvent.NavigateHome)
                     }
-                }.onFailure {
+                }.onFailure { e ->
                     showToast("네트워크 환경을 확인해주세요.")
-                    it.printStackTrace()
-                    Log.e("UserRepositoryImpl", "invoke: $it")
+                    e.printStackTrace()
+                    Log.e("UserRepositoryImpl", "invoke: $e")
+                    _uiState.update { state -> state.copy(isLoading = false) }
                 }
         }
     }
@@ -173,7 +175,9 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
 
-            getTokenFlowUseCase().collect { valid ->
+            getTokenFlowUseCase().catch {
+                _uiState.update { it.copy(isLoading = false) }
+            }.collect { valid ->
                 _uiState.update {
                     if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
                     else it.copy(isLoading = false)
