@@ -48,37 +48,30 @@ class ProfileEditViewModel @Inject constructor(
     }
 
     fun updateImgUrl(newImgUrl: String) {
-        val oldImageUrl = uiState.value.imgUrl
-
-        _uiState.update {
-            it.copy(enabled = false)
-        }
+        _uiState.update { it.copy(enabled = false) }
 
         viewModelScope.launch {
             val fileImageUrl = changeImageUrlUseCase(newImgUrl)
             if (fileImageUrl == null) {
                 _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
-                _uiState.update {
-                    it.copy(enabled = true)
-                }
+                _uiState.update { it.copy(enabled = true) }
                 return@launch
             }
 
+            val oldImageUrl = uiState.value.imgUrl
             val result = if (oldImageUrl.isEmpty()) {
                 postImageUrlUseCase(fileImageUrl)
             } else {
                 putImageUrlUseCase(fileImageUrl)
             }
 
+            val enabled = validateNickName(uiState.value.name)
+
             result.onSuccess { imageUrl ->
-                _uiState.update {
-                    it.copy(imgUrl = imageUrl, enabled = true)
-                }
+                _uiState.update { it.copy(imgUrl = imageUrl, enabled = enabled) }
             }.onFailure { e ->
-                _uiState.update {
-                    it.copy(enabled = true)
-                }
-                e.printStackTrace()
+                Log.e("ProfileEditViewModel", "updateImgUrl: $e")
+                _uiState.update { it.copy(enabled = enabled) }
                 _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
             }
         }
@@ -91,7 +84,7 @@ class ProfileEditViewModel @Inject constructor(
                     Log.d("ProfileEditViewModel", "completeEdit: $it")
                     _event.emit(ProfileEditEvent.CompleteEdit)
                 }.onFailure {
-                    Log.d("ProfileEditViewModel", "failure: $it")
+                    Log.e("ProfileEditViewModel", "failure: $it")
                     _event.emit(ProfileEditEvent.ShowToast("네트워크 환경을 확인해주세요."))
                 }
         }
