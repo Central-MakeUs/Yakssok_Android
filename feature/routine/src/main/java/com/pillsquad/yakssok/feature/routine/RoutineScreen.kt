@@ -107,6 +107,7 @@ internal fun RoutineRoute(
     if (selectedStartDate != null) {
         StartDateDialog(
             uiStartDate = uiState.startDate,
+            uiEndDate = uiState.endDate,
             selectedStartDate = selectedStartDate,
             onDismiss = { selectedStartDate = null },
             onConfirm = {
