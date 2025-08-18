@@ -72,6 +72,14 @@ class UserPreferences @Inject constructor(
     val inviteCodeFlow: Flow<String> = dataStore.data
         .map { it[INVITE_CODE] ?: "" }
 
+    suspend fun saveSession(access: String, refresh: String, isInit: Boolean) {
+        dataStore.edit {
+            it[ACCESS_TOKEN_KEY] = access
+            it[REFRESH_TOKEN_KEY] = refresh
+            it[IS_INITIALIZED] = isInit
+        }
+    }
+
     suspend fun saveInitialized(isInitialized: Boolean) {
         dataStore.edit { it[IS_INITIALIZED] = isInitialized }
     }
