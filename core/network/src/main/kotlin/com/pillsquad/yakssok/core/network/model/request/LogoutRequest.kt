@@ -5,9 +5,6 @@ import kotlinx.serialization.Serializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
-data class JoinRequest(
-    val oauthAuthorizationCode: String,
-    val oauthType: String,
-    val nonce: String,
-    val nickName: String,
+data class LogoutRequest(
+    val deviceId: String
 )

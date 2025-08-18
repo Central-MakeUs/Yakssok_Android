@@ -1,7 +1,6 @@
 package com.pillsquad.yakssok.core.network.service
 
 import com.pillsquad.yakssok.core.network.model.ApiResponse
-import com.pillsquad.yakssok.core.network.model.request.JoinRequest
 import com.pillsquad.yakssok.core.network.model.request.LoginRequest
 import com.pillsquad.yakssok.core.network.model.request.RefreshRequest
 import com.pillsquad.yakssok.core.network.model.response.AccessTokenResponse
@@ -15,11 +14,6 @@ interface TokenApi {
     suspend fun refreshToken(
         @Body params: RefreshRequest
     ): ApiResponse<AccessTokenResponse>
-
-    @POST("/api/auth/join")
-    suspend fun joinUser(
-        @Body params: JoinRequest
-    ): ApiResponse<Unit>
 
     @POST("/api/auth/login")
     suspend fun loginUser(

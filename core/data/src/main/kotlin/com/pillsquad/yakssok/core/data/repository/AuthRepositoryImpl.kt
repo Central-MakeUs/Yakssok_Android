@@ -1,82 +1,61 @@
 package com.pillsquad.yakssok.core.data.repository
 
-import android.util.Log
 import com.pillsquad.yakssok.core.data.BuildConfig
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
+import com.pillsquad.yakssok.core.model.OAuthType
 import com.pillsquad.yakssok.core.network.datasource.AuthDataSource
-import com.pillsquad.yakssok.core.network.model.ApiResponse
-import com.pillsquad.yakssok.core.network.model.request.JoinRequest
 import com.pillsquad.yakssok.core.network.model.request.LoginRequest
+import com.pillsquad.yakssok.core.network.model.request.LogoutRequest
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val authRetrofitDataSource: AuthDataSource,
-    private val userLocalDataSource: UserLocalDataSource
+    private val remote: AuthDataSource,
+    private val local: UserLocalDataSource,
 ) : AuthRepository {
-    override suspend fun joinUser(
-        accessToken: String,
-        nickName: String,
-        pushAgreement: Boolean
-    ): Result<Unit> {
-        val params = JoinRequest(
-            oauthAuthorizationCode = accessToken,
-            oauthType = "kakao",
-            nonce = "",
-            nickName = nickName,
-        )
-
-        return authRetrofitDataSource.joinUser(params = params).toResult(transform = { it })
-    }
 
     override suspend fun loginUser(accessToken: String): Result<Boolean> {
         val params = LoginRequest(
             oauthAuthorizationCode = accessToken,
-            oauthType = "kakao"
+            oauthType = OAuthType.KAKAO.value,
         )
 
-        val response = authRetrofitDataSource.loginUser(params = params)
-
-        if (response is ApiResponse.Success) {
-            userLocalDataSource.saveInitialized(response.data.isInitialized)
-            userLocalDataSource.saveAccessToken(response.data.accessToken)
-            userLocalDataSource.saveRefreshToken(response.data.refreshToken)
-        }
-
-        return response.toResult(
-            transform = { it.isInitialized }
-        )
+        return remote.loginUser(params = params)
+            .toResult()
+            .mapCatching { dto ->
+                local.saveSession(dto.accessToken, dto.refreshToken, dto.isInitialized)
+                dto.isInitialized
+            }
     }
 
     override suspend fun putLogout(): Result<Unit> {
-        val result = authRetrofitDataSource.logoutUser().toResult(transform = { it })
+        val deviceId = local.deviceIdFlow.firstOrNull()
+            ?.takeIf { it.isNotBlank() }
+            ?: return Result.failure(IllegalStateException("deviceId is null or blank"))
 
-        result.onSuccess {
-            userLocalDataSource.clearAllData()
-            // Todo: room 데이터 삭제
-        }.onFailure {
-            it.printStackTrace()
-            Log.e("UserRepositoryImpl", "putLogout: $it")
-        }
-
-        return result
+        return remote.logoutUser(LogoutRequest(deviceId = deviceId))
+            .toResult()
+            .onSuccess { local.clearAllData() }
     }
 
     override suspend fun testLoginUser() {
-        userLocalDataSource.saveAccessToken(BuildConfig.MASTER_ACCESS)
-        userLocalDataSource.saveRefreshToken(BuildConfig.MASTER_REFRESH)
+        local.saveAccessToken(BuildConfig.MASTER_ACCESS)
+        local.saveRefreshToken(BuildConfig.MASTER_REFRESH)
+        local.saveInitialized(true)
     }
 
     override fun checkToken(): Flow<Boolean> {
         return combine(
-            userLocalDataSource.accessTokenFlow,
-            userLocalDataSource.refreshTokenFlow,
-            userLocalDataSource.isInitializedFlow
-        ) { accessToken, refreshToken, initialized ->
-            accessToken.isNotBlank() && refreshToken.isNotBlank() && initialized
-        }
+            local.accessTokenFlow,
+            local.refreshTokenFlow,
+            local.isInitializedFlow
+        ) { access, refresh, init ->
+            access.isNotBlank() && refresh.isNotBlank() && init
+        }.distinctUntilChanged()
     }
 }
