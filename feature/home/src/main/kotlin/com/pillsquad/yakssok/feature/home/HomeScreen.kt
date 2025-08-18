@@ -37,6 +37,7 @@ import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
+import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
@@ -84,7 +85,7 @@ internal fun HomeRoute(
         viewModel.refresh()
     }
 
-    var feedbackTarget by remember { mutableStateOf<User?>(null) }
+    var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
 
     OnResumeEffect {
         viewModel.refresh()
@@ -100,10 +101,9 @@ internal fun HomeRoute(
         }
     }
 
-    feedbackTarget?.let { user ->
+    feedbackTarget?.let { feedback ->
         FeedbackDialog(
-            user = user,
-            routineList = viewModel.getFeedbackList(user.id),
+            feedback = feedback,
             onDismiss = { feedbackTarget = null },
             onConfirm = { userId, message, type ->
                 viewModel.postFeedback(userId, message, type)
@@ -131,9 +131,10 @@ internal fun HomeRoute(
                 isRefreshing = isRefreshing,
                 scaleFraction = scaleFraction,
                 refreshState = refreshState,
-                showFeedBackSection = state.showFeedBackSection,
+                showFeedBackSection = state.feedbackTargetList.isNotEmpty(),
                 selectedDate = state.selectedDate,
                 userProfileList = state.userList,
+                feedbackTargetList = state.feedbackTargetList,
                 routineCache = state.routineCache,
                 selectedUserIdx = state.selectedUserIdx,
                 scrollState = scrollState,
@@ -141,7 +142,7 @@ internal fun HomeRoute(
                 onClickUser = viewModel::onMateClick,
                 onSelectDate = viewModel::onSelectedDate,
                 onClickRoutine = viewModel::onRoutineClick,
-                onSendMessage = {
+                onClickFeedback = {
                     feedbackTarget = it
                 },
                 onNavigateMy = onNavigateMyPage,
@@ -163,6 +164,7 @@ private fun HomeScreen(
     showFeedBackSection: Boolean = false,
     selectedDate: LocalDate = LocalDate.today(),
     userProfileList: List<User> = emptyList(),
+    feedbackTargetList: List<FeedbackTarget> = emptyList(),
     routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>> = SparseArray(),
     selectedUserIdx: Int = 0,
     scrollState: ScrollState = rememberScrollState(),
@@ -170,7 +172,7 @@ private fun HomeScreen(
     onClickUser: (Int) -> Unit = {},
     onSelectDate: (LocalDate) -> Unit = {},
     onClickRoutine: (Int) -> Unit = {},
-    onSendMessage: (User) -> Unit = {},
+    onClickFeedback: (FeedbackTarget) -> Unit = {},
     onNavigateMy: () -> Unit = {},
     onNavigateMate: () -> Unit = {},
     onNavigateAlert: () -> Unit = {},
@@ -208,22 +210,20 @@ private fun HomeScreen(
                     item {
                         Spacer(modifier = Modifier.width(16.dp))
                     }
-                    items(userProfileList.size) { index ->
-                        val user = userProfileList[index]
 
-                        if (user.notTakenCount != null) {
-                            UserInfoCard(
-                                id = user.id,
-                                nickName = user.nickName,
-                                relationName = user.relationName,
-                                profileUrl = user.profileImage,
-                                remainedMedicine = user.notTakenCount ?: 0,
-                                onClick = {
-                                    onSendMessage(user)
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                        }
+                    items(feedbackTargetList.size) { index ->
+                        val feedbackTarget = feedbackTargetList[index]
+
+                        UserInfoCard(
+                            id = feedbackTarget.userId,
+                            nickName = feedbackTarget.nickName,
+                            relationName = feedbackTarget.relationName,
+                            profileUrl = feedbackTarget.profileImageUrl,
+                            routineCount = feedbackTarget.routineCount,
+                            onClick = { onClickFeedback(feedbackTarget) }
+                        )
+
+                        Spacer(modifier = Modifier.width(16.dp))
                     }
 
                 }

@@ -4,41 +4,27 @@ import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.model.User
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
 class GetUserProfileListUseCase @Inject constructor(
     private val friendRepository: FriendRepository,
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(): Result<List<User>> = coroutineScope {
-        val myDataDeferred = async { userRepository.getMyUser() }
-        val otherDataDeferred = async { friendRepository.getFollowingList() }
-        val feedbackTargetDeferred = async { friendRepository.getFeedbackTargetList() }
+    suspend operator fun invoke(): Result<List<User>> = supervisorScope {
+        val myDef = async { runCatching { userRepository.getMyUser() } }
+        val followingDef = async { friendRepository.getFollowingList() }
 
-        val myData = myDataDeferred.await()
-        val otherResult = otherDataDeferred.await()
-        val feedbackResult = feedbackTargetDeferred.await()
+        val me = myDef.await().getOrElse { return@supervisorScope Result.failure(it) }
+        val others = followingDef.await().getOrElse { return@supervisorScope Result.failure(it) }
 
-        otherResult.onFailure {
-            return@coroutineScope Result.failure(it)
+        val merged = buildList {
+            add(me)
+            addAll(others.filterNot { it.id == me.id })
         }
 
-        feedbackResult.onFailure {
-            return@coroutineScope Result.failure(it)
-        }
-
-        val feedbackMap = feedbackResult.getOrElse {
-            return@coroutineScope Result.failure(it)
-        }.associateBy { it.userId }
-
-        val updatedOthers = otherResult.getOrElse {
-            return@coroutineScope Result.failure(it)
-        }.map { user ->
-            val notTakenCount = feedbackMap[user.id]?.notTakenCount
-            user.copy(notTakenCount = notTakenCount)
-        }
-
-        Result.success(listOf(myData) + updatedOthers)
+        Result.success(merged)
     }
 }

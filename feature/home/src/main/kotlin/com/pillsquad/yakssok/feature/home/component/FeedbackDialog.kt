@@ -38,29 +38,25 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.model.FeedbackTarget
+import com.pillsquad.yakssok.core.model.FeedbackType
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineRow
 
 @Composable
 internal fun FeedbackDialog(
-    user: User,
-    todayRoutineCount: Int = user.notTakenCount ?: 0,
-    routineList: List<Routine>,
+    feedback: FeedbackTarget,
     onDismiss: () -> Unit,
     onConfirm: (Int, String, String) -> Unit
 ) {
-    val isNagging = todayRoutineCount != 0
+    val isNagging = feedback.feedbackType == FeedbackType.NAG
     val hintText = if (isNagging) "한 줄 잔소리" else "한 줄 칭찬"
 
     val textList = if (isNagging) {
-        listOf(
-            "얼른 먹어요!", "약 놓쳤어요!", "건강 챙겨요!", "먹을 때까지 숨 참을게요 흡!"
-        )
+        listOf("얼른 먹어요!", "약 놓쳤어요!", "건강 챙겨요!", "먹을 때까지 숨 참을게요 흡!")
     } else {
-        listOf(
-            "정말 대단하군!", "오늘도 건강 챙기기 완료네요!", "야무진 당신", "칭찬 드려요 짱!"
-        )
+        listOf("정말 대단하군!", "오늘도 건강 챙기기 완료네요!", "야무진 당신", "칭찬 드려요 짱!")
     }
 
     var selectedTextIdx by remember { mutableStateOf<Int?>(null) }
@@ -124,16 +120,15 @@ internal fun FeedbackDialog(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 DialogInfoItem(
-                    user = user,
+                    feedback = feedback,
                     isNagging = isNagging,
-                    takenCount = routineList.size - todayRoutineCount
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 DialogContent(
                     isNagging = isNagging,
-                    routineList = routineList,
+                    routineList = feedback.routineList,
                     textList = textList,
                     selectedTextIdx = selectedTextIdx,
                     hintText = hintText,
@@ -170,7 +165,7 @@ internal fun FeedbackDialog(
                                 textList[selectedTextIdx ?: 0]
                             }
                             val type = if (isNagging) "nag" else "praise"
-                            onConfirm(user.id, message, type)
+                            onConfirm(feedback.userId, message, type)
                         }
                     )
                 }
@@ -259,37 +254,31 @@ private fun DialogContent(
 
 @Composable
 private fun DialogInfoItem(
-    user: User,
+    feedback: FeedbackTarget,
     isNagging: Boolean,
-    takenCount: Int? = null
 ) {
     val descriptionName = if (isNagging) "안 먹은 약" else "오늘 먹은 약"
-    val routineCount = if (isNagging) {
-        user.notTakenCount
-    } else {
-        takenCount
-    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         YakssokImage(
-            flag = user.id,
+            flag = feedback.userId,
             modifier = Modifier.size(52.dp),
-            imageUrl = user.profileImage
+            imageUrl = feedback.profileImageUrl
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Column {
             Text(
-                text = user.relationName,
+                text = feedback.relationName,
                 style = YakssokTheme.typography.body2,
                 color = YakssokTheme.color.grey400
             )
             Text(
-                text = user.nickName,
+                text = feedback.nickName,
                 style = YakssokTheme.typography.body2,
                 color = YakssokTheme.color.grey600
             )
@@ -321,7 +310,7 @@ private fun DialogInfoItem(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "${routineCount}개",
+                    text = "${feedback.routineCount}개",
                     style = YakssokTheme.typography.subtitle2,
                     color = YakssokTheme.color.grey900
                 )
