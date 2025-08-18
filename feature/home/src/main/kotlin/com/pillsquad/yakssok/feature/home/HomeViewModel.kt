@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.common.today
+import com.pillsquad.yakssok.core.domain.usecase.GetFeedbackTargetUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
@@ -16,7 +17,7 @@ import com.pillsquad.yakssok.core.model.UserCache
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -25,8 +26,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -40,6 +41,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getUserProfileListUseCase: GetUserProfileListUseCase,
     private val getUserRoutineUseCase: GetUserRoutineUseCase,
+    private val getFeedbackTargetUseCase: GetFeedbackTargetUseCase,
     private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
     private val postFeedbackUseCase: PostFeedbackUseCase
 ) : ViewModel() {
@@ -51,65 +53,17 @@ class HomeViewModel @Inject constructor(
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
 
-    private val today: LocalDate
-        get() = LocalDate.today()
-    private val now: LocalTime
-        get() = LocalTime.now()
+    private val today get() = LocalDate.today()
+    private val now get() = LocalTime.now()
 
     init {
         viewModelScope.launch { refreshTrigger.emit(Unit) }
 
         viewModelScope.launch {
-            val usersFlow: Flow<List<User>> = refreshTrigger
-                .mapLatest { fetchUsersOrFallback() }
-                .onEach { users ->
-                    val show = users.any { it.notTakenCount != null }
-
-                    val prev = _uiState.value as? HomeUiState.Success
-
-                    _uiState.value = HomeUiState.Success(
-                        showFeedBackSection = show,
-                        isInit = prev?.isInit ?: true,
-                        userList = users,
-                        selectedDate = prev?.selectedDate ?: today,
-                        selectedUserIdx = prev?.selectedUserIdx ?: 0,
-                        routineCache = prev?.routineCache ?: SparseArray(),
-                        remindList = prev?.remindList ?: emptyList(),
-                    )
-                }
-
-            val routinesFlow: Flow<Pair<SparseArray<MutableMap<LocalDate, List<Routine>>>, List<User>>> =
-                usersFlow.flatMapLatest { users ->
-                    flow {
-                        val (startDate, endDate) = getStartEndDate()
-                        val cache = buildRoutineCache(users, startDate, endDate)
-                        emit(cache to users)
-                    }
-                }
-
-            routinesFlow
+            refreshTrigger
+                .mapLatest { loadHome() }
                 .catch { _errorFlow.emit("네트워크 환경을 확인해주세요.") }
-                .collect { (cache, users) ->
-                    val base = when (val current = _uiState.value) {
-                        is HomeUiState.Success -> current
-                        HomeUiState.Loading -> HomeUiState.Success()
-                    }
-
-                    val updatedUsers = recomputeIsNotMedicine(users, cache)
-                    val show = updatedUsers.any { it.notTakenCount != null }
-
-                    val computedRemind = cache[0]?.get(today).orEmpty().filter { it.isFeedbackRoutine(now) }
-                    val shouldShow = base.isInit && computedRemind.isNotEmpty()
-
-                    _uiState.value = base.copy(
-                        showFeedBackSection = show,
-                        userList = updatedUsers,
-                        routineCache = cache,
-                        remindList = if (shouldShow) computedRemind else base.remindList,
-                        selectedDate = base.selectedDate,
-                        selectedUserIdx = base.selectedUserIdx
-                    )
-                }
+                .collect { _uiState.value = it }
         }
     }
 
@@ -117,30 +71,64 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { refreshTrigger.emit(Unit) }
     }
 
+    private suspend fun loadHome(): HomeUiState {
+        val previous = _uiState.value as? HomeUiState.Success
+
+        return supervisorScope {
+            val users = getUserProfileListUseCase().getOrElse {
+                _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                previous?.userList ?: HomeUiState.Success().userList
+            }
+
+            val (start, end) = getStartEndDate()
+            val routineDef = async { buildRoutineCache(users, start, end) }
+            val targetsDef = async {
+                getFeedbackTargetUseCase()
+                    .getOrElse {
+                        _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                        emptyList()
+                    }
+            }
+
+            val cache = routineDef.await()
+            val targets = targetsDef.await()
+
+            val adjustedUsers = recomputeIsNotMedicine(users, cache)
+            val todayRemind = cache[0]?.get(today).orEmpty().filter { it.isFeedbackRoutine(now) }
+            val shouldShowRemind = (previous?.isInit ?: true) && todayRemind.isNotEmpty()
+
+            HomeUiState.Success(
+                isInit = previous?.isInit ?: true,
+                userList = adjustedUsers,
+                selectedDate = previous?.selectedDate ?: today,
+                selectedUserIdx = previous?.selectedUserIdx ?: 0,
+                routineCache = cache,
+                remindList = if (shouldShowRemind) todayRemind else (previous?.remindList
+                    ?: emptyList()),
+                feedbackTargetList = targets
+            )
+        }
+    }
+
     fun onSelectedDate(date: LocalDate) {
-        val state = _uiState.value
-        if (state is HomeUiState.Success) {
-            _uiState.value = state.copy(selectedDate = date)
+        (_uiState.value as? HomeUiState.Success)?.let {
+            _uiState.value = it.copy(selectedDate = date)
         }
     }
 
     fun onMateClick(userIdx: Int) {
-        val state = _uiState.value
-        if (state is HomeUiState.Success) {
-            _uiState.value = state.copy(selectedUserIdx = userIdx)
+        (_uiState.value as? HomeUiState.Success)?.let {
+            _uiState.value = it.copy(selectedUserIdx = userIdx)
         }
     }
 
     fun onRoutineClick(routineId: Int) {
-        val state = _uiState.value
-        if (state !is HomeUiState.Success) return
-
+        val state = _uiState.value as? HomeUiState.Success ?: return
         val userIdx = state.selectedUserIdx
         val date = state.selectedDate
-        val currentMap = state.routineCache[userIdx] ?: return
-
         if (userIdx != 0 || date != today) return
 
+        val currentMap = state.routineCache[userIdx] ?: return
         val updated = currentMap[date]?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return
@@ -160,14 +148,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             postFeedbackUseCase(userId, message, type)
                 .onSuccess {
-                    val state = _uiState.value
-                    if (state is HomeUiState.Success) {
-                        val newList = state.userList.map { user ->
-                            if (user.id == userId) user.copy(notTakenCount = null) else user
-                        }
+                    (_uiState.value as? HomeUiState.Success)?.let { state ->
+                        val newList = state.feedbackTargetList.filter { it.userId != userId }
                         _uiState.value = state.copy(
-                            userList = newList,
-                            showFeedBackSection = newList.any { it.notTakenCount != null }
+                            feedbackTargetList = newList,
                         )
                     }
                 }.onFailure {
@@ -176,33 +160,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getFeedbackList(userId: Int): List<Routine> {
-        val state = _uiState.value
-        if (state !is HomeUiState.Success) return emptyList()
-        val idx = state.userList.indexOfFirst { it.id == userId }
-        val user = state.userList[idx]
-
-        val feedbackList = state.routineCache[idx]?.get(today).orEmpty()
-
-        return if (user.notTakenCount == 0) {
-            feedbackList
-        } else {
-            feedbackList.filter { it.isFeedbackRoutine(now) }
-        }
-    }
-
     fun clearRemindState() {
-        val state = _uiState.value
-        if (state is HomeUiState.Success) {
-            _uiState.value = state.copy(isInit = false, remindList = emptyList())
-        }
-    }
-
-    private suspend fun fetchUsersOrFallback(): List<User> {
-        val prev = (uiState.value as? HomeUiState.Success)?.userList ?: emptyList()
-        return getUserProfileListUseCase().getOrElse {
-            _errorFlow.emit("네트워크 환경을 확인해주세요.")
-            prev
+        (_uiState.value as? HomeUiState.Success)?.let {
+            _uiState.value = it.copy(isInit = false, remindList = emptyList())
         }
     }
 

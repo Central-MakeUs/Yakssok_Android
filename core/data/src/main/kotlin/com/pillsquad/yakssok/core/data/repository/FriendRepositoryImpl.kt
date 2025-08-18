@@ -22,33 +22,27 @@ class FriendRepositoryImpl @Inject constructor(
     ): Result<List<User>> {
         // Todo: Local Data와 연동
 
-        return friendDataSource.getFollowingList().toResult(
-            transform = { response ->
-                response.followingInfoResponses.map {
-                    if(isHome) {
-                        it.toUser()
-                    } else {
-                        it.toFollowUser()
-                    }
+        return friendDataSource.getFollowingList().toResult { response ->
+            response.followingInfoResponses.map {
+                if (isHome) {
+                    it.toUser()
+                } else {
+                    it.toFollowUser()
                 }
             }
-        )
+        }
     }
 
     override suspend fun getFollowerList(): Result<List<User>> {
-        return friendDataSource.getFollowerList().toResult(
-            transform = { response ->
-                response.followerInfoResponses.map { it.toUser() }
-            }
-        )
+        return friendDataSource.getFollowerList().toResult { response ->
+            response.followerInfoResponses.map { it.toUser() }
+        }
     }
 
     override suspend fun getFeedbackTargetList(): Result<List<FeedbackTarget>> {
-        return friendDataSource.getFeedbackTargetList().toResult(
-            transform = { response ->
-                response.feedbackTargetResponseList.map { it.toFeedBackTarget() }
-            }
-        )
+        return friendDataSource.getFeedbackTargetList().toResult { response ->
+            response.feedbackTargetResponseList.map { it.toFeedBackTarget() }
+        }
     }
 
     override suspend fun postAddFriend(
@@ -60,9 +54,7 @@ class FriendRepositoryImpl @Inject constructor(
             relationName = relationName
         )
 
-        val result = friendDataSource.postAddFriend(params).toResult(
-            transform = { it }
-        )
+        val result = friendDataSource.postAddFriend(params).toResult()
 
         result.onSuccess {
             val currentCount = userLocalDataSource.mateCountFlow.firstOrNull() ?: 0

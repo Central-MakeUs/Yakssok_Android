@@ -34,7 +34,7 @@ internal fun UserInfoCard(
     nickName: String,
     relationName: String,
     profileUrl: String,
-    remainedMedicine: Int,
+    routineCount: Int,
     onClick: () -> Unit
 ) {
     Column(
@@ -78,14 +78,14 @@ internal fun UserInfoCard(
             modifier = Modifier.padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (remainedMedicine > 0) {
+            if (routineCount > 0) {
                 Text(
                     buildAnnotatedString {
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey500)) {
                             append("안먹은 약ㆍ")
                         }
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey900)) {
-                            append("${remainedMedicine}개")
+                            append("${routineCount}개")
                         }
                     },
                     style = YakssokTheme.typography.subtitle2,
@@ -107,7 +107,7 @@ internal fun UserInfoCard(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        if (remainedMedicine > 0) {
+        if (routineCount > 0) {
             YakssokButton(
                 modifier = Modifier.height(40.dp),
                 text = "잔소리 보내기",

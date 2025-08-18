@@ -18,5 +18,15 @@ data class FeedbackTargetResponse(
     val nickName: String,
     val relationName: String,
     val profileImageUrl: String?,
-    val notTakenCount: Int
+    val feedbackType: String,
+    val medicationCount: Int,
+    val medicationDetails: List<MedicationDetail>
+)
+
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class MedicationDetail(
+    val type: String,
+    val name: String,
+    val time: String
 )
