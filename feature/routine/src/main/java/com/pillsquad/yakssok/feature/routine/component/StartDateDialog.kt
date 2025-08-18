@@ -11,12 +11,18 @@ import kotlinx.datetime.LocalDate
 @Composable
 internal fun StartDateDialog(
     uiStartDate: LocalDate,
+    uiEndDate: LocalDate?,
     today: LocalDate = LocalDate.today(),
     selectedStartDate: LocalDate?,
     onDismiss: () -> Unit,
     onConfirm: (LocalDate) -> Unit,
     onValueChange: (LocalDate?) -> Unit
 ) {
+    val candidateStartDate = selectedStartDate ?: uiStartDate
+    val isOnOrAfterToday = candidateStartDate >= today
+    val isNotAfterEnd = uiEndDate?.let { candidateStartDate <= it } ?: true
+    val isConfirmEnabled = isOnOrAfterToday && isNotAfterEnd
+
     YakssokDialog(
         title = "복용 시작 날짜를 설정해주세요",
         cancelText = "닫기",
@@ -27,9 +33,7 @@ internal fun StartDateDialog(
                 onValueChange = { onValueChange(it) }
             )
         },
-        enabled = selectedStartDate?.let {
-            it >= today
-        } ?: false,
+        enabled = isConfirmEnabled,
         onDismiss = onDismiss,
         onConfirm = { onConfirm(selectedStartDate ?: today) }
     )
