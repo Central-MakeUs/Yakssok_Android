@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,12 +58,11 @@ fun DailyMedicineRow(
         if (routine.isTaken) R.drawable.ic_checkbox_true else R.drawable.ic_checkbox_false
 
     val formattedTime = formatLocalTime(routine.intakeTime)
-    val rowHeight = if (routine.medicationName.length > 10) 72.dp else 56.dp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(rowHeight)
+            .defaultMinSize(minHeight = 56.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .then(
