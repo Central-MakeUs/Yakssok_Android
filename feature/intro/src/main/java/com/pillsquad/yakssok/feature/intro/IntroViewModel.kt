@@ -14,6 +14,7 @@ import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostUserDevicesUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutUserInitialUseCase
+import com.pillsquad.yakssok.core.model.HttpException
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -95,9 +96,15 @@ class IntroViewModel @Inject constructor(
                         _event.emit(IntroEvent.NavigateHome)
                     }
                 }.onFailure { e ->
-                    showToast("네트워크 환경을 확인해주세요.")
+
                     e.printStackTrace()
-                    Log.e("UserRepositoryImpl", "invoke: $e")
+
+                    if (e is HttpException && e.code == 2001L) {
+                        showToast("토큰이 만료되었습니다. 다시 로그인해주세요.")
+                    } else {
+                        showToast("네트워크 환경을 확인해주세요.")
+                    }
+
                     _uiState.update { state -> state.copy(isLoading = false) }
                 }
         }
