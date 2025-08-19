@@ -3,7 +3,7 @@ package com.pillsquad.yakssok.core.model
 import kotlinx.datetime.LocalDateTime
 
 data class AlarmPagerItem (
-    val notificationId: Int,
+    val notificationId: Long,
     val notificationType: MessageType,
     val senderNickName: String,
     val senderProfileUrl: String,

@@ -7,25 +7,35 @@ import androidx.paging.PagingState
 
 internal class PagingDataSource<T : Any>(
     private val perPage: Int,
-    private val fetcher: suspend (startKey: String?, perPage: Int) -> Result<List<T>>,
-    private val keySelector: (T) -> String
-) : PagingSource<String, T>() {
-    override fun getRefreshKey(state: PagingState<String, T>): String? = null
+    private val fetcher: suspend (startKey: Long?, perPage: Int) -> Result<List<T>>,
+    private val keySelector: (T) -> Long
+) : PagingSource<Long, T>() {
+    override fun getRefreshKey(state: PagingState<Long, T>): Long? = null
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, T> {
-        val start = params.key
-        val response = fetcher(start, perPage)
+    override suspend fun load(params: LoadParams<Long>): LoadResult<Long, T> {
+        val startKey = params.key
+        val response = fetcher(startKey, perPage)
 
         return when {
             response.isSuccess -> {
-                val data = response.getOrNull().orEmpty()
+                var data = response.getOrNull().orEmpty()
+
+                if (startKey != null) {
+                    data = data.filter { keySelector(it) < startKey }
+                }
+
+                val nextKey = if (data.isEmpty() || data.size < perPage) {
+                    null
+                } else {
+                    data.lastOrNull()?.let(keySelector)
+                }
+
                 LoadResult.Page(
                     data = data,
-                    prevKey = null, // 최신순 로딩이므로 이전키 없음
-                    nextKey = data.lastOrNull()?.let(keySelector), // 오래된 메시지의 ID
+                    prevKey = null,
+                    nextKey = nextKey
                 )
             }
-
             else -> {
                 LoadResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
             }
@@ -37,8 +47,8 @@ internal class PagingDataSource<T : Any>(
 
         fun <T : Any> createPager(
             pageSize: Int = DEFAULT_PER_PAGE,
-            keySelector: (T) -> String,
-            fetcher: suspend (startKey: String?, perPage: Int) -> Result<List<T>>,
+            keySelector: (T) -> Long,
+            fetcher: suspend (startKey: Long?, perPage: Int) -> Result<List<T>>,
         ) = Pager(
             config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
             pagingSourceFactory = {

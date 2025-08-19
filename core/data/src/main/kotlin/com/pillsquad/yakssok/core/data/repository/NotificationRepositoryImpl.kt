@@ -16,7 +16,7 @@ class NotificationRepositoryImpl @Inject constructor(
     override fun getAlarmPager(): Flow<PagingData<AlarmPagerItem>> {
         return PagingDataSource.createPager(
             pageSize = 20,
-            keySelector = { it.notificationId.toString() },
+            keySelector = { it.notificationId },
             fetcher = { startKey, perPage ->
                 notificationDataSource.fetchAlarms(startKey, perPage).toResult(
                     transform = { it.content.map { alarm -> alarm.toAlarmPagerItem() } }

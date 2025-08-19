@@ -13,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlertViewModel @Inject constructor(
-    private val getAlarmListUseCase: GetAlarmListUseCase
+    getAlarmListUseCase: GetAlarmListUseCase
 ): ViewModel() {
     val alarmList = getAlarmListUseCase().cachedIn(viewModelScope)
-
 }

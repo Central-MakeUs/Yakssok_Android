@@ -10,7 +10,6 @@ import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 fun LocalTime.Companion.now(): LocalTime {
@@ -23,7 +22,7 @@ fun LocalTime.formatToServerTime(): String {
 
 fun formatLocalTime(localTime: LocalTime): String {
     val javaTime = java.time.LocalTime.of(localTime.hour, localTime.minute)
-    val formatter = DateTimeFormatter.ofPattern("h:mm a") // ex: 9:00 AM, 10:00 PM
+    val formatter = DateTimeFormatter.ofPattern("h:mm a")
     return javaTime.format(formatter)
 }
 
@@ -44,19 +43,11 @@ fun getTimeDifferenceString(target: LocalDateTime): String {
 
     val diffInMinutes = (now - targetInstant).inWholeMinutes
 
+    println("$targetInstant, $diffInMinutes")
     return when {
         diffInMinutes < 1 -> "방금 전"
         diffInMinutes < 60 -> "${diffInMinutes}분 전"
         diffInMinutes < 60 * 24 -> "${diffInMinutes / 60}시간 전"
         else -> "${diffInMinutes / (60 * 24)}일 전"
     }
-}
-
-@OptIn(ExperimentalTime::class)
-fun String.toLocalTimeByTimeZone(): LocalDateTime {
-    val timeZone = TimeZone.currentSystemDefault()
-    val safeInstantString = if (this.endsWith("Z")) this else "${this}Z"
-    val instant = Instant.parse(safeInstantString)
-
-    return instant.toLocalDateTime(timeZone)
 }
