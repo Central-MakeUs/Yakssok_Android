@@ -68,7 +68,9 @@ internal fun CompleteDialog(
 private fun InfoCard(
     uiState: RoutineUiModel,
 ) {
-    val timeString = uiState.intakeTimes.joinToString(" / ") { formatKotlinxTime(it) }
+    val timeString = uiState.intakeTimes
+        .take(uiState.intakeCount)
+        .joinToString(" / ") { formatKotlinxTime(it) }
 
     Column(
         modifier = Modifier
@@ -95,6 +97,7 @@ private fun InfoCard(
             Spacer(modifier = Modifier.height(8.dp))
             WeekRow(uiState.intakeDays)
         }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,7 +119,9 @@ private fun InfoCard(
                     color = YakssokTheme.color.grey600
                 )
             }
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = timeString,
                 style = YakssokTheme.typography.body2,
