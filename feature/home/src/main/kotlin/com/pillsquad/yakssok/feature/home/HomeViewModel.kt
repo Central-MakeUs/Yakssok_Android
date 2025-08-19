@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
 
         return supervisorScope {
             val users = getUserProfileListUseCase().getOrElse {
-                _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                _errorFlow.emit("메이트 목록을 불러올 수 없습니다.")
                 previous?.userList ?: HomeUiState.Success().userList
             }
 
@@ -85,7 +85,7 @@ class HomeViewModel @Inject constructor(
             val targetsDef = async {
                 getFeedbackTargetUseCase()
                     .getOrElse {
-                        _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                        _errorFlow.emit("피드백 목록을 불러올 수 없습니다.")
                         emptyList()
                     }
             }
@@ -155,7 +155,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }.onFailure {
-                    _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                    _errorFlow.emit("피드백 전송에 실패했습니다.")
                 }
         }
     }
