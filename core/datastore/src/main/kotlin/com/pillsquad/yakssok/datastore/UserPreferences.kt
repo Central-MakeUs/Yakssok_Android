@@ -72,6 +72,20 @@ class UserPreferences @Inject constructor(
     val inviteCodeFlow: Flow<String> = dataStore.data
         .map { it[INVITE_CODE] ?: "" }
 
+    suspend fun saveInfo(
+        nickName: String,
+        profileImg: String,
+        medicationCount: Int,
+        mateCount: Int
+    ) {
+        dataStore.edit {
+            it[USER_NAME] = nickName
+            it[USER_PROFILE_IMG] = profileImg
+            it[MEDICATION_COUNT] = medicationCount
+            it[MATE_COUNT] = mateCount
+        }
+    }
+
     suspend fun saveSession(access: String, refresh: String, isInit: Boolean) {
         dataStore.edit {
             it[ACCESS_TOKEN_KEY] = access

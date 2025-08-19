@@ -26,6 +26,15 @@ class UserLocalDataSource @Inject constructor(
 
     val inviteCodeFlow: Flow<String> = userPreferences.inviteCodeFlow
 
+    suspend fun saveInfo(
+        nickName: String,
+        profileImg: String,
+        medicationCount: Int,
+        mateCount: Int
+    ) {
+        userPreferences.saveInfo(nickName, profileImg, medicationCount, mateCount)
+    }
+
     suspend fun saveSession(access: String, refresh: String, isInit: Boolean) {
         userPreferences.saveSession(access, refresh, isInit)
     }

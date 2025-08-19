@@ -74,6 +74,7 @@ class IntroViewModel @Inject constructor(
     }
 
     // flag는 tiramisu 이상일 때 false, 아닐 때 true
+    // 회원가입시
     fun putUserInitial() {
         viewModelScope.launch {
             putUserInitialUseCase(uiState.value.nickName)
@@ -141,6 +142,12 @@ class IntroViewModel @Inject constructor(
     fun testLoginUser() {
         viewModelScope.launch {
             testLoginUseCase.invoke()
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = true, loginSuccess = true) }
+                }.onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
+
+                }
         }
     }
 
@@ -153,7 +160,7 @@ class IntroViewModel @Inject constructor(
             _uiState.update {
                 when {
                     result.isSuccess && result.getOrDefault(true) -> it.copy(
-                        isLoading = false,
+                        isLoading = true,
                         loginSuccess = true,
                         token = accessToken
                     )
@@ -182,13 +189,13 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
 
-            getTokenFlowUseCase().catch {
-                _uiState.update { it.copy(isLoading = false) }
-            }.collect { valid ->
+            getTokenFlowUseCase().onSuccess {  valid ->
                 _uiState.update {
                     if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
                     else it.copy(isLoading = false)
                 }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

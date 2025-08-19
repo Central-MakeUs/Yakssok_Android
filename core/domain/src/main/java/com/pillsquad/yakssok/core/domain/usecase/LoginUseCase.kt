@@ -10,18 +10,18 @@ class LoginUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(accessToken: String): Result<Boolean> {
+    suspend operator fun invoke(accessToken: String): Result<Boolean> = runCatching {
         val result = authRepository.loginUser(accessToken)
 
         result.onSuccess { flag ->
             if (flag) {
-                userRepository.postMyInfoToLocal()
+                userRepository.postMyInfoToLocal().getOrThrow()
             }
         }.onFailure {
             it.printStackTrace()
             Log.e("UserRepositoryImpl", "invoke: $it")
         }
 
-        return result
+        result.getOrThrow()
     }
 }

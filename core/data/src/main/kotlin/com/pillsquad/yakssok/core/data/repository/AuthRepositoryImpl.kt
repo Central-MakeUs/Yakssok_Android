@@ -43,19 +43,15 @@ class AuthRepositoryImpl @Inject constructor(
             .onSuccess { local.clearAllData() }
     }
 
-    override suspend fun testLoginUser() {
-        local.saveAccessToken(BuildConfig.MASTER_ACCESS)
-        local.saveRefreshToken(BuildConfig.MASTER_REFRESH)
-        local.saveInitialized(true)
+    override suspend fun testLoginUser(): Result<Unit> = runCatching {
+        local.saveSession(BuildConfig.MASTER_ACCESS, BuildConfig.MASTER_REFRESH, true)
     }
 
-    override fun checkToken(): Flow<Boolean> {
-        return combine(
-            local.accessTokenFlow,
-            local.refreshTokenFlow,
-            local.isInitializedFlow
-        ) { access, refresh, init ->
-            access.isNotBlank() && refresh.isNotBlank() && init
-        }.distinctUntilChanged()
+    override suspend fun checkToken(): Result<Boolean> = runCatching {
+        val access = local.accessTokenFlow.firstOrNull() ?: ""
+        val refresh = local.refreshTokenFlow.firstOrNull() ?: ""
+        val init = local.isInitializedFlow.firstOrNull() ?: false
+
+        access.isNotBlank() && refresh.isNotBlank() && init
     }
 }
