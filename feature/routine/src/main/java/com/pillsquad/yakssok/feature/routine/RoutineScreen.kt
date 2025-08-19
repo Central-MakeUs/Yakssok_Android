@@ -134,8 +134,6 @@ internal fun RoutineRoute(
                 viewModel.updateEndDate(it)
                 selectedEndDate = null
                 isEndDateShow = false
-                selectedIntakeDays = uiState.intakeDays
-                isIntakeDaysShow = true
             },
             onValueChange = {
                 selectedEndDate = it
