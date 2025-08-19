@@ -10,10 +10,10 @@ class NotificationRetrofitDataSource @Inject constructor(
     private val notificationApi: NotificationApi
 ): NotificationDataSource {
     override suspend fun fetchAlarms(
-        startKey: String?,
+        startKey: Long?,
         perPage: Int
     ): ApiResponse<AlarmListResponse> {
-        val lastId = startKey?.toIntOrNull() ?: Int.MAX_VALUE
+        val lastId = startKey?.toInt() ?: Int.MAX_VALUE
         return notificationApi.getAlarmList(lastId, perPage)
     }
 }
