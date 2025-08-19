@@ -6,7 +6,7 @@ import com.pillsquad.yakssok.core.model.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun postMyInfoToLocal()
+    suspend fun postMyInfoToLocal(): Result<Unit>
     suspend fun getMyUser(): User
     suspend fun putMyInfo(nickName: String, profileImage: String): Result<Unit>
     suspend fun putUserInitial(nickName: String): Result<Unit>

@@ -9,8 +9,9 @@ class TestLoginUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke() {
-        authRepository.testLoginUser()
-        userRepository.postMyInfoToLocal()
+    suspend operator fun invoke(): Result<Unit> = runCatching {
+        authRepository.testLoginUser().getOrThrow()
+        userRepository.postMyInfoToLocal().getOrThrow()
+        true
     }
 }

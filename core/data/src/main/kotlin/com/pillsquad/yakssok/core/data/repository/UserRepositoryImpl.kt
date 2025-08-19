@@ -22,18 +22,20 @@ class UserRepositoryImpl @Inject constructor(
     private val userRetrofitDataSource: UserDataSource,
     private val userLocalDataSource: UserLocalDataSource
 ) : UserRepository {
-    override suspend fun postMyInfoToLocal() {
+    override suspend fun postMyInfoToLocal(): Result<Unit> {
         val result = userRetrofitDataSource.getMyInfo().toResult(transform = { it })
 
-        result.onSuccess {
-            userLocalDataSource.saveUserName(it.nickName)
-            userLocalDataSource.saveUserProfileImg(it.profileImage ?: "")
-            userLocalDataSource.saveMedicationCount(it.medicationCount)
-            userLocalDataSource.saveMateCount(it.followingCount)
+        return result.onSuccess {
+            userLocalDataSource.saveInfo(
+                it.nickName,
+                it.profileImage ?: "",
+                it.medicationCount,
+                it.followingCount
+            )
         }.onFailure {
             it.printStackTrace()
             Log.e("UserRepositoryImpl", "postMyInfoToLocal: $it")
-        }
+        }.mapCatching { }
     }
 
     override suspend fun getMyUser(): User {
