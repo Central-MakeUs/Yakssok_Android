@@ -26,17 +26,17 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
+import com.pillsquad.yakssok.core.model.FeedbackTarget
+import com.pillsquad.yakssok.core.model.FeedbackType
 import com.pillsquad.yakssok.feature.home.R
 
 @Composable
 internal fun UserInfoCard(
-    id: Int,
-    nickName: String,
-    relationName: String,
-    profileUrl: String,
-    routineCount: Int,
+    feedback: FeedbackTarget,
     onClick: () -> Unit
 ) {
+    val isNagging = feedback.feedbackType == FeedbackType.NAG
+
     Column(
         modifier = Modifier
             .shadow(
@@ -54,19 +54,19 @@ internal fun UserInfoCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             YakssokImage(
-                flag = id,
+                flag = feedback.userId,
                 modifier = Modifier.size(52.dp),
-                imageUrl = profileUrl,
+                imageUrl = feedback.profileImageUrl,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
-                    text = relationName,
+                    text = feedback.relationName,
                     style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey400
                 )
                 Text(
-                    text = nickName,
+                    text = feedback.nickName,
                     style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey600
                 )
@@ -78,14 +78,14 @@ internal fun UserInfoCard(
             modifier = Modifier.padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (routineCount > 0) {
+            if (isNagging) {
                 Text(
                     buildAnnotatedString {
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey500)) {
                             append("안먹은 약ㆍ")
                         }
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey900)) {
-                            append("${routineCount}개")
+                            append("${feedback.routineCount}개")
                         }
                     },
                     style = YakssokTheme.typography.subtitle2,
@@ -107,7 +107,7 @@ internal fun UserInfoCard(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        if (routineCount > 0) {
+        if (isNagging) {
             YakssokButton(
                 modifier = Modifier.height(40.dp),
                 text = "잔소리 보내기",

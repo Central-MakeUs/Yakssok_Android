@@ -116,6 +116,7 @@ internal fun HomeRoute(
         HomeUiState.Loading -> {
             // 스켈레톤 UI가 짱인데..
         }
+
         is HomeUiState.Success -> {
             if (state.remindList.isNotEmpty()) {
                 val nickName = state.userList[0].nickName
@@ -215,11 +216,7 @@ private fun HomeScreen(
                         val feedbackTarget = feedbackTargetList[index]
 
                         UserInfoCard(
-                            id = feedbackTarget.userId,
-                            nickName = feedbackTarget.nickName,
-                            relationName = feedbackTarget.relationName,
-                            profileUrl = feedbackTarget.profileImageUrl,
-                            routineCount = feedbackTarget.routineCount,
+                            feedback = feedbackTarget,
                             onClick = { onClickFeedback(feedbackTarget) }
                         )
 
