@@ -9,6 +9,7 @@ setNamespace("core.domain")
 
 dependencies {
     implementation(projects.core.model)
+    implementation(projects.core.common)
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
