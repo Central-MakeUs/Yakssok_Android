@@ -4,6 +4,7 @@ import com.pillsquad.yakssok.core.model.UserCache
 import kotlinx.datetime.LocalDate
 
 interface RoutineRepository {
+    suspend fun getMyRoutine(): Result<UserCache>
     suspend fun getMyRoutine(startDate: LocalDate, endDate: LocalDate): Result<UserCache>
     suspend fun getFriendRoutine(
         startDate: LocalDate,

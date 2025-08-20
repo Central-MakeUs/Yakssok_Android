@@ -11,6 +11,10 @@ import javax.inject.Inject
 class RoutineRepositoryImpl @Inject constructor(
     private val routineDataSource: RoutineDataSource
 ) : RoutineRepository {
+    override suspend fun getMyRoutine(): Result<UserCache> {
+        return routineDataSource.getMyRoutine().toResult { it.toRoutineAndTakenCache() }
+    }
+
     override suspend fun getMyRoutine(
         startDate: LocalDate,
         endDate: LocalDate
@@ -18,9 +22,7 @@ class RoutineRepositoryImpl @Inject constructor(
         return routineDataSource.getMyRoutine(
             startDate = startDate.toString(),
             endDate = endDate.toString()
-        ).toResult(
-            transform = { it.toRoutineAndTakenCache() }
-        )
+        ).toResult{ it.toRoutineAndTakenCache() }
     }
 
     override suspend fun getFriendRoutine(
@@ -32,9 +34,7 @@ class RoutineRepositoryImpl @Inject constructor(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
             friendsId = friendsId
-        ).toResult(
-            transform = { it.toRoutineAndTakenCache() }
-        )
+        ).toResult{ it.toRoutineAndTakenCache() }
     }
 
     override suspend fun putTakeRoutine(scheduleId: Int): Result<Unit> {

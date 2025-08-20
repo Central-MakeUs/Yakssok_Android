@@ -8,6 +8,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RoutineApi {
+    @GET("/api/medication-schedules/today")
+    suspend fun getMyRoutineToday(): ApiResponse<RoutineResponse>
 
     @GET("/api/medication-schedules")
     suspend fun getMyRoutine(

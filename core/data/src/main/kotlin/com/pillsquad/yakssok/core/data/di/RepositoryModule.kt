@@ -12,6 +12,7 @@ import com.pillsquad.yakssok.core.data.repository.SoundRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserDevicesRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserPreferencesRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserRepositoryImpl
+import com.pillsquad.yakssok.core.data.repository.WidgetRepositoryImpl
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.repository.FeedbackRepository
 import com.pillsquad.yakssok.core.domain.repository.FriendRepository
@@ -23,6 +24,7 @@ import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.domain.repository.UserDevicesRepository
 import com.pillsquad.yakssok.core.domain.repository.UserPreferencesRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.WidgetRepository
 import com.pillsquad.yakssok.core.network.datasource.ImageDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDevicesDataSource
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
@@ -88,6 +90,11 @@ abstract class RepositoryModule {
     abstract fun bindUserPreferencesRepository(
         userPreferencesRepository: UserPreferencesRepositoryImpl
     ): UserPreferencesRepository
+
+    @Binds @Singleton
+    abstract fun bindWidgetRepository(
+        widgetRepository: WidgetRepositoryImpl
+    ): WidgetRepository
 
     companion object {
         @Provides
