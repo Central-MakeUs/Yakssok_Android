@@ -57,6 +57,8 @@ fun getProperty(key: String): String {
 }
 
 dependencies {
+    implementation(projects.widget)
+
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
