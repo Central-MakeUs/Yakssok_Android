@@ -4,6 +4,7 @@ import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.request.RefreshRequest
 import com.pillsquad.yakssok.core.network.service.TokenApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.net.HttpURLConnection
@@ -15,45 +16,53 @@ class TokenInterceptor @Inject constructor(
     private val tokenApi: TokenApi,
     private val tokenProvider: TokenProvider
 ) : Interceptor {
+
+    private val mutex = Mutex()
+
     override fun intercept(chain: Interceptor.Chain): Response {
-        val newRequest = chain.request().newBuilder().apply {
-            val token = tokenProvider.getAccessToken()
-            if (!token.isNullOrBlank()) {
-                addHeader("Authorization", "Bearer $token")
-            }
+        val originalRequest = chain.request()
+        val accessToken = tokenProvider.getAccessToken()
+        val authedRequest = originalRequest.newBuilder().apply {
+            if (!accessToken.isNullOrBlank()) header("Authorization", "Bearer $accessToken")
         }.build()
 
-        val response = chain.proceed(newRequest)
+        val response = chain.proceed(authedRequest)
 
-        when (response.code) {
-            HttpURLConnection.HTTP_OK -> {
-                val newAccessToken = response.header("Authorization", null) ?: return response
-                val oldAccessToken = tokenProvider.getAccessToken()
-
-                if (newAccessToken != oldAccessToken) {
-                    tokenProvider.setAccessToken(newAccessToken)
-                }
-            }
-
-            HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                val retryRequest = chain.request().newBuilder().apply {
-                    runBlocking {
-                        tokenProvider.getRefreshToken()?.let {
-                            val params = RefreshRequest(it)
-                            val newToken = tokenApi.refreshToken(params = params)
-
-                            if (newToken is ApiResponse.Success) {
-                                addHeader("Authorization", "Bearer ${newToken.data.accessToken}")
-                                tokenProvider.setAccessToken(newToken.data.accessToken)
-                            }
-                        }
-                    }
-                }
-
-                return chain.proceed(retryRequest.build())
-            }
+        if (response.code != HttpURLConnection.HTTP_UNAUTHORIZED) {
+            return response
         }
 
-        return response
+        val newAccess = runBlocking { refreshSafely(accessToken) }
+
+        return if (newAccess.isNullOrBlank()) {
+            response
+        } else {
+            response.close()
+            val retried = originalRequest.newBuilder()
+                .header("Authorization", "Bearer $newAccess")
+                .build()
+            chain.proceed(retried)
+        }
+    }
+
+    private suspend fun refreshSafely(oldAccess: String?): String? {
+        return mutex.lockAndGet {
+            val latest = tokenProvider.getAccessToken()
+            if (!latest.isNullOrBlank() && latest != oldAccess) return@lockAndGet latest
+
+            val rt = tokenProvider.getRefreshToken() ?: return@lockAndGet null
+            when (val res = tokenApi.refreshToken(RefreshRequest(rt))) {
+                is ApiResponse.Success -> {
+                    tokenProvider.setAccessToken(res.data.accessToken)
+                    res.data.accessToken
+                }
+                else -> null
+            }
+        }
+    }
+
+    private suspend inline fun <T> Mutex.lockAndGet(block: () -> T): T {
+        lock()
+        return try { block() } finally { unlock() }
     }
 }
