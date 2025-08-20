@@ -7,16 +7,17 @@ import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.background
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import com.pillsquad.yakssok.widget.MarkTakenAction
 import com.pillsquad.yakssok.widget.R
 import com.pillsquad.yakssok.widget.launchAppAction
 
@@ -48,7 +49,7 @@ internal fun SquareCard(
             modifier = GlanceModifier
                 .width(80.dp)
                 .height(34.dp)
-                .clickable({})
+                .clickable(actionRunCallback<MarkTakenAction>())
         )
 
         Spacer(GlanceModifier.height(16.dp))

@@ -1,7 +1,6 @@
 package com.pillsquad.yakssok.widget
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -10,8 +9,14 @@ import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
+import com.pillsquad.yakssok.core.domain.usecase.widget.ObserveWidgetSnapshotUseCase
 import com.pillsquad.yakssok.widget.screen.RectCard
 import com.pillsquad.yakssok.widget.screen.SquareCard
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 class YakssokWidget : GlanceAppWidget() {
@@ -24,12 +29,32 @@ class YakssokWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            val snapShot = remember { runBlocking { "" } }
+            val deps = EntryPointAccessors.fromApplication(context, Deps::class.java)
+            val snapShot = remember { runBlocking { deps.observeUC().invoke().first() } }
+
             val size = LocalSize.current
             val isTall = size.height >= 80.dp
-            Log.e("Widget", "$size")
 
-            if (isTall) SquareCard("지금 먹을 약", "pm 1:00 유산균", "1/3회", true) else RectCard("지금 먹을 약", "pm 1:00 유산균", true)
+            if (isTall) {
+                SquareCard(
+                    title = "지금 먹을 약",
+                    subTitle = snapShot.subTitle,
+                    progress = snapShot.progress,
+                    isTaken = snapShot.nextRoutineId == null
+                )
+            } else {
+                RectCard(
+                    title = "지금 먹을 약",
+                    subTitle = snapShot.subTitle,
+                    isTaken = snapShot.nextRoutineId == null
+                )
+            }
         }
+    }
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface Deps {
+        fun observeUC(): ObserveWidgetSnapshotUseCase
     }
 }

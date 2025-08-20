@@ -89,6 +89,7 @@ google="4.4.3"
 firebaseCrashlyticsPlugin = "3.0.5"
 firebaseBom = "34.0.0"
 firebaseCrashlytics = "20.0.0"
+workRuntimeKtx = "2.10.3"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -114,6 +115,7 @@ androidx-datastore = { group = "androidx.datastore", name = "datastore-preferenc
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterfaceVersion" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glanceMaterial3" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 ## paging
 androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "pagingCompose" }
