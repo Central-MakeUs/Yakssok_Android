@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kakao.sdk.common.KakaoSdk
 import com.pillsquad.yakssok.core.common.AppInfo
 import com.pillsquad.yakssok.core.push.ChannelRegistry
+import com.pillsquad.yakssok.widget.scheduleWidgetSync
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -22,5 +23,7 @@ class YakssokApplication : Application() {
         FirebaseApp.initializeApp(this)
         FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
         channelRegistry.ensureChannels()
+
+        scheduleWidgetSync(this)
     }
 }

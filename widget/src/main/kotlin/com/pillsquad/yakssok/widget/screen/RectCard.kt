@@ -7,6 +7,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.background
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
@@ -18,6 +19,7 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.layout.wrapContentWidth
+import com.pillsquad.yakssok.widget.MarkTakenAction
 import com.pillsquad.yakssok.widget.R
 import com.pillsquad.yakssok.widget.launchAppAction
 
@@ -48,7 +50,7 @@ internal fun RectCard(
             modifier = GlanceModifier
                 .width(60.dp)
                 .height(26.dp)
-                .clickable({})
+                .clickable(actionRunCallback<MarkTakenAction>())
         )
 
         Spacer(GlanceModifier.height(10.dp))
