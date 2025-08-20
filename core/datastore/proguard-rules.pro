@@ -20,6 +20,9 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class com.pillsquad.yakssok.core.datastore.di.** { *; }
+-keep @interface com.pillsquad.yakssok.core.datastore.di.*
+
 # Keep Dependency Injection Framework related classes and methods
 -keep class dagger.hilt.** { *; }
 -keep class javax.inject.** { *; }

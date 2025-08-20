@@ -36,7 +36,7 @@ internal fun RectCard(
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(ColorProvider(Color(0x80FFFFFF), Color(0xFFFFFFFF)))
+            .background(ColorProvider(Color(0xFFFFFFFF), Color(0xFFFFFFFF)))
             .clickable(launchAppAction())
             .padding(vertical = 12.dp, horizontal = 20.dp),
         horizontalAlignment = Alignment.Start,

@@ -36,7 +36,7 @@ internal fun SquareCard(
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(ColorProvider(Color(0x80FFFFFF), Color(0xFFFFFFFF)))
+            .background(ColorProvider(Color(0xFFFFFFFF), Color(0xFFFFFFFF)))
             .clickable(launchAppAction())
             .padding(20.dp),
         horizontalAlignment = Alignment.Start,

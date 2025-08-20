@@ -9,6 +9,8 @@ import javax.inject.Inject
 class RoutineRetrofitDataSource @Inject constructor(
     private val routineApi: RoutineApi
 ) : RoutineDataSource {
+    override suspend fun getMyRoutine(): ApiResponse<RoutineResponse> = routineApi.getMyRoutineToday()
+
     override suspend fun getMyRoutine(
         startDate: String,
         endDate: String
