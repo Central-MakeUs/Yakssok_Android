@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.feature.home.R
 import kotlinx.datetime.LocalDate
@@ -86,6 +87,7 @@ private fun CalendarHeader(
 @Composable
 private fun RowCalendar(
     weekDates: List<LocalDate>,
+    today: LocalDate = LocalDate.today(),
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
 ) {
@@ -99,6 +101,24 @@ private fun RowCalendar(
             val isSelected = (date == selectedDate)
             val label = dayLabels[idx]
             val textStyle = if (isSelected) YakssokTheme.typography.subtitle2 else YakssokTheme.typography.body1
+            val weekColor = if (date == today) {
+                YakssokTheme.color.primary400
+            } else {
+                if (isSelected) {
+                    YakssokTheme.color.grey50
+                } else {
+                    YakssokTheme.color.grey400
+                }
+            }
+            val dayColor = if (date == today) {
+                YakssokTheme.color.primary400
+            } else {
+                if (isSelected) {
+                    YakssokTheme.color.grey50
+                } else {
+                    YakssokTheme.color.grey600
+                }
+            }
 
             Column(
                 modifier = Modifier
@@ -115,14 +135,14 @@ private fun RowCalendar(
                     modifier = Modifier.height(24.dp),
                     text = label,
                     style = textStyle,
-                    color = if (isSelected) YakssokTheme.color.grey50 else YakssokTheme.color.grey400
+                    color = weekColor
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier.height(24.dp),
-                    text = "${date.dayOfMonth}",
+                    text = "${date.day}",
                     style = textStyle,
-                    color = if (isSelected) YakssokTheme.color.grey50 else YakssokTheme.color.grey600
+                    color = dayColor
                 )
             }
         }
