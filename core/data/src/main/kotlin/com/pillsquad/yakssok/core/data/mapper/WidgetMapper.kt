@@ -1,18 +1,34 @@
 package com.pillsquad.yakssok.core.data.mapper
 
+import com.pillsquad.yakssok.core.model.WidgetItem
 import com.pillsquad.yakssok.core.model.WidgetSnapshot
 import com.pillsquad.yakssok.datastore.model.WidgetEntity
+import com.pillsquad.yakssok.datastore.model.WidgetRow
 
 internal fun WidgetEntity.toWidgetSnapShot(): WidgetSnapshot =
     WidgetSnapshot(
-        subTitle = sub,
+        rows = rows.map { it.toWidgetItem() },
         progress = progress,
-        nextRoutineId = nextRoutine
+    )
+
+internal fun WidgetRow.toWidgetItem(): WidgetItem =
+    WidgetItem(
+        routineId = routineId,
+        intakeTime = intakeTime,
+        medicationName = medicationName,
+        isTaken = isTaken
     )
 
 internal fun WidgetSnapshot.toWidgetEntity(): WidgetEntity =
     WidgetEntity(
-        sub = subTitle,
+        rows = rows.map { it.toWidgetRow() },
         progress = progress,
-        nextRoutine = nextRoutineId
+    )
+
+internal fun WidgetItem.toWidgetRow(): WidgetRow =
+    WidgetRow(
+        routineId = routineId,
+        intakeTime = intakeTime,
+        medicationName = medicationName,
+        isTaken = isTaken
     )
