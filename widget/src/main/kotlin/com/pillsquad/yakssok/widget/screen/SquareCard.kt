@@ -44,12 +44,12 @@ internal fun SquareCard(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            provider = ImageProvider(imageResource),
+            provider = ImageProvider(R.drawable.ic_widget_logo_true),
             contentDescription = "복약 처리",
             modifier = GlanceModifier
                 .width(80.dp)
                 .height(34.dp)
-                .clickable(onClick = onAction)
+//                .clickable(onClick = onAction)
         )
 
         Spacer(GlanceModifier.height(16.dp))
