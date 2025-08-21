@@ -116,11 +116,11 @@ private fun CalendarDay(
     val isToday = date == today
     val isFuture = date >= today
 
-    val textColor = if (isSelected) {
-        YakssokTheme.color.grey50
+    val textColor = if (isToday) {
+        YakssokTheme.color.primary400
     } else {
-        if (isToday) {
-            YakssokTheme.color.primary400
+        if (isSelected) {
+            YakssokTheme.color.grey50
         } else {
             YakssokTheme.color.grey500
         }
