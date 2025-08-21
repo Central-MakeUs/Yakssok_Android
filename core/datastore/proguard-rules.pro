@@ -21,6 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.pillsquad.yakssok.core.datastore.di.** { *; }
+-keep class com.pillsquad.yakssok.core.datastore.model.** { *; }
 -keep @interface com.pillsquad.yakssok.core.datastore.di.*
 
 # Keep Dependency Injection Framework related classes and methods
