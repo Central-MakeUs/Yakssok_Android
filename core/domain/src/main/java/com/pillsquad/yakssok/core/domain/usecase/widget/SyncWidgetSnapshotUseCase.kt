@@ -35,7 +35,7 @@ internal fun computeSnapshot(
                 routineId = r.routineId ?: 0,
                 intakeTime = r.intakeTime.toString(),
                 medicationName = r.medicationName,
-                isTaken = cache.takenCache[day] == true
+                isTaken = r.isTaken
             )
         }
     val total = rows.size

@@ -6,20 +6,17 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.Action
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.background
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.layout.wrapContentWidth
-import com.pillsquad.yakssok.widget.MarkTakenAction
 import com.pillsquad.yakssok.widget.R
 import com.pillsquad.yakssok.widget.launchAppAction
 
@@ -28,6 +25,7 @@ internal fun RectCard(
     title: String,
     subTitle: String,
     isTaken: Boolean,
+    onAction: Action
 ) {
     val imageResource = if (isTaken) {
         R.drawable.ic_widget_logo_true
@@ -50,7 +48,7 @@ internal fun RectCard(
             modifier = GlanceModifier
                 .width(60.dp)
                 .height(26.dp)
-                .clickable(actionRunCallback<MarkTakenAction>())
+                .clickable(onAction)
         )
 
         Spacer(GlanceModifier.height(10.dp))

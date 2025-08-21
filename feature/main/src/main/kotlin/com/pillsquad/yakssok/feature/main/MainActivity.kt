@@ -26,4 +26,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onPause() {
+        viewModel.syncWidget()
+
+        super.onPause()
+    }
 }
