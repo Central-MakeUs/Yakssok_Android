@@ -9,3 +9,7 @@ class YakssokWidgetReceiver2x1 : GlanceAppWidgetReceiver() {
 class YakssokWidgetReceiver3x2 : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = YakssokWidget()
 }
+
+class YakssokWidgetReceiver5x3 : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = YakssokWidget()
+}

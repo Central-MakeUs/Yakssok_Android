@@ -38,17 +38,17 @@ internal fun RectCard(
             .fillMaxSize()
             .background(ColorProvider(Color(0xFFFFFFFF), Color(0xFFFFFFFF)))
             .clickable(launchAppAction())
-            .padding(vertical = 12.dp, horizontal = 20.dp),
+            .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            provider = ImageProvider(imageResource),
+            provider = ImageProvider(R.drawable.ic_widget_logo_true),
             contentDescription = "복약 처리",
             modifier = GlanceModifier
                 .width(60.dp)
                 .height(26.dp)
-                .clickable(onAction)
+//                .clickable(onAction)
         )
 
         Spacer(GlanceModifier.height(10.dp))

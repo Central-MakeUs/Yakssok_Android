@@ -18,6 +18,7 @@ import com.pillsquad.yakssok.core.domain.usecase.widget.ObserveWidgetSnapshotUse
 import com.pillsquad.yakssok.core.model.WidgetItem
 import com.pillsquad.yakssok.widget.screen.RectCard
 import com.pillsquad.yakssok.widget.screen.SquareCard
+import com.pillsquad.yakssok.widget.screen.WideCard
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -30,7 +31,8 @@ class YakssokWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Responsive(
         setOf(
             DpSize(150.dp, 50.dp),
-            DpSize(225.dp, 100.dp)
+            DpSize(225.dp, 100.dp),
+            DpSize(375.dp, 150.dp)
         )
     )
 
@@ -60,23 +62,30 @@ class YakssokWidget : GlanceAppWidget() {
             } ?: "오늘은 없어요!"
 
             val size = LocalSize.current
-            val isTall = size.height >= 80.dp
-
-            if (isTall) {
-                SquareCard(
-                    title = "지금 먹을 약",
-                    subTitle = sub,
-                    progress = snapShot.progress,
-                    isTaken = candidate?.isTaken ?: false,
-                    onAction = pillAction
-                )
-            } else {
-                RectCard(
-                    title = "지금 먹을 약",
-                    subTitle = sub,
-                    isTaken = candidate?.isTaken ?: false,
-                    onAction = pillAction
-                )
+            when (size.width) {
+                150.dp -> {
+                    RectCard(
+                        title = "오늘 먹어야 할 약",
+                        subTitle = sub,
+                        isTaken = candidate?.isTaken ?: false,
+                        onAction = pillAction
+                    )
+                }
+                225.dp -> {
+                    SquareCard(
+                        title = "오늘 먹어야 할 약",
+                        subTitle = sub,
+                        progress = snapShot.progress,
+                        isTaken = candidate?.isTaken ?: false,
+                        onAction = pillAction
+                    )
+                }
+                375.dp -> {
+                    WideCard(
+                        list = snapShot.rows,
+                        onAction = pillAction
+                    )
+                }
             }
         }
     }
