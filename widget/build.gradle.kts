@@ -11,8 +11,11 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.model)
     implementation(projects.core.designsystem)
+    implementation(projects.core.common)
 
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.work.runtime.ktx)
+
+    implementation(libs.kotlinx.datetime)
 }

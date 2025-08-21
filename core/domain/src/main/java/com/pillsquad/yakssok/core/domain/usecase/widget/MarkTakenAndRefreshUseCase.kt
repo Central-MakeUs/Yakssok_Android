@@ -16,7 +16,7 @@ class MarkTakenAndRefreshUseCase @Inject constructor(
         today: LocalDate = LocalDate.today()
     ): Result<WidgetSnapshot> =
         routineRepository.putTakeRoutine(scheduleId).mapCatching {
-            val updated = routineRepository.getMyRoutine(today, today).getOrThrow()
+            val updated = routineRepository.getMyRoutine().getOrThrow()
             val snap = computeSnapshot(updated, today)
             widgetRepository.saveFromUserCache(updated, today).getOrThrow()
             snap
