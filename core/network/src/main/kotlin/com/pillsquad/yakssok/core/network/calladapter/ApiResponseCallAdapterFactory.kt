@@ -13,17 +13,17 @@ internal class ApiResponseCallAdapterFactory : CallAdapter.Factory() {
         annotations: Array<out Annotation>,
         retrofit: Retrofit
     ): CallAdapter<*, *>? {
-        return when(getRawType(returnType)) {
-           Call::class.java -> {
-               val callType = getParameterUpperBound(0, returnType as ParameterizedType)
-               val rawType = getRawType(callType)
-               if(rawType != ApiResponse::class.java) {
-                   return null
-               }
+        return when (getRawType(returnType)) {
+            Call::class.java -> {
+                val callType = getParameterUpperBound(0, returnType as ParameterizedType)
+                val rawType = getRawType(callType)
+                if (rawType != ApiResponse::class.java) {
+                    return null
+                }
 
-               val resultType = getParameterUpperBound(0, callType as ParameterizedType)
-               return ApiResponseCallAdapter<Any>(resultType)
-           }
+                val resultType = getParameterUpperBound(0, callType as ParameterizedType)
+                return ApiResponseCallAdapter<Any>(resultType)
+            }
 
             else -> null
         }
