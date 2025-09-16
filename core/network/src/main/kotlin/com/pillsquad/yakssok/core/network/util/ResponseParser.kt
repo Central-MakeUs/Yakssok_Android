@@ -34,11 +34,12 @@ private fun <T> parseFailureResponse(
 
         val code = errorResponse.code
         val message = errorResponse.message
+        val body = errorResponse.body?.toString() ?: "null"
 
         ApiResponse.Failure.HttpError(
             code = code,
             message = message,
-            body = errorResponse.body?.toString() ?: "null"
+            body = body
         )
     } catch (e: Exception) {
         e.printStackTrace()
