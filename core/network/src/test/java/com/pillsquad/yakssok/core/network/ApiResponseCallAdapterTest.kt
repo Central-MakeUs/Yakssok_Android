@@ -75,6 +75,31 @@ class ApiResponseCallAdapterTest {
     }
 
     @Test
+    fun `server error should return ApiResponse_Failure_HttpError`() = runTest {
+        val json = """
+        {
+          "code": 5001,
+          "message": "Internal Server Error"
+        }
+    """.trimIndent()
+
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(500)
+                .setBody(json)
+        )
+
+        val response = api.getMyInfo()
+
+        println("response: $response")
+
+        assert(response is ApiResponse.Failure.HttpError)
+        val error = response as ApiResponse.Failure.HttpError
+        assertEquals(500, error.code)
+        assertEquals("Internal Server Error", error.message)
+    }
+
+    @Test
     fun `success response with null body should return ApiResponse_Success(Unit)`() = runTest {
         mockWebServer.enqueue(MockResponse().setBody("""
             {
