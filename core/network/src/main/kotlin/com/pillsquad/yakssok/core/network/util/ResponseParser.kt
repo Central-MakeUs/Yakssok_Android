@@ -1,13 +1,9 @@
 package com.pillsquad.yakssok.core.network.util
 
-import android.util.Log
 import com.pillsquad.yakssok.core.network.model.ApiResponse
 import com.pillsquad.yakssok.core.network.model.BaseResponse
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import okio.IOException
 import retrofit2.Response
 
