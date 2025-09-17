@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navigator: MainNavigator = rememberMainNavigator()
             YakssokTheme {
-                MainScreen(
+                MainRoute(
                     navigator = navigator,
                     viewModel = viewModel
                 )
