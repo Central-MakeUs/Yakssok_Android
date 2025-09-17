@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,11 +27,11 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.profileEdit.R
 import com.pillsquad.yakssok.feature.profile_edit.model.ProfileEditUiModel
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 internal fun ProfileEditRoute(
@@ -41,21 +40,13 @@ internal fun ProfileEditRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
+    val showSnackbar = LocalShowErrorSnackBar.current
     val imagePickerLauncher = rememberImagePickerLauncher()
 
     CollectEvent(viewModel.event) { event ->
         when(event) {
-            ProfileEditEvent.CompleteEdit -> {
-                onNavigateBack()
-            }
-            is ProfileEditEvent.ShowToast -> {
-                Toast.makeText(
-                    context,
-                    event.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            ProfileEditEvent.CompleteEdit -> onNavigateBack()
+            is ProfileEditEvent.ShowErrorSnackbar -> showSnackbar(event.throwable)
         }
     }
 

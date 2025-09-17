@@ -44,6 +44,7 @@ import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
@@ -69,7 +70,7 @@ internal fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
+    val showSnackbar = LocalShowErrorSnackBar.current
     val scrollState = rememberScrollState()
     val refreshState = rememberPullToRefreshState()
 
@@ -87,13 +88,8 @@ internal fun HomeRoute(
 
     var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
 
-    OnResumeEffect {
-        viewModel.refresh()
-    }
-
-    CollectEvent(viewModel.errorFlow) {
-        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-    }
+    OnResumeEffect { viewModel.refresh() }
+    CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
 
     LaunchedEffect(uiState) {
         if (uiState is HomeUiState.Success) {

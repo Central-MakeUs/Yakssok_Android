@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 sealed interface RoutineEvent {
     data object NavigateBack : RoutineEvent
-    data class ShowToast(val message: String) : RoutineEvent
+    data class ShowErrorSnackbar(val throwable: Throwable) : RoutineEvent
 }
 
 @HiltViewModel
@@ -86,10 +86,9 @@ class RoutineViewModel @Inject constructor(
                 .onSuccess {
                     stopSoundPool()
                     _event.emit(RoutineEvent.NavigateBack)
-                }.onFailure {
-                    it.printStackTrace()
-                    Log.e("RoutineViewModel", "postMedication: ${it.message}")
-                    _event.emit(RoutineEvent.ShowToast("약을 등록하는데 실패했습니다."))
+                }.onFailure { e ->
+                    e.printStackTrace()
+                    _event.emit(RoutineEvent.ShowErrorSnackbar(e))
                 }
         }
     }

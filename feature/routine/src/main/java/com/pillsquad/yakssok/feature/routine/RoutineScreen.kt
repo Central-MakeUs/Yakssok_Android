@@ -34,6 +34,8 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.AlarmType
 import com.pillsquad.yakssok.core.model.MedicationType
 import com.pillsquad.yakssok.core.model.WeekType
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.routine.component.CompleteDialog
 import com.pillsquad.yakssok.feature.routine.component.EndDateDialog
@@ -54,7 +56,6 @@ internal fun RoutineRoute(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
 
     var selectedStartDate: LocalDate? by remember { mutableStateOf(null) }
     var selectedEndDate: LocalDate? by remember { mutableStateOf(null) }
@@ -68,6 +69,7 @@ internal fun RoutineRoute(
     var isComplete by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val showSnackbar = LocalShowErrorSnackBar.current
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -96,11 +98,10 @@ internal fun RoutineRoute(
         }
     }
 
-    LaunchedEffect(event) {
-        when(event) {
+    CollectEvent(viewModel.event) {
+        when(it) {
             RoutineEvent.NavigateBack -> onNavigateBack()
-            is RoutineEvent.ShowToast -> {}
-            null -> Unit
+            is RoutineEvent.ShowErrorSnackbar -> showSnackbar(it.throwable)
         }
     }
 

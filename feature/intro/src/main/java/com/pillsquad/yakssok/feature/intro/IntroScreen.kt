@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
@@ -58,6 +58,7 @@ internal fun IntroRoute(
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val context = LocalContext.current
     val activity = LocalView.current.context as Activity
+    val showErrorSnackBar = LocalShowErrorSnackBar.current
 
     var showSetting by remember { mutableStateOf(false) }
     var pendingCheck by remember { mutableStateOf(false) }
@@ -94,8 +95,7 @@ internal fun IntroRoute(
                 onNavigateMate()
             }
 
-            is IntroEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT)
-                .show()
+            is IntroEvent.ShowErrorSnackbar -> showErrorSnackBar(it.throwable)
         }
     }
 

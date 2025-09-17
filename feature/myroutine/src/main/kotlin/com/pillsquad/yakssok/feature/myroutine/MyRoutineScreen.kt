@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.MedicationStatus
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.customInsets
@@ -51,23 +52,14 @@ internal fun MyRoutineRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val showSnackbar = LocalShowErrorSnackBar.current
 
     val tabs = listOf("전체", "복약 전", "복약 중", "복약 종료")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val tabIndex = pagerState.currentPage
 
-    OnResumeEffect {
-        viewModel.getMyRoutineList()
-    }
-
-    CollectEvent(viewModel.event) {
-        when (it) {
-            is MyRoutineEvent.ShowToast -> {
-                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    OnResumeEffect { viewModel.getMyRoutineList() }
+    CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
 
     if (uiState.optionalShowId != null) {
         OptionalDialog(

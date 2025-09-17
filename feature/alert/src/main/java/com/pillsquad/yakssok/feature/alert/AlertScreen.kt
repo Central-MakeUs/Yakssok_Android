@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,6 +15,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.AlarmPagerItem
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.alert.component.AlarmComponent
 import com.pillsquad.yakssok.feature.alert.component.PageItemFooter
@@ -24,6 +26,13 @@ internal fun AlertRoute(
     onNavigateBack: () -> Unit
 ) {
     val lazyPagingItems = viewModel.alarmList.collectAsLazyPagingItems()
+    val showSnackbar = LocalShowErrorSnackBar.current
+
+    LaunchedEffect(lazyPagingItems.loadState) {
+        val error = (lazyPagingItems.loadState.refresh as? LoadState.Error)?.error
+            ?: (lazyPagingItems.loadState.append as? LoadState.Error)?.error
+        error?.let { showSnackbar(it) }
+    }
 
     AlertScreen(
         pagingItems = lazyPagingItems,

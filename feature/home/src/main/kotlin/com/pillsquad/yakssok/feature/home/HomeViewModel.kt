@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
     private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
     private val postFeedbackUseCase: PostFeedbackUseCase
 ) : ViewModel() {
-    private val _errorFlow = MutableSharedFlow<String>()
+    private val _errorFlow = MutableSharedFlow<Throwable>()
     val errorFlow = _errorFlow.asSharedFlow()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
@@ -62,7 +62,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             refreshTrigger
                 .mapLatest { loadHome() }
-                .catch { _errorFlow.emit("네트워크 환경을 확인해주세요.") }
+                .catch { throwable -> _errorFlow.emit(throwable) }
                 .collect { _uiState.value = it }
         }
     }
@@ -75,8 +75,8 @@ class HomeViewModel @Inject constructor(
         val previous = _uiState.value as? HomeUiState.Success
 
         return supervisorScope {
-            val users = getUserProfileListUseCase().getOrElse {
-                _errorFlow.emit("메이트 목록을 불러올 수 없습니다.")
+            val users = getUserProfileListUseCase().getOrElse { throwable ->
+                _errorFlow.emit(throwable)
                 previous?.userList ?: HomeUiState.Success().userList
             }
 
@@ -84,8 +84,8 @@ class HomeViewModel @Inject constructor(
             val routineDef = async { buildRoutineCache(users, start, end) }
             val targetsDef = async {
                 getFeedbackTargetUseCase()
-                    .getOrElse {
-                        _errorFlow.emit("피드백 목록을 불러올 수 없습니다.")
+                    .getOrElse { throwable ->
+                        _errorFlow.emit(throwable)
                         emptyList()
                     }
             }
@@ -140,7 +140,7 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateRoutineTakenUseCase(routineId)
-                .onFailure { _errorFlow.emit("네트워크 환경을 확인해주세요.") }
+                .onFailure { throwable -> _errorFlow.emit(throwable) }
         }
     }
 
@@ -154,8 +154,8 @@ class HomeViewModel @Inject constructor(
                             feedbackTargetList = newList,
                         )
                     }
-                }.onFailure {
-                    _errorFlow.emit("피드백 전송에 실패했습니다.")
+                }.onFailure { throwable ->
+                    _errorFlow.emit(throwable)
                 }
         }
     }
@@ -191,14 +191,14 @@ class HomeViewModel @Inject constructor(
     ): UserCache {
         return if (userId == null) {
             getUserRoutineUseCase(startDate, endDate)
-                .getOrElse {
-                    _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                .getOrElse { throwable ->
+                    _errorFlow.emit(throwable)
                     UserCache.empty()
                 }
         } else {
             getUserRoutineUseCase(userId, startDate, endDate)
-                .getOrElse {
-                    _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                .getOrElse { throwable ->
+                    _errorFlow.emit(throwable)
                     UserCache.empty()
                 }
         }

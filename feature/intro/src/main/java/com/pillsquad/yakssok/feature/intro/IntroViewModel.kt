@@ -1,8 +1,6 @@
 package com.pillsquad.yakssok.feature.intro
 
 import android.app.Activity
-import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.auth.model.OAuthToken
@@ -14,7 +12,7 @@ import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostUserDevicesUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutUserInitialUseCase
-import com.pillsquad.yakssok.core.model.HttpException
+import com.pillsquad.yakssok.core.model.DomainException
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,7 +27,7 @@ import javax.inject.Inject
 sealed class IntroEvent {
     data object NavigateHome: IntroEvent()
     data object NavigateHomeThenMate: IntroEvent()
-    data class ShowToast(val message: String): IntroEvent()
+    data class ShowErrorSnackbar(val throwable: Throwable): IntroEvent()
 }
 
 @HiltViewModel
@@ -97,14 +94,8 @@ class IntroViewModel @Inject constructor(
                         _event.emit(IntroEvent.NavigateHome)
                     }
                 }.onFailure { e ->
-
                     e.printStackTrace()
-
-                    if (e is HttpException && e.code == 2001L) {
-                        showToast("토큰이 만료되었습니다. 다시 로그인해주세요.")
-                    } else {
-                        showToast("네트워크 환경을 확인해주세요.")
-                    }
+                    showErrorSnackBar(e)
 
                     _uiState.update { state -> state.copy(isLoading = false) }
                 }
@@ -116,7 +107,7 @@ class IntroViewModel @Inject constructor(
 
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null || token == null) {
-                showToast("카카오 로그인 실패")
+                showErrorSnackBar(DomainException.KakaoFailedException(error))
             } else {
                 loginUser(token.accessToken)
             }
@@ -126,7 +117,7 @@ class IntroViewModel @Inject constructor(
             kakao.loginWithKakaoTalk(activity) { token, error ->
                 if (error != null || token == null) {
                     if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                        showToast("카카오 로그인 실패")
+                        showErrorSnackBar(DomainException.KakaoFailedException(error))
                         return@loginWithKakaoTalk
                     }
                     UserApiClient.instance.loginWithKakaoAccount(activity, callback = callback)
@@ -156,26 +147,25 @@ class IntroViewModel @Inject constructor(
             if (uiState.value.isHaveToSignup) {
                 _uiState.update { it.copy(isLoading = true) }
             }
-            val result = loginUseCase(accessToken)
-            _uiState.update {
-                when {
-                    result.isSuccess && result.getOrDefault(true) -> it.copy(
-                        isLoading = true,
-                        loginSuccess = true,
-                        token = accessToken
-                    )
-
-                    result.isSuccess && !result.getOrDefault(false) -> it.copy(
-                        isLoading = false,
-                        isHaveToSignup = true,
-                        token = accessToken
-                    )
-
-                    else -> {
-                        showToast("네트워크 환경을 확인해주세요.")
-                        it.copy(isLoading = false)
+            loginUseCase(accessToken).onSuccess {  isRegistered ->
+                _uiState.update { ui ->
+                    if (isRegistered) {
+                        ui.copy(
+                            isLoading = true,
+                            loginSuccess = true,
+                            token = accessToken
+                        )
+                    } else {
+                        ui.copy(
+                            isLoading = false,
+                            isHaveToSignup = true,
+                            token = accessToken
+                        )
                     }
                 }
+            }.onFailure {  throwable ->
+                showErrorSnackBar(throwable)
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -200,9 +190,9 @@ class IntroViewModel @Inject constructor(
         }
     }
 
-    private fun showToast(message: String) {
+    private fun showErrorSnackBar(throwable: Throwable) {
         viewModelScope.launch {
-            _event.emit(IntroEvent.ShowToast(message))
+            _event.emit(IntroEvent.ShowErrorSnackbar(throwable))
         }
     }
 }
