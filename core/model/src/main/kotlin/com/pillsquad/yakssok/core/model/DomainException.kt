@@ -7,6 +7,7 @@ enum class DomainErrorCode(
     // OAuth 관련 에러
     INVALID_OAUTH_TOKEN(1000L, "토큰이 만료되었습니다."),
     UNSUPPORTED_SOCIAL_PROVIDER(1001L, "회원가입을 다시 시도해주세요."),
+    KAKAO_FAILED(1002L, "카카오 로그인에 실패했습니다."),
 
     // 인증 관련 에러
     ALREADY_REGISTERED_USER(2000L, "이미 가입된 회원입니다."),
@@ -26,6 +27,7 @@ enum class DomainErrorCode(
     MEDICATION_RECORD_NOT_FOUND(5001L, "존재하지 않는 복약 기록입니다."),
     NO_PERMISSION(5002L, "해당 작업을 수행할 권한이 없습니다."),
     NOT_TODAY_SCHEDULE(5003L, "오늘의 복약 스케줄이 아닙니다."),
+    ALREADY_END_SCHEDULE(5100L, "이미 종료된 복약 스케줄입니다."),
 
     // 이미지 관련 에러
     IMAGE_UPLOAD_FAILED(9100L, "이미지 업로드에 실패했습니다."),
@@ -56,6 +58,11 @@ sealed class DomainException(
     data class UnsupportedSocialProviderException(
         override val cause: Throwable? = null,
         override val errorCode: ErrorCode = DomainErrorCode.UNSUPPORTED_SOCIAL_PROVIDER
+    ) : DomainException(cause, errorCode)
+
+    data class KakaoFailedException(
+        override val cause: Throwable? = null,
+        override val errorCode: ErrorCode = DomainErrorCode.KAKAO_FAILED
     ) : DomainException(cause, errorCode)
 
     // 인증 관련 예외
@@ -115,6 +122,11 @@ sealed class DomainException(
     data class NotTodayScheduleException(
         override val cause: Throwable? = null,
         override val errorCode: ErrorCode = DomainErrorCode.NOT_TODAY_SCHEDULE
+    ) : DomainException(cause, errorCode)
+
+    data class AlreadyEndScheduleException(
+        override val cause: Throwable? = null,
+        override val errorCode: ErrorCode = DomainErrorCode.ALREADY_END_SCHEDULE
     ) : DomainException(cause, errorCode)
 
     // 이미지 관련 예외

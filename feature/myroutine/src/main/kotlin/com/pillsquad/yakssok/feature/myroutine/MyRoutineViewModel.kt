@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.GetMyRoutineListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutEndRoutineUseCase
+import com.pillsquad.yakssok.core.model.DomainException
 import com.pillsquad.yakssok.core.model.MedicationStatus
-import com.pillsquad.yakssok.feature.myroutine.model.PillUiModel
 import com.pillsquad.yakssok.feature.myroutine.model.RoutineUiModel
 import com.pillsquad.yakssok.feature.myroutine.model.toPillUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,10 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class MyRoutineEvent {
-    data class ShowToast(val message: String) : MyRoutineEvent()
-}
-
 @HiltViewModel
 class MyRoutineViewModel @Inject constructor(
     private val getMyRoutineListUseCase: GetMyRoutineListUseCase,
@@ -30,8 +26,8 @@ class MyRoutineViewModel @Inject constructor(
     private var _uiState = MutableStateFlow(RoutineUiModel())
     val uiState = _uiState.asStateFlow()
 
-    private var _event = MutableSharedFlow<MyRoutineEvent>()
-    val event = _event.asSharedFlow()
+    private val _errorFlow = MutableSharedFlow<Throwable>()
+    val errorFlow = _errorFlow.asSharedFlow()
 
     init {
         getMyRoutineList()
@@ -45,9 +41,7 @@ class MyRoutineViewModel @Inject constructor(
 
             if (isAlreadyEnd) {
                 updateDialogId(optional = null)
-                _event.emit(
-                    MyRoutineEvent.ShowToast("복용 완료된 루틴은 종료할 수 없습니다.")
-                )
+                _errorFlow.emit(DomainException.AlreadyEndScheduleException())
             } else {
                 updateDialogId(optional = null, routineEnd = id)
             }
@@ -75,7 +69,7 @@ class MyRoutineViewModel @Inject constructor(
                     }
                 }.onFailure {
                     it.printStackTrace()
-                    Log.e("MyRoutineViewModel", "endRoutine: $it")
+                    _errorFlow.emit(DomainException.NetworkException())
                 }
         }
     }
@@ -88,9 +82,9 @@ class MyRoutineViewModel @Inject constructor(
                         pillList = response.map { medication -> medication.toPillUiModel() }
                     )
                 }
-            }.onFailure {
-                it.printStackTrace()
-                Log.e("MyRoutineViewModel", "getMyRoutineList: $it")
+            }.onFailure { throwable ->
+                throwable.printStackTrace()
+                _errorFlow.emit(throwable)
             }
         }
     }

@@ -28,6 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.AppInfo
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
@@ -53,6 +55,7 @@ internal fun MyPageRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val showSnackbar = LocalShowErrorSnackBar.current
 
     var permissionGranted by remember { mutableStateOf(isNotificationGranted(context)) }
 
@@ -65,15 +68,7 @@ internal fun MyPageRoute(
         if (!now) viewModel.setNotificationPermission(false)
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.event.collectLatest { event ->
-            when (event) {
-                is MyPageEvent.ShowToast -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
+    CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
 
     if (isLogoutShow != null) {
         LogoutDeleteDialog(

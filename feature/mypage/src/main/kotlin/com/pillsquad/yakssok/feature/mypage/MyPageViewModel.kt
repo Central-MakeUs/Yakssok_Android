@@ -20,10 +20,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class MyPageEvent {
-    data class ShowToast(val message: String) : MyPageEvent()
-}
-
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val getMyInfoUseCase: GetMyInfoUseCase,
@@ -34,8 +30,8 @@ class MyPageViewModel @Inject constructor(
     private var _uiState = MutableStateFlow<MyPageUiState>(MyPageUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private var _event = MutableSharedFlow<MyPageEvent>()
-    val event = _event.asSharedFlow()
+    private val _errorFlow = MutableSharedFlow<Throwable>()
+    val errorFlow = _errorFlow.asSharedFlow()
 
     private val notificationGranted = MutableStateFlow<Boolean?>(null)
     fun setNotificationPermission(granted: Boolean) {
@@ -66,15 +62,19 @@ class MyPageViewModel @Inject constructor(
                             MyPageUiState.Success(state.data.copy(isAgreement = !target))
                         } else state
                     }
-                    _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                    _errorFlow.emit(e)
                     e.printStackTrace()
                 }
         }
     }
 
-    fun logoutUser() { viewModelScope.launch { logoutUserUseCase() } }
+    fun logoutUser() {
+        viewModelScope.launch { logoutUserUseCase() }
+    }
 
-    fun deleteAccount() { viewModelScope.launch { deleteAccountUseCase() } }
+    fun deleteAccount() {
+        viewModelScope.launch { deleteAccountUseCase() }
+    }
 
     private fun observeMyInfoCombined() {
         viewModelScope.launch {
@@ -90,7 +90,7 @@ class MyPageViewModel @Inject constructor(
                 }
                 .catch { e ->
                     _uiState.value = MyPageUiState.Error(e.message ?: "알 수 없는 오류")
-                    _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                    _errorFlow.emit(e)
                 }
 
             combine(
@@ -113,8 +113,8 @@ class MyPageViewModel @Inject constructor(
                     lastForcedOffKey = true
                     viewModelScope.launch {
                         postUserDevicesUseCase(false)
-                            .onFailure {
-                                _event.emit(MyPageEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                            .onFailure { throwable ->
+                                _errorFlow.emit(throwable)
                                 lastForcedOffKey = false
                             }
                     }

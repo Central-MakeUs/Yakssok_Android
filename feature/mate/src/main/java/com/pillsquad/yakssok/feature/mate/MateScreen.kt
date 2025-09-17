@@ -2,7 +2,6 @@ package com.pillsquad.yakssok.feature.mate
 
 import android.content.ClipData
 import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +38,8 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTextField
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
+import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.customInsets
 import com.pillsquad.yakssok.feature.mate.component.DashedBorderBox
 import com.pillsquad.yakssok.feature.mate.component.MateCompleteDialog
@@ -52,19 +52,14 @@ internal fun MateRoute(
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event by viewModel.event.collectAsStateWithLifecycle(initialValue = null)
-    val context = LocalContext.current
     var isComplete by remember { mutableStateOf(false) }
 
-    LaunchedEffect(event) {
-        when (event) {
-            is MateEvent.PostSuccess -> isComplete = true
-            is MateEvent.ShowToast -> {
-                Toast.makeText(context, (event as MateEvent.ShowToast).message, Toast.LENGTH_SHORT)
-                    .show()
-            }
+    val showErrorSnackbar = LocalShowErrorSnackBar.current
 
-            else -> Unit
+    CollectEvent(viewModel.event) {
+        when (it) {
+            is MateEvent.PostSuccess -> isComplete = true
+            is MateEvent.ShowErrorSnackbar -> showErrorSnackbar(it.throwable)
         }
     }
 

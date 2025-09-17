@@ -8,6 +8,7 @@ import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostImageUrlUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutImageUrlUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutMyInfoUseCase
+import com.pillsquad.yakssok.core.model.DomainException
 import com.pillsquad.yakssok.feature.profile_edit.model.ProfileEditUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +21,7 @@ import javax.inject.Inject
 
 sealed class ProfileEditEvent {
     data object CompleteEdit : ProfileEditEvent()
-    data class ShowToast(val message: String) : ProfileEditEvent()
+    data class ShowErrorSnackbar(val throwable: Throwable) : ProfileEditEvent()
 }
 
 @HiltViewModel
@@ -53,7 +54,7 @@ class ProfileEditViewModel @Inject constructor(
         viewModelScope.launch {
             val fileImageUrl = changeImageUrlUseCase(newImgUrl)
             if (fileImageUrl == null) {
-                _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
+                _event.emit(ProfileEditEvent.ShowErrorSnackbar(DomainException.ImageUploadFailedException()))
                 _uiState.update { it.copy(enabled = true) }
                 return@launch
             }
@@ -70,9 +71,8 @@ class ProfileEditViewModel @Inject constructor(
             result.onSuccess { imageUrl ->
                 _uiState.update { it.copy(imgUrl = imageUrl, enabled = enabled) }
             }.onFailure { e ->
-                Log.e("ProfileEditViewModel", "updateImgUrl: $e")
                 _uiState.update { it.copy(enabled = enabled) }
-                _event.emit(ProfileEditEvent.ShowToast("이미지 업로드에 실패했습니다."))
+                _event.emit(ProfileEditEvent.ShowErrorSnackbar(e))
             }
         }
     }
@@ -81,11 +81,9 @@ class ProfileEditViewModel @Inject constructor(
         viewModelScope.launch {
             putMyInfoUseCase(uiState.value.name, uiState.value.imgUrl)
                 .onSuccess {
-                    Log.d("ProfileEditViewModel", "completeEdit: $it")
                     _event.emit(ProfileEditEvent.CompleteEdit)
-                }.onFailure {
-                    Log.e("ProfileEditViewModel", "failure: $it")
-                    _event.emit(ProfileEditEvent.ShowToast("네트워크 환경을 확인해주세요."))
+                }.onFailure { throwable ->
+                    _event.emit(ProfileEditEvent.ShowErrorSnackbar(throwable))
                 }
         }
     }

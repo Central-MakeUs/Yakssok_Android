@@ -36,7 +36,7 @@ class CalendarViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalendarUiModel())
     val uiState = _uiState.asStateFlow()
 
-    private val _errorFlow = MutableSharedFlow<String>()
+    private val _errorFlow = MutableSharedFlow<Throwable>()
     val errorFlow = _errorFlow.asSharedFlow()
 
     private val config = CalendarConfig()
@@ -80,7 +80,7 @@ class CalendarViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateRoutineTakenUseCase(routineId)
-                .onFailure { _errorFlow.emit("네트워크 환경을 확인해주세요.") }
+                .onFailure { throwable -> _errorFlow.emit(throwable) }
         }
     }
 
@@ -99,9 +99,8 @@ class CalendarViewModel @Inject constructor(
                         loadUserRoutine(userId = friend.id, userIdx, startDate, endDate)
                     }
                 }
-                .onFailure {
-                    Log.e("CalendarViewModel", "getUserProfileList failed", it)
-                    _errorFlow.emit("네트워크 환경을 확인해주세요.")
+                .onFailure { throwable ->
+                    _errorFlow.emit(throwable)
                 }
         }
     }
@@ -141,9 +140,8 @@ class CalendarViewModel @Inject constructor(
         result.onSuccess { cache ->
             cacheManager.merge(userIdx, cache)
             updateUserListWithRoutineEmptyState(userIdx, cache)
-        }.onFailure {
-            Log.e("CalendarViewModel", "getRoutine failed for userId=$userId", it)
-            _errorFlow.emit("네트워크 환경을 확인해주세요.")
+        }.onFailure { throwable ->
+            _errorFlow.emit(throwable)
         }
     }
 

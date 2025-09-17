@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.calendar
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.util.isEmpty
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,6 +21,7 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.customInsets
@@ -40,15 +39,10 @@ internal fun CalendarRoute(
     onNavigateMyPage: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val showSnackbar = LocalShowErrorSnackBar.current
 
-    OnResumeEffect {
-        viewModel.loadUserAndRoutines()
-    }
-
-    CollectEvent(viewModel.errorFlow) {
-        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-    }
+    OnResumeEffect { viewModel.loadUserAndRoutines() }
+    CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
 
     CalendarScreen(
         uiState = uiState,
@@ -93,7 +87,7 @@ internal fun CalendarScreen(
             onNavigateMy = onNavigateMyPage
         )
 
-        LazyColumn (
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -151,12 +145,14 @@ internal fun CalendarScreen(
                         onNavigateToRoutine = onNavigateRoutine
                     )
                 } else {
-                    val isCheckBoxVisible = (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
+                    val isCheckBoxVisible =
+                        (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
 
                     DailyMedicineList(
                         modifier = modifier,
                         isCheckBoxVisible = isCheckBoxVisible,
-                        routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate) ?: emptyList(),
+                        routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
+                            ?: emptyList(),
                         onItemClick = onRoutineClick,
                         onNavigateToRoute = onNavigateRoutine
                     )
