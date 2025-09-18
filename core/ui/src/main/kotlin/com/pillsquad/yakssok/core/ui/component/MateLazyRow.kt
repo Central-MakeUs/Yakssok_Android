@@ -95,7 +95,7 @@ private fun MateItem(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             modifier = Modifier.height(21.dp),
-            text = user.relationName,
+            text = user.nickName,
             style = YakssokTheme.typography.body2,
             color = textColor
         )

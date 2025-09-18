@@ -271,18 +271,11 @@ private fun DialogInfoItem(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Column {
-            Text(
-                text = feedback.relationName,
-                style = YakssokTheme.typography.body2,
-                color = YakssokTheme.color.grey400
-            )
-            Text(
-                text = feedback.nickName,
-                style = YakssokTheme.typography.body2,
-                color = YakssokTheme.color.grey600
-            )
-        }
+        Text(
+            text = feedback.nickName,
+            style = YakssokTheme.typography.subtitle2,
+            color = YakssokTheme.color.grey600
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 

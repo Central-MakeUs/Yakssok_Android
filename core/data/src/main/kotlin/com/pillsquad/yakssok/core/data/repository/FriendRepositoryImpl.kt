@@ -1,7 +1,6 @@
 package com.pillsquad.yakssok.core.data.repository
 
 import com.pillsquad.yakssok.core.data.mapper.toFeedBackTarget
-import com.pillsquad.yakssok.core.data.mapper.toFollowUser
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUser
 import com.pillsquad.yakssok.core.domain.repository.FriendRepository
@@ -23,13 +22,7 @@ class FriendRepositoryImpl @Inject constructor(
         // Todo: Local Data와 연동
 
         return friendDataSource.getFollowingList().toResult { response ->
-            response.followingInfoResponses.map {
-                if (isHome) {
-                    it.toUser()
-                } else {
-                    it.toFollowUser()
-                }
-            }
+            response.followingInfoResponses.map { it.toUser() }
         }
     }
 
