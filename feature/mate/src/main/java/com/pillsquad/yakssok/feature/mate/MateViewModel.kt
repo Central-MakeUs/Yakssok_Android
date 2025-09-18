@@ -40,37 +40,32 @@ class MateViewModel @Inject constructor(
         viewModelScope.launch {
             getUserInfoByInviteCodeUseCase(_uiState.value.friendCode)
                 .onSuccess {
-                    _uiState.value = _uiState.value.copy(
-                        friendNickName = it.nickName,
-                        friendImageUrl = it.profileImageUrl,
-                    )
-
-                    updateCurPage(1)
-                }.onFailure { throwable ->
-                    throwable.printStackTrace()
-                    _event.emit(MateEvent.ShowErrorSnackbar(throwable))
-                }
-        }
-    }
-
-    fun postAddFriend() {
-        viewModelScope.launch {
-            postAddFriendUseCase(_uiState.value.friendCode, _uiState.value.relationName)
-                .onSuccess {
+                    _uiState.update { model ->
+                        model.copy(
+                            friendNickName = it.nickName,
+                            friendImageUrl = it.profileImageUrl,
+                        )
+                    }
                     _event.emit(MateEvent.PostSuccess)
-                }
-                .onFailure { throwable ->
-                    _event.emit(MateEvent.ShowErrorSnackbar(throwable))
-                    throwable.printStackTrace()
+                }.onFailure { e ->
+                    e.printStackTrace()
+                    _event.emit(MateEvent.ShowErrorSnackbar(e))
                 }
         }
     }
 
-    fun updateCurPage(newPage: Int) {
-        _uiState.update {
-            it.copy(curPage = newPage)
-        }
-    }
+//    fun postAddFriend() {
+//        viewModelScope.launch {
+//            postAddFriendUseCase(_uiState.value.friendCode, _uiState.value.relationName)
+//                .onSuccess {
+//                    _event.emit(MateEvent.PostSuccess)
+//                }
+//                .onFailure { throwable ->
+//                    _event.emit(MateEvent.ShowErrorSnackbar(throwable))
+//                    throwable.printStackTrace()
+//                }
+//        }
+//    }
 
     fun updateInputCode(newCode: String) {
         _uiState.update {
@@ -78,11 +73,11 @@ class MateViewModel @Inject constructor(
         }
     }
 
-    fun updateNickName(relationName: String) {
-        _uiState.update {
-            it.copy(relationName = relationName, isEnabled = validateNickName(relationName))
-        }
-    }
+//    fun updateNickName(relationName: String) {
+//        _uiState.update {
+//            it.copy(relationName = relationName, isEnabled = validateNickName(relationName))
+//        }
+//    }
 
     private fun getMyInfoWithCode() {
         viewModelScope.launch {
@@ -92,8 +87,8 @@ class MateViewModel @Inject constructor(
         }
     }
 
-    private fun validateNickName(nickName: String): Boolean {
-        val trimmed = nickName.trim()
-        return trimmed.isNotEmpty() && trimmed.length <= 5
-    }
+//    private fun validateNickName(nickName: String): Boolean {
+//        val trimmed = nickName.trim()
+//        return trimmed.isNotEmpty() && trimmed.length <= 5
+//    }
 }

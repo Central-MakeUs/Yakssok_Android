@@ -66,7 +66,6 @@ internal fun MateRoute(
     if (isComplete) {
         MateCompleteDialog(
             nickName = uiState.friendNickName,
-            relationName = uiState.relationName,
             imgUrl = uiState.friendImageUrl,
             onNavigateBack = {
                 isComplete = false
@@ -75,24 +74,12 @@ internal fun MateRoute(
         )
     }
 
-    when (uiState.curPage) {
-        0 -> MateScreen(
-            uiState = uiState,
-            updateInputCode = viewModel::updateInputCode,
-            onNavigateBack = onNavigateBack,
-            onNavigatePlus = { viewModel.getFriendInfo() }
-        )
-
-        1 -> PlusMateScreen(
-            nickName = uiState.friendNickName,
-            relationName = uiState.relationName,
-            profileImageUrl = uiState.friendImageUrl,
-            enabled = uiState.isEnabled,
-            onValueChange = viewModel::updateNickName,
-            onNavigateBack = { viewModel.updateCurPage(0) },
-            onNavigateHome = { viewModel.postAddFriend() }
-        )
-    }
+    MateScreen(
+        uiState = uiState,
+        updateInputCode = viewModel::updateInputCode,
+        onNavigateBack = onNavigateBack,
+        onNavigatePlus = { viewModel.getFriendInfo() }
+    )
 }
 
 @Composable
