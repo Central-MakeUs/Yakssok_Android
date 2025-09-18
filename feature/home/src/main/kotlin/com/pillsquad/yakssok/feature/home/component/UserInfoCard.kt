@@ -47,35 +47,26 @@ internal fun UserInfoCard(
             )
             .clip(RoundedCornerShape(16.dp))
             .background(YakssokTheme.color.grey50)
-            .padding(16.dp)
-
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            YakssokImage(
-                flag = feedback.userId,
-                modifier = Modifier.size(52.dp),
-                imageUrl = feedback.profileImageUrl,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(
-                    text = feedback.relationName,
-                    style = YakssokTheme.typography.body2,
-                    color = YakssokTheme.color.grey400
-                )
-                Text(
-                    text = feedback.nickName,
-                    style = YakssokTheme.typography.body2,
-                    color = YakssokTheme.color.grey600
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
+        YakssokImage(
+            flag = feedback.userId,
+            modifier = Modifier.size(52.dp),
+            imageUrl = feedback.profileImageUrl,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = feedback.nickName,
+            style = YakssokTheme.typography.subtitle2,
+            color = YakssokTheme.color.grey600
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Row(
-            modifier = Modifier.padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isNagging) {
@@ -88,17 +79,19 @@ internal fun UserInfoCard(
                             append("${feedback.routineCount}개")
                         }
                     },
-                    style = YakssokTheme.typography.subtitle2,
+                    style = YakssokTheme.typography.body2,
                 )
             } else {
                 Text(
                     text = "다먹었어요!",
-                    style = YakssokTheme.typography.subtitle2,
+                    style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey500
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(21.dp),
                     painter = painterResource(R.drawable.img_alleat),
                     contentDescription = "congratuation",
                     tint = Color.Unspecified
@@ -106,7 +99,8 @@ internal fun UserInfoCard(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+
         if (isNagging) {
             YakssokButton(
                 modifier = Modifier.height(40.dp),

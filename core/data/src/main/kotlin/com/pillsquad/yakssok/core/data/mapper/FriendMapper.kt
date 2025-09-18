@@ -14,15 +14,6 @@ internal fun FollowingInfoResponse.toUser(): User =
     User(
         id = userId,
         nickName = nickName,
-        relationName = relationName,
-        profileImage = profileImageUrl ?: ""
-    )
-
-internal fun FollowingInfoResponse.toFollowUser(): User =
-    User(
-        id = userId,
-        nickName = nickName,
-        relationName = nickName,
         profileImage = profileImageUrl ?: ""
     )
 
@@ -30,7 +21,6 @@ internal fun FollowerInfoResponse.toUser(): User =
     User(
         id = userId,
         nickName = nickName,
-        relationName = nickName,
         profileImage = profileImageUrl ?: ""
     )
 
@@ -40,7 +30,6 @@ internal fun FeedbackTargetResponse.toFeedBackTarget(): FeedbackTarget {
     return FeedbackTarget(
         userId = userId,
         nickName = nickName,
-        relationName = relationName,
         profileImageUrl = profileImageUrl ?: "",
         feedbackType = type,
         routineCount = medicationCount,

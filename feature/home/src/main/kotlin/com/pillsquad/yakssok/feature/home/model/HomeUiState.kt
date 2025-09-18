@@ -17,7 +17,6 @@ sealed interface HomeUiState {
             User(
                 id = 0,
                 nickName = "나",
-                relationName = "나",
                 profileImage = ""
             )
         ),

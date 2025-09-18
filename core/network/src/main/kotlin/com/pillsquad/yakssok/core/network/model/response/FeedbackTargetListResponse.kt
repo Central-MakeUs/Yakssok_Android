@@ -16,7 +16,7 @@ data class FeedbackTargetListResponse(
 data class FeedbackTargetResponse(
     val userId: Int,
     val nickName: String,
-    val relationName: String,
+    val relationName: String?,
     val profileImageUrl: String?,
     val feedbackType: String,
     val medicationCount: Int,

@@ -45,7 +45,6 @@ class UserRepositoryImpl @Inject constructor(
         return User(
             id = 0,
             nickName = name,
-            relationName = "나",
             profileImage = image
         )
     }
