@@ -23,7 +23,6 @@ import com.pillsquad.yakssok.feature.mate.R
 @Composable
 internal fun MateCompleteDialog(
     nickName: String,
-    relationName: String,
     imgUrl: String,
     onNavigateBack: () -> Unit
 ) {
@@ -49,7 +48,6 @@ internal fun MateCompleteDialog(
         },
         content = {
             Row(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 YakssokImage(
@@ -61,22 +59,9 @@ internal fun MateCompleteDialog(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = YakssokTheme.typography.body2.toSpanStyle()
-                                .copy(YakssokTheme.color.grey400)
-                        ) {
-                            append("${relationName}\n")
-                        }
-                        withStyle(
-                            style = YakssokTheme.typography.body2.toSpanStyle()
-                                .copy(YakssokTheme.color.grey600)
-                        ) {
-                            append(nickName)
-                        }
-                    },
-                    textAlign = TextAlign.Center,
-                    color = YakssokTheme.color.grey950,
+                    text = nickName,
+                    style = YakssokTheme.typography.subtitle2,
+                    color = YakssokTheme.color.grey600
                 )
             }
         },
