@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="kakao">카카오로 계속하기</string>
-    <string name="signup_title_header">약쏙에서 사용할\n</string>
+    <string name="signup_title_header">약을 먹어야할 때,\n</string>
     <string name="signup_title_body">닉네임</string>
-    <string name="signup_title_tail">을 작성해보아요!</string>
+    <string name="signup_title_tail">으로 불러드릴게요.</string>
     <string name="signup_hint">닉네임</string>
     <string name="signup">시작하기</string>
 </resources>
