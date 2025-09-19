@@ -49,7 +49,6 @@ fun MateLazyRow(
             val user = userList[idx]
 
             MateItem(
-                id = user.id,
                 user = user,
                 imgSize = imgSize,
                 onMateClick = { onMateClick(idx) },
@@ -73,12 +72,11 @@ fun MateLazyRow(
 }
 
 @Composable
-private fun MateItem(
-    id: Int,
+fun MateItem(
     user: User,
     imgSize: Int = 52,
-    onMateClick: () -> Unit,
-    isClicked: Boolean
+    onMateClick: () -> Unit = {},
+    isClicked: Boolean = false
 ) {
     val textColor = if (isClicked) YakssokTheme.color.primary500 else YakssokTheme.color.grey600
 
@@ -87,7 +85,7 @@ private fun MateItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         YakssokImage(
-            flag = id,
+            flag = user.id,
             modifier = Modifier.size(imgSize.dp),
             imageUrl = user.profileImage,
             isStroke = isClicked
