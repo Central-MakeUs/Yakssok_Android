@@ -192,7 +192,7 @@ private fun CodeContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "내 코드 알려주고,\n팔로우 요청해보세요!",
+            text = "상대방 코드를 입력하고,\n메이트 맺어보세요!",
             textAlign = TextAlign.Center,
             style = YakssokTheme.typography.body1,
             color = YakssokTheme.color.grey950

@@ -16,11 +16,7 @@ class FriendRepositoryImpl @Inject constructor(
     private val friendDataSource: FriendDataSource,
     private val userLocalDataSource: UserLocalDataSource
 ) : FriendRepository {
-    override suspend fun getFollowingList(
-        isHome: Boolean,
-    ): Result<List<User>> {
-        // Todo: Local Data와 연동
-
+    override suspend fun getFollowingList(): Result<List<User>> {
         return friendDataSource.getFollowingList().toResult { response ->
             response.followingInfoResponses.map { it.toUser() }
         }
