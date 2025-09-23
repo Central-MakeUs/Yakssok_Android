@@ -5,12 +5,10 @@ import com.pillsquad.yakssok.core.network.model.request.MyInfoRequest
 import com.pillsquad.yakssok.core.network.model.request.UserInitialRequest
 import com.pillsquad.yakssok.core.network.model.response.InviteCodeResponse
 import com.pillsquad.yakssok.core.network.model.response.MyInfoResponse
-import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PUT
-import retrofit2.http.Query
 
 interface UserApi {
     @GET("/api/users/me")
@@ -29,11 +27,6 @@ interface UserApi {
     suspend fun putUserInitial(
         @Body params: UserInitialRequest
     ): ApiResponse<Unit>
-
-    @GET("/api/users")
-    suspend fun getUserInfoByInviteCode(
-        @Query("inviteCode") inviteCode: String
-    ): ApiResponse<UserInfoResponse>
 
     @DELETE("/api/users")
     suspend fun deleteUser(): ApiResponse<Unit>

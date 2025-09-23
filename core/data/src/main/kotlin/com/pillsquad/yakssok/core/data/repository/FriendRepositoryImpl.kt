@@ -3,9 +3,11 @@ package com.pillsquad.yakssok.core.data.repository
 import com.pillsquad.yakssok.core.data.mapper.toFeedBackTarget
 import com.pillsquad.yakssok.core.data.mapper.toResult
 import com.pillsquad.yakssok.core.data.mapper.toUser
+import com.pillsquad.yakssok.core.data.mapper.toUserInfo
 import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.User
+import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.datasource.FriendDataSource
 import com.pillsquad.yakssok.core.network.model.request.FollowRequest
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
@@ -34,22 +36,10 @@ class FriendRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun postAddFriend(
-        inviteCode: String,
-        relationName: String
-    ): Result<Unit> {
-        val params = FollowRequest(
-            inviteCode = inviteCode,
-            relationName = relationName
-        )
+    override suspend fun postAddFriend(inviteCode: String): Result<UserInfo> {
+        val params = FollowRequest(inviteCode = inviteCode)
+        val result = friendDataSource.postAddFriend(params).toResult { it.toUserInfo() }
 
-        val result = friendDataSource.postAddFriend(params).toResult()
-
-        result.onSuccess {
-            val currentCount = userLocalDataSource.mateCountFlow.firstOrNull() ?: 0
-            userLocalDataSource.saveMateCount(currentCount + 1)
-        }
-
-        return result
+        return result.onSuccess { userLocalDataSource.incrementMateCount() }
     }
 }

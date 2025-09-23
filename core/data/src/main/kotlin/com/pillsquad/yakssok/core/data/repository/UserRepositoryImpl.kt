@@ -2,11 +2,9 @@ package com.pillsquad.yakssok.core.data.repository
 
 import android.util.Log
 import com.pillsquad.yakssok.core.data.mapper.toResult
-import com.pillsquad.yakssok.core.data.mapper.toUserInfo
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.model.MyInfo
 import com.pillsquad.yakssok.core.model.User
-import com.pillsquad.yakssok.core.model.UserInfo
 import com.pillsquad.yakssok.core.network.datasource.UserDataSource
 import com.pillsquad.yakssok.core.network.model.request.MyInfoRequest
 import com.pillsquad.yakssok.core.network.model.request.UserInitialRequest
@@ -105,12 +103,6 @@ class UserRepositoryImpl @Inject constructor(
                 }
             )
         }
-    }
-
-    override suspend fun getUserInfoByInviteCode(inviteCode: String): Result<UserInfo> {
-        return userRetrofitDataSource.getUserInfoByInviteCode(inviteCode).toResult(
-            transform = { it.toUserInfo() }
-        )
     }
 
     override suspend fun getMyInfo(): Flow<MyInfo> {

@@ -55,10 +55,6 @@ class UserLocalDataSource @Inject constructor(
         userPreferences.saveMedicationCount(count)
     }
 
-    suspend fun saveMateCount(count: Int) {
-        userPreferences.saveMateCount(count)
-    }
-
     suspend fun saveDeviceId(deviceId: String) {
         userPreferences.saveDeviceId(deviceId)
     }
@@ -85,6 +81,10 @@ class UserLocalDataSource @Inject constructor(
 
     suspend fun saveInviteCode(inviteCode: String) {
         userPreferences.saveInviteCode(inviteCode)
+    }
+
+    suspend fun incrementMateCount() {
+        userPreferences.incrementMateCount()
     }
 
     suspend fun clearTokens() {

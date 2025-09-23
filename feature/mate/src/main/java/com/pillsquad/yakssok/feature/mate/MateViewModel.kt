@@ -3,7 +3,6 @@ package com.pillsquad.yakssok.feature.mate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.domain.usecase.GetMyInfoWithInviteCodeUseCase
-import com.pillsquad.yakssok.core.domain.usecase.GetUserInfoByInviteCodeUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostAddFriendUseCase
 import com.pillsquad.yakssok.feature.mate.model.MateUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +22,6 @@ sealed class MateEvent {
 @HiltViewModel
 class MateViewModel @Inject constructor(
     private val getMyInfoWithInviteCodeUseCase: GetMyInfoWithInviteCodeUseCase,
-    private val getUserInfoByInviteCodeUseCase: GetUserInfoByInviteCodeUseCase,
     private val postAddFriendUseCase: PostAddFriendUseCase
 ) : ViewModel() {
     private var _uiState = MutableStateFlow(MateUiModel())
@@ -36,9 +34,9 @@ class MateViewModel @Inject constructor(
         getMyInfoWithCode()
     }
 
-    fun getFriendInfo() {
+    fun postFriend() {
         viewModelScope.launch {
-            getUserInfoByInviteCodeUseCase(_uiState.value.friendCode)
+            postAddFriendUseCase(_uiState.value.friendCode)
                 .onSuccess {
                     _uiState.update { model ->
                         model.copy(
@@ -54,30 +52,11 @@ class MateViewModel @Inject constructor(
         }
     }
 
-//    fun postAddFriend() {
-//        viewModelScope.launch {
-//            postAddFriendUseCase(_uiState.value.friendCode, _uiState.value.relationName)
-//                .onSuccess {
-//                    _event.emit(MateEvent.PostSuccess)
-//                }
-//                .onFailure { throwable ->
-//                    _event.emit(MateEvent.ShowErrorSnackbar(throwable))
-//                    throwable.printStackTrace()
-//                }
-//        }
-//    }
-
     fun updateInputCode(newCode: String) {
         _uiState.update {
             it.copy(friendCode = newCode)
         }
     }
-
-//    fun updateNickName(relationName: String) {
-//        _uiState.update {
-//            it.copy(relationName = relationName, isEnabled = validateNickName(relationName))
-//        }
-//    }
 
     private fun getMyInfoWithCode() {
         viewModelScope.launch {
@@ -86,9 +65,4 @@ class MateViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(myCode = code, myName = name)
         }
     }
-
-//    private fun validateNickName(nickName: String): Boolean {
-//        val trimmed = nickName.trim()
-//        return trimmed.isNotEmpty() && trimmed.length <= 5
-//    }
 }

@@ -5,11 +5,12 @@ import com.pillsquad.yakssok.core.network.model.request.FollowRequest
 import com.pillsquad.yakssok.core.network.model.response.FeedbackTargetListResponse
 import com.pillsquad.yakssok.core.network.model.response.FollowerResponse
 import com.pillsquad.yakssok.core.network.model.response.FollowingsResponse
+import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
 
 interface FriendDataSource {
 
     suspend fun getFollowingList(): ApiResponse<FollowingsResponse>
     suspend fun getFollowerList(): ApiResponse<FollowerResponse>
     suspend fun getFeedbackTargetList(): ApiResponse<FeedbackTargetListResponse>
-    suspend fun postAddFriend(params: FollowRequest): ApiResponse<Unit>
+    suspend fun postAddFriend(params: FollowRequest): ApiResponse<UserInfoResponse>
 }

@@ -5,6 +5,7 @@ import com.pillsquad.yakssok.core.network.model.request.FollowRequest
 import com.pillsquad.yakssok.core.network.model.response.FeedbackTargetListResponse
 import com.pillsquad.yakssok.core.network.model.response.FollowerResponse
 import com.pillsquad.yakssok.core.network.model.response.FollowingsResponse
+import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -20,8 +21,8 @@ interface FriendApi {
     @GET("/api/friends/medication-status")
     suspend fun getFeedbackTargetList(): ApiResponse<FeedbackTargetListResponse>
 
-    @POST("/api/friends")
+    @POST("/api/v2/friends")
     suspend fun postAddFriend(
         @Body params: FollowRequest
-    ): ApiResponse<Unit>
+    ): ApiResponse<UserInfoResponse>
 }

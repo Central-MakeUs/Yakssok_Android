@@ -6,6 +6,5 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class FollowRequest(
-    val inviteCode: String,
-    val relationName: String
+    val inviteCode: String
 )
