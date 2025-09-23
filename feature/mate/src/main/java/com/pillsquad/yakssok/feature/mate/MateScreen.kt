@@ -78,7 +78,7 @@ internal fun MateRoute(
         uiState = uiState,
         updateInputCode = viewModel::updateInputCode,
         onNavigateBack = onNavigateBack,
-        onNavigatePlus = { viewModel.getFriendInfo() }
+        onNavigatePlus = { viewModel.postFriend() }
     )
 }
 
@@ -141,9 +141,7 @@ private fun MateScreen(
 }
 
 @Composable
-private fun IconBox(
-
-) {
+private fun IconBox() {
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -5,7 +5,6 @@ import com.pillsquad.yakssok.core.network.model.request.MyInfoRequest
 import com.pillsquad.yakssok.core.network.model.request.UserInitialRequest
 import com.pillsquad.yakssok.core.network.model.response.InviteCodeResponse
 import com.pillsquad.yakssok.core.network.model.response.MyInfoResponse
-import com.pillsquad.yakssok.core.network.model.response.UserInfoResponse
 
 interface UserDataSource {
 
@@ -13,6 +12,5 @@ interface UserDataSource {
     suspend fun putMyInfo(params: MyInfoRequest): ApiResponse<Unit>
     suspend fun putUserInitial(params: UserInitialRequest): ApiResponse<Unit>
     suspend fun getMyInviteCode(): ApiResponse<InviteCodeResponse>
-    suspend fun getUserInfoByInviteCode(inviteCode: String): ApiResponse<UserInfoResponse>
     suspend fun deleteUser(): ApiResponse<Unit>
 }

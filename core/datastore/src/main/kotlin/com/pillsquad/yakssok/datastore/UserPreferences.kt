@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.pillsquad.yakssok.datastore.di.UserPreferences
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -111,8 +112,13 @@ class UserPreferences @Inject constructor(
         dataStore.edit { it[MEDICATION_COUNT] = count }
     }
 
-    suspend fun saveMateCount(count: Int) {
-        dataStore.edit { it[MATE_COUNT] = count }
+    suspend fun incrementMateCount(count: Int = 1) {
+        require(count != 0) { "delta must not be zero" }
+        dataStore.edit { prefs ->
+            val current = prefs[MATE_COUNT] ?: 0
+            val next = (current + count).coerceAtLeast(0) // 음수 방지
+            prefs[MATE_COUNT] = next
+        }
     }
 
     suspend fun saveDeviceId(deviceId: String) {
