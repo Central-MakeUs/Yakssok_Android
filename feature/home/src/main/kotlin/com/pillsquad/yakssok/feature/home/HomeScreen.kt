@@ -110,7 +110,22 @@ internal fun HomeRoute(
 
     when (val state = uiState) {
         HomeUiState.Loading -> {
-            // 스켈레톤 UI가 짱인데..
+            PullToRefreshColumn(
+                refreshState = refreshState,
+                isRefreshing = isRefreshing,
+                scaleFraction = scaleFraction,
+                onRefresh = onRefresh,
+                topBar = {
+                    YakssokTopAppBar(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        isLogo = true,
+                        onNavigateAlert = onNavigateAlert,
+                        onNavigateMy = onNavigateMyPage
+                    )
+                }
+            ) {
+                HomeSkeleton(showFeedbackSection = true)
+            }
         }
 
         is HomeUiState.Success -> {
@@ -139,9 +154,7 @@ internal fun HomeRoute(
                 onClickUser = viewModel::onMateClick,
                 onSelectDate = viewModel::onSelectedDate,
                 onClickRoutine = viewModel::onRoutineClick,
-                onClickFeedback = {
-                    feedbackTarget = it
-                },
+                onClickFeedback = { feedbackTarget = it },
                 onNavigateMy = onNavigateMyPage,
                 onNavigateMate = onNavigateMate,
                 onNavigateAlert = onNavigateAlert,
@@ -204,9 +217,7 @@ private fun HomeScreen(
                 LazyRow(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    item {
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
+                    item { Spacer(modifier = Modifier.width(16.dp)) }
 
                     items(feedbackTargetList.size) { index ->
                         val feedbackTarget = feedbackTargetList[index]
