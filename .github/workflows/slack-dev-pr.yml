@@ -1,0 +1,21 @@
+name: Notify Slack for dev branch PRs
+
+on:
+  pull_request:
+    branches:
+      - dev
+    types: [opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send notification to Slack
+        run: |
+          payload=$(jq -n --arg user "${{ github.event.pull_request.user.login }}" \
+                         --arg userUrl "${{ github.event.pull_request.user.html_url }}" \
+                         --arg title "${{ github.event.pull_request.title }}" \
+                         --arg url "${{ github.event.pull_request.html_url }}" \
+                         '{text: "Pull request opened by <\($userUrl)|\($user)>\n> *Title:* <\($url)|\($title)>\n> *URL:* <\($url)>"}')
+          curl -X POST -H 'Content-type: application/json' --data "$payload" ${{ secrets.SLACK_WEBHOOK_URL }}
