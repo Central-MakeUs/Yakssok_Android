@@ -17,7 +17,8 @@ class YakssokApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        AppInfo.APP_VERSION = BuildConfig.VERSION_NAME
+        AppInfo.VERSION_NAME = BuildConfig.VERSION_NAME
+        AppInfo.VERSION_CODE = BuildConfig.VERSION_CODE
 
         KakaoSdk.init(this, BuildConfig.KAKAO_API_KEY)
         FirebaseApp.initializeApp(this)

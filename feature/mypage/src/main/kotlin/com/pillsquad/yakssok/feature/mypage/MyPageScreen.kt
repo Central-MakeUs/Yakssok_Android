@@ -1,7 +1,5 @@
 package com.pillsquad.yakssok.feature.mypage
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +38,6 @@ import com.pillsquad.yakssok.feature.mypage.component.PillMateRow
 import com.pillsquad.yakssok.feature.mypage.component.ProfileEditButton
 import com.pillsquad.yakssok.feature.mypage.component.ProfileRow
 import com.pillsquad.yakssok.feature.mypage.model.MyPageUiState
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 internal fun MyPageRoute(
@@ -99,7 +95,7 @@ internal fun MyPageRoute(
 
     MyPageScreen(
         uiState = uiState,
-        appVersion = AppInfo.APP_VERSION,
+        appVersion = AppInfo.VERSION_NAME,
         notificationPermissionGranted = permissionGranted,
         onNavigateBack = onNavigateBack,
         onNavigateProfileEdit = onNavigateProfileEdit,

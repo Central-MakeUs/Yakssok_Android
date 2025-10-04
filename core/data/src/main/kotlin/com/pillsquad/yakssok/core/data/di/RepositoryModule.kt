@@ -12,6 +12,7 @@ import com.pillsquad.yakssok.core.data.repository.SoundRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserDevicesRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserPreferencesRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.UserRepositoryImpl
+import com.pillsquad.yakssok.core.data.repository.VersionRepositoryImpl
 import com.pillsquad.yakssok.core.data.repository.WidgetRepositoryImpl
 import com.pillsquad.yakssok.core.domain.repository.AuthRepository
 import com.pillsquad.yakssok.core.domain.repository.FeedbackRepository
@@ -24,6 +25,7 @@ import com.pillsquad.yakssok.core.domain.repository.SoundRepository
 import com.pillsquad.yakssok.core.domain.repository.UserDevicesRepository
 import com.pillsquad.yakssok.core.domain.repository.UserPreferencesRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
+import com.pillsquad.yakssok.core.domain.repository.VersionRepository
 import com.pillsquad.yakssok.core.domain.repository.WidgetRepository
 import com.pillsquad.yakssok.core.network.datasource.ImageDataSource
 import com.pillsquad.yakssok.core.network.datasource.UserDevicesDataSource
@@ -95,6 +97,11 @@ abstract class RepositoryModule {
     abstract fun bindWidgetRepository(
         widgetRepository: WidgetRepositoryImpl
     ): WidgetRepository
+
+    @Binds @Singleton
+    abstract fun bindVersionRepository(
+        versionRepository: VersionRepositoryImpl
+    ): VersionRepository
 
     companion object {
         @Provides
