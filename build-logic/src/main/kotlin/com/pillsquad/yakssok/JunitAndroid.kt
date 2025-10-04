@@ -9,5 +9,7 @@ internal fun Project.configureJUnitAndroid() {
     dependencies {
         add("implementation", libs.findLibrary("junit4").get())
         add("androidTestImplementation", libs.findLibrary("androidx.test.ext").get())
+
+        add("testImplementation", libs.findLibrary("mockk.core").get())
     }
 }
