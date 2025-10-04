@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.google.play.service)
     implementation(libs.coroutines.play.services)
+    implementation(libs.firebase.config)
 }

@@ -90,6 +90,7 @@ firebaseCrashlyticsPlugin = "3.0.5"
 firebaseBom = "34.0.0"
 firebaseCrashlytics = "20.0.0"
 workRuntimeKtx = "2.10.3"
+firebaseConfigKtx = "23.0.1"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -102,6 +103,7 @@ google-play-service = { module = "com.google.android.gms:play-services-appset", 
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
 
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
