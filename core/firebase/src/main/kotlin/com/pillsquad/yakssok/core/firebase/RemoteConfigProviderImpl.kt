@@ -9,12 +9,12 @@ class RemoteConfigProviderImpl @Inject constructor (
     private val remoteConfig: FirebaseRemoteConfig
 ) : RemoteConfigProvider {
 
-    override suspend fun getMinSupportedVersion(): Result<VersionModel> = runCatching {
+    override suspend fun getRemoteVersion(): Result<VersionModel> = runCatching {
         remoteConfig.fetchAndActivate().await()
 
         VersionModel(
-            minSupportedVersion = remoteConfig.getString(MIN_SUPPORTED_VERSION_KEY),
-            recommendedVersion = remoteConfig.getString(RECOMMENDED_VERSION_KEY)
+            minSupportedVersion = remoteConfig.getLong(MIN_SUPPORTED_VERSION_KEY).toInt(),
+            recommendedVersion = remoteConfig.getLong(RECOMMENDED_VERSION_KEY).toInt()
         )
     }
 
