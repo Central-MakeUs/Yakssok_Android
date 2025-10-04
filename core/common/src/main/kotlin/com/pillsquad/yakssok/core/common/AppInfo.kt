@@ -1,5 +1,6 @@
 package com.pillsquad.yakssok.core.common
 
 object AppInfo {
-    var APP_VERSION = "unknown"
+    var VERSION_NAME = "unknown"
+    var VERSION_CODE = 1
 }
