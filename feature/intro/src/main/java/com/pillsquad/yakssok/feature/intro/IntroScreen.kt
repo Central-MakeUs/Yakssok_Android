@@ -40,12 +40,13 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
+import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
 import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
+import com.pillsquad.yakssok.core.ui.ext.openPlayStore
 import com.pillsquad.yakssok.feature.intro.component.UpdateDialog
-import com.pillsquad.yakssok.feature.intro.util.openPlayStore
 import com.pillsquad.yakssok.feature.intro.util.startUpdate
 
 @Composable
@@ -56,7 +57,7 @@ internal fun IntroRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var isTestDialogShow by remember { mutableStateOf(false) }
+    var showTestDialogShow by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val context = LocalContext.current
@@ -82,6 +83,8 @@ internal fun IntroRoute(
             viewModel.postPushAgreement(true)
         }
     }
+
+    OnResumeEffect { viewModel.checkAppUpdate() }
 
     BackHandler {
         if (uiState.isHaveToSignup && !uiState.isLoading) {
@@ -161,11 +164,11 @@ internal fun IntroRoute(
         )
     }
 
-    if (isTestDialogShow) {
+    if (showTestDialogShow) {
         TestAccountDialog(
-            onDismiss = { isTestDialogShow = false },
+            onDismiss = { showTestDialogShow = false },
             onConfirm = {
-                isTestDialogShow = false
+                showTestDialogShow = false
                 viewModel.testLoginUser()
             }
         )
@@ -218,7 +221,7 @@ internal fun IntroRoute(
         else -> {
             LoginScreen(
                 onClick = { viewModel.handleSignIn(activity) },
-                onLongClick = { isTestDialogShow = true }
+                onLongClick = { showTestDialogShow = true }
             )
         }
     }
