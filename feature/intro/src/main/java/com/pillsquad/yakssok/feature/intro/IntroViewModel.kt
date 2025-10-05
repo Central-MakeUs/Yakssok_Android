@@ -7,12 +7,14 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.pillsquad.yakssok.core.domain.usecase.TestLoginUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetAppUpdateStatusUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostUserDevicesUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutUserInitialUseCase
+import com.pillsquad.yakssok.core.domain.usecase.TestLoginUseCase
 import com.pillsquad.yakssok.core.model.DomainException
+import com.pillsquad.yakssok.core.model.UpdateType
 import com.pillsquad.yakssok.feature.intro.model.IntroUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -28,6 +30,10 @@ sealed class IntroEvent {
     data object NavigateHome: IntroEvent()
     data object NavigateHomeThenMate: IntroEvent()
     data class ShowErrorSnackbar(val throwable: Throwable): IntroEvent()
+    data object ShowForceUpdate: IntroEvent()
+    data object ShowSoftUpdate: IntroEvent()
+    data object ShowNetworkDialog: IntroEvent()
+    data object ShowErrorDialog: IntroEvent()
 }
 
 @HiltViewModel
@@ -36,7 +42,8 @@ class IntroViewModel @Inject constructor(
     private val testLoginUseCase: TestLoginUseCase,
     private val getTokenFlowUseCase: GetTokenFlowUseCase,
     private val putUserInitialUseCase: PutUserInitialUseCase,
-    private val postUserDevicesUseCase: PostUserDevicesUseCase
+    private val postUserDevicesUseCase: PostUserDevicesUseCase,
+    private val getAppUpdateStatusUseCase: GetAppUpdateStatusUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
@@ -45,12 +52,37 @@ class IntroViewModel @Inject constructor(
     val event = _event.asSharedFlow()
 
     private var launchFromOneLink: Boolean = false
+    init { checkAppUpdate() }
+
     fun markLaunchedFromOneLink(fromOneLink: Boolean) {
         launchFromOneLink = fromOneLink
     }
 
-    init {
-        checkToken()
+    fun checkAppUpdate() {
+        viewModelScope.launch {
+            when (getAppUpdateStatusUseCase()) {
+                UpdateType.NONE -> checkToken()
+                UpdateType.SOFT -> _event.emit(IntroEvent.ShowSoftUpdate)
+                UpdateType.FORCE -> _event.emit(IntroEvent.ShowForceUpdate)
+                UpdateType.NETWORK -> _event.emit(IntroEvent.ShowNetworkDialog)
+                UpdateType.ERROR -> _event.emit(IntroEvent.ShowErrorDialog)
+            }
+        }
+    }
+
+    fun checkToken() {
+        viewModelScope.launch {
+            delay(1000)
+
+            getTokenFlowUseCase().onSuccess {  valid ->
+                _uiState.update {
+                    if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
+                    else it.copy(isLoading = false)
+                }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
     }
 
     fun deleteLoginInfo() {
@@ -173,21 +205,6 @@ class IntroViewModel @Inject constructor(
     private fun validateNickName(nickName: String): Boolean {
         val trimmed = nickName.trim()
         return trimmed.isNotEmpty() && trimmed.length <= 5
-    }
-
-    private fun checkToken() {
-        viewModelScope.launch {
-            delay(1000)
-
-            getTokenFlowUseCase().onSuccess {  valid ->
-                _uiState.update {
-                    if (valid) it.copy(isLoading = true, loginSuccess = true, token = "token")
-                    else it.copy(isLoading = false)
-                }
-            }.onFailure {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
     }
 
     private fun showErrorSnackBar(throwable: Throwable) {
