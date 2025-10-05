@@ -44,6 +44,9 @@ import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
 import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
+import com.pillsquad.yakssok.feature.intro.component.UpdateDialog
+import com.pillsquad.yakssok.feature.intro.util.openPlayStore
+import com.pillsquad.yakssok.feature.intro.util.startUpdate
 
 @Composable
 internal fun IntroRoute(
@@ -62,6 +65,7 @@ internal fun IntroRoute(
 
     var showSetting by remember { mutableStateOf(false) }
     var pendingCheck by remember { mutableStateOf(false) }
+    var showUpdateDialog by remember { mutableStateOf<Int?>(null) }
 
     var permissionRequested by rememberSaveable { mutableStateOf(false) }
 
@@ -94,8 +98,11 @@ internal fun IntroRoute(
                 onNavigateHome()
                 onNavigateMate()
             }
-
             is IntroEvent.ShowErrorSnackbar -> showErrorSnackBar(it.throwable)
+            IntroEvent.ShowSoftUpdate -> startUpdate(activity, 0) { showUpdateDialog = 0 }
+            IntroEvent.ShowForceUpdate -> startUpdate(activity, 1) { showUpdateDialog = 1 }
+            IntroEvent.ShowNetworkDialog -> showUpdateDialog = 2
+            IntroEvent.ShowErrorDialog -> showUpdateDialog = 3
         }
     }
 
@@ -160,6 +167,26 @@ internal fun IntroRoute(
             onConfirm = {
                 isTestDialogShow = false
                 viewModel.testLoginUser()
+            }
+        )
+    }
+
+    showUpdateDialog?.let { type ->
+        UpdateDialog(
+            type = type,
+            onConfirm = {
+                if (type == 0 || type == 1) {
+                    openPlayStore(activity)
+                } else {
+                    activity.finish()
+                }
+            },
+            onDismiss = {
+                if (type == 0) {
+                    showUpdateDialog = null
+                } else {
+                    activity.finish()
+                }
             }
         )
     }

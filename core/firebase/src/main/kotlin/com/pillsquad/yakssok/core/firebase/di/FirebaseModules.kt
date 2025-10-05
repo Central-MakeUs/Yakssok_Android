@@ -40,12 +40,6 @@ abstract class FirebaseModules {
             }
             remoteConfig.setConfigSettingsAsync(configSettings)
 
-            val defaults = mapOf(
-                "min_supported_version" to "1.0.0",
-                "recommended_version" to "1.0.0"
-            )
-            remoteConfig.setDefaultsAsync(defaults)
-
             return remoteConfig
         }
     }

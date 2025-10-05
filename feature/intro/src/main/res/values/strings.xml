@@ -6,4 +6,9 @@
     <string name="signup_title_tail">으로 불러드릴게요.</string>
     <string name="signup_hint">닉네임</string>
     <string name="signup">시작하기</string>
+
+    <string name="immediate_update">최신 버전으로 업데이트해야 서비스를 이용할 수 있습니다.\n지금바로 업데이트해 주세요.</string>
+    <string name="flexible_update">최신 버전이 출시되었습니다.\n업데이트하시겠습니까?</string>
+    <string name="network_error">네트워크가 안정적이지 않습니다.\n네트워크를 연결해주세요.</string>
+    <string name="other_error">버전 정보를 읽어올 수 없습니다.\n다시 시도해주세요.</string>
 </resources>

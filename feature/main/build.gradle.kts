@@ -8,8 +8,6 @@ setNamespace("feature.main")
 
 dependencies {
     implementation(libs.kotlinx.immutable)
-    implementation(libs.app.update)
-    implementation(libs.app.update.ktx)
 
     implementation(projects.feature.home)
     implementation(projects.feature.intro)
