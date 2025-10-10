@@ -5,7 +5,7 @@ on:
     branches:
       - dev
       - main
-    types: [ closed ]
+    types: [ opened ]
 
 jobs:
   build:
@@ -18,6 +18,29 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
+
+      - name: Create local.properties
+        run: |
+          echo "baseDevUrl=${{ secrets.BASE_DEV_URL }}" >> local.properties
+          echo "prodDevUrl=${{ secrets.PROD_DEV_URL }}" >> local.properties
+          echo "privacyPolicy=${{ secrets.PRIVACY_POLICY }}" >> local.properties
+          echo "usagePolicy=${{ secrets.USAGE_POLICY }}" >> local.properties
+          echo "KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}" >> local.properties
+          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> local.properties
+          echo "KEYSTORE_FILE=release-key.jks" >> local.properties
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> local.properties
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> local.properties
+          echo "MASTER_ACCESS=${{ secrets.MASTER_ACCESS }}" >> local.properties
+          echo "MASTER_REFRESH=${{ secrets.MASTER_REFRESH }}" >> local.properties
+
+      - name: Restore google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
+
+      - name: Restore release keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 --decode > release-key.jks
 
       - name: Build Release APK
         run: ./gradlew assembleRelease
