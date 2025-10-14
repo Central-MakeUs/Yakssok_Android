@@ -30,7 +30,7 @@ import com.pillsquad.yakssok.core.ui.R
 
 @Composable
 fun NoMedicineColumn(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     isNeverAlarm: Boolean,
     onNavigateToRoutine: () -> Unit
 ) {

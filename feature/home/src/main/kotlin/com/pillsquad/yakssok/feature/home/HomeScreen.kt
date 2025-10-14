@@ -1,9 +1,7 @@
 package com.pillsquad.yakssok.feature.home
 
 import android.util.SparseArray
-import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,10 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,7 +51,6 @@ import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
@@ -69,11 +65,10 @@ internal fun HomeRoute(
     onNavigateCalendar: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val showSnackbar = LocalShowErrorSnackBar.current
-    val scrollState = rememberScrollState()
-    val refreshState = rememberPullToRefreshState()
+    var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
 
+    val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
 
     val scaleFraction = {
@@ -85,8 +80,6 @@ internal fun HomeRoute(
         isRefreshing = true
         viewModel.refresh()
     }
-
-    var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
 
     OnResumeEffect { viewModel.refresh() }
     CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
@@ -108,87 +101,6 @@ internal fun HomeRoute(
         )
     }
 
-    when (val state = uiState) {
-        HomeUiState.Loading -> {
-            PullToRefreshColumn(
-                refreshState = refreshState,
-                isRefreshing = isRefreshing,
-                scaleFraction = scaleFraction,
-                onRefresh = onRefresh,
-                topBar = {
-                    YakssokTopAppBar(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        isLogo = true,
-                        onNavigateAlert = onNavigateAlert,
-                        onNavigateMy = onNavigateMyPage
-                    )
-                }
-            ) {
-                HomeSkeleton(showFeedbackSection = true)
-            }
-        }
-
-        is HomeUiState.Success -> {
-            if (state.remindList.isNotEmpty()) {
-                val nickName = state.userList[0].nickName
-
-                RemindDialog(
-                    name = nickName,
-                    routineList = state.remindList,
-                    onDismiss = { viewModel.clearRemindState() }
-                )
-            }
-
-            HomeScreen(
-                isRefreshing = isRefreshing,
-                scaleFraction = scaleFraction,
-                refreshState = refreshState,
-                showFeedBackSection = state.feedbackTargetList.isNotEmpty(),
-                selectedDate = state.selectedDate,
-                userProfileList = state.userList,
-                feedbackTargetList = state.feedbackTargetList,
-                routineCache = state.routineCache,
-                selectedUserIdx = state.selectedUserIdx,
-                scrollState = scrollState,
-                onRefresh = onRefresh,
-                onClickUser = viewModel::onMateClick,
-                onSelectDate = viewModel::onSelectedDate,
-                onClickRoutine = viewModel::onRoutineClick,
-                onClickFeedback = { feedbackTarget = it },
-                onNavigateMy = onNavigateMyPage,
-                onNavigateMate = onNavigateMate,
-                onNavigateAlert = onNavigateAlert,
-                onNavigateRoutine = onNavigateRoutine,
-                onNavigateCalendar = onNavigateCalendar
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreen(
-    isRefreshing: Boolean = false,
-    scaleFraction: () -> Float = { 1f },
-    refreshState: PullToRefreshState = rememberPullToRefreshState(),
-    showFeedBackSection: Boolean = false,
-    selectedDate: LocalDate = LocalDate.today(),
-    userProfileList: List<User> = emptyList(),
-    feedbackTargetList: List<FeedbackTarget> = emptyList(),
-    routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>> = SparseArray(),
-    selectedUserIdx: Int = 0,
-    scrollState: ScrollState = rememberScrollState(),
-    onRefresh: () -> Unit = {},
-    onClickUser: (Int) -> Unit = {},
-    onSelectDate: (LocalDate) -> Unit = {},
-    onClickRoutine: (Int) -> Unit = {},
-    onClickFeedback: (FeedbackTarget) -> Unit = {},
-    onNavigateMy: () -> Unit = {},
-    onNavigateMate: () -> Unit = {},
-    onNavigateAlert: () -> Unit = {},
-    onNavigateRoutine: () -> Unit = {},
-    onNavigateCalendar: () -> Unit = {},
-) {
     PullToRefreshColumn(
         refreshState = refreshState,
         isRefreshing = isRefreshing,
@@ -199,90 +111,134 @@ private fun HomeScreen(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 isLogo = true,
                 onNavigateAlert = onNavigateAlert,
-                onNavigateMy = onNavigateMy
+                onNavigateMy = onNavigateMyPage
             )
         }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(YakssokTheme.color.grey100)
-                .verticalScroll(scrollState)
-        ) {
-
-
-            if (showFeedBackSection) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    item { Spacer(modifier = Modifier.width(16.dp)) }
-
-                    items(feedbackTargetList.size) { index ->
-                        val feedbackTarget = feedbackTargetList[index]
-
-                        UserInfoCard(
-                            feedback = feedbackTarget,
-                            onClick = { onClickFeedback(feedbackTarget) }
-                        )
-
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
-
+        when (val state = uiState) {
+            is HomeUiState.Loading -> HomeSkeleton(showFeedbackSection = true)
+            is HomeUiState.Success -> {
+                state.remindList.firstOrNull()?.let {
+                    RemindDialog(
+                        name = state.userList.firstOrNull()?.nickName.orEmpty(),
+                        routineList = state.remindList,
+                        onDismiss = viewModel::clearRemindState
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                HomeScreen(
+                    state = state,
+                    onClickUser = viewModel::onMateClick,
+                    onSelectDate = viewModel::onSelectedDate,
+                    onClickRoutine = viewModel::onRoutineClick,
+                    onClickFeedback = { feedbackTarget = it },
+                    onNavigateMate = onNavigateMate,
+                    onNavigateRoutine = onNavigateRoutine,
+                    onNavigateCalendar = onNavigateCalendar
+                )
             }
-
-            HomeContent(
-                modifier = Modifier,
-                userProfileList = userProfileList,
-                routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList(),
-                selectedDate = selectedDate,
-                selectedUserIdx = selectedUserIdx,
-                isRounded = showFeedBackSection,
-                isNotMedicine = userProfileList[selectedUserIdx].isNotMedicine,
-                onClickUser = onClickUser,
-                onSelectDate = onSelectDate,
-                onClickRoutine = onClickRoutine,
-                onNavigateMate = onNavigateMate,
-                onNavigateRoutine = onNavigateRoutine,
-                onNavigateCalendar = onNavigateCalendar
-            )
         }
     }
 }
 
 @Composable
-private fun HomeContent(
-    modifier: Modifier,
-    userProfileList: List<User>,
-    routineList: List<Routine>,
-    selectedDate: LocalDate,
-    selectedUserIdx: Int,
-    isRounded: Boolean,
-    isNotMedicine: Boolean,
+private fun HomeScreen(
+    state: HomeUiState.Success,
     onClickUser: (Int) -> Unit,
-    onSelectDate: (LocalDate) -> Unit = {},
-    onClickRoutine: (Int) -> Unit = {},
+    onSelectDate: (LocalDate) -> Unit,
+    onClickRoutine: (Int) -> Unit,
+    onClickFeedback: (FeedbackTarget) -> Unit,
     onNavigateMate: () -> Unit,
     onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit,
+) {
+    val scrollState = rememberScrollState()
+    val showFeedbackSection by remember(state.feedbackTargetList) {
+        derivedStateOf { state.feedbackTargetList.isNotEmpty() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(YakssokTheme.color.grey100)
+            .verticalScroll(scrollState)
+    ) {
+        if (showFeedbackSection) {
+            FeedbackSection(
+                feedbackTargetList = state.feedbackTargetList,
+                onClickFeedback = onClickFeedback
+            )
+        }
+
+        HomeContent(
+            userProfileList = state.userList,
+            routineCache = state.routineCache,
+            selectedDate = state.selectedDate,
+            selectedUserIdx = state.selectedUserIdx,
+            isRounded = showFeedbackSection,
+            onClickUser = onClickUser,
+            onSelectDate = onSelectDate,
+            onClickRoutine = onClickRoutine,
+            onNavigateMate = onNavigateMate,
+            onNavigateRoutine = onNavigateRoutine,
+            onNavigateCalendar = onNavigateCalendar
+        )
+    }
+}
+
+@Composable
+private fun FeedbackSection(
+    feedbackTargetList: List<FeedbackTarget>,
+    onClickFeedback: (FeedbackTarget) -> Unit
+) {
+    Spacer(modifier = Modifier.height(16.dp))
+    LazyRow(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        item { Spacer(modifier = Modifier.width(16.dp)) }
+
+        items(feedbackTargetList.size) { index ->
+            val feedbackTarget = feedbackTargetList[index]
+
+            UserInfoCard(
+                feedback = feedbackTarget,
+                onClick = { onClickFeedback(feedbackTarget) }
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+}
+
+@Composable
+private fun HomeContent(
+    userProfileList: List<User>,
+    routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>>,
+    selectedDate: LocalDate,
+    selectedUserIdx: Int,
+    isRounded: Boolean,
+    onClickUser: (Int) -> Unit,
+    onSelectDate: (LocalDate) -> Unit,
+    onClickRoutine: (Int) -> Unit,
+    onNavigateMate: () -> Unit,
+    onNavigateRoutine: () -> Unit,
+    onNavigateCalendar: () -> Unit
 ) {
     val shape =
         if (isRounded) RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp) else RectangleShape
     val topPadding = if (isRounded) 32.dp else 10.dp
 
     val today = LocalDate.today()
-    val weekDates = remember {
-        val currentDayOfWeek = today.dayOfWeek.isoDayNumber
-        val monday = today.minus(currentDayOfWeek - 1, DateTimeUnit.DAY)
-        (0..6).map { monday.plus(it, DateTimeUnit.DAY) }
+    val weekDates by remember {
+        derivedStateOf { calculateCurrentWeek(today) }
     }
 
+    val selectedUser = userProfileList.getOrNull(selectedUserIdx) ?: return
+    val routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList()
+
     Column(
-        modifier = modifier
+        modifier = Modifier
             .shadow(
                 offsetX = 0.dp,
                 offsetY = 4.dp,
@@ -298,7 +254,7 @@ private fun HomeContent(
             userList = userProfileList,
             selectedUserIdx = selectedUserIdx,
             onNavigateMate = onNavigateMate,
-            onMateClick = { onClickUser(it) }
+            onMateClick = onClickUser
         )
         Spacer(modifier = Modifier.height(8.dp))
         WeekDataSelector(
@@ -308,15 +264,14 @@ private fun HomeContent(
             onNavigateCalendar = onNavigateCalendar
         )
         Spacer(modifier = Modifier.height(32.dp))
+
         if (routineList.isEmpty()) {
             NoMedicineColumn(
-                modifier = Modifier,
-                isNeverAlarm = isNotMedicine,
+                isNeverAlarm = selectedUser.isNotMedicine,
                 onNavigateToRoutine = onNavigateRoutine
             )
         } else {
             val isCheckBoxVisible = (selectedUserIdx == 0) && (selectedDate == today)
-
             DailyMedicineList(
                 routineList = routineList,
                 isCheckBoxVisible = isCheckBoxVisible,
@@ -326,4 +281,9 @@ private fun HomeContent(
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
+}
+
+private fun calculateCurrentWeek(today: LocalDate): List<LocalDate> {
+    val monday = today.minus(today.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY)
+    return List(7) { i -> monday.plus(i.toLong(), DateTimeUnit.DAY) }
 }
