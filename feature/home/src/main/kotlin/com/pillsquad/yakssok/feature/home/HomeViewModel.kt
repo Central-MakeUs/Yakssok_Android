@@ -11,10 +11,12 @@ import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
-import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserCache
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import com.pillsquad.yakssok.feature.home.model.RoutineGroup
+import com.pillsquad.yakssok.feature.home.model.toRoutineGroup
+import com.pillsquad.yakssok.feature.home.model.toRoutineList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -23,8 +25,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -94,7 +94,8 @@ class HomeViewModel @Inject constructor(
             val targets = targetsDef.await()
 
             val adjustedUsers = recomputeIsNotMedicine(users, cache)
-            val todayRemind = cache[0]?.get(today).orEmpty().filter { it.isFeedbackRoutine(now) }
+            val todayRemind =
+                cache[0]?.get(today)?.haveToTake?.filter { it.isFeedbackRoutine(now) }.orEmpty()
             val shouldShowRemind = (previous?.isInit ?: true) && todayRemind.isNotEmpty()
 
             HomeUiState.Success(
@@ -129,11 +130,11 @@ class HomeViewModel @Inject constructor(
         if (userIdx != 0 || date != today) return
 
         val currentMap = state.routineCache[userIdx] ?: return
-        val updated = currentMap[date]?.map {
+        val updated = currentMap[date]?.toRoutineList()?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return
 
-        val newUserMap = currentMap.toMutableMap().apply { put(date, updated) }
+        val newUserMap = currentMap.toMutableMap().apply { put(date, updated.toRoutineGroup()) }
         val newCache = state.routineCache.copyAndPut(userIdx, newUserMap)
 
         _uiState.value = state.copy(routineCache = newCache)
@@ -170,16 +171,18 @@ class HomeViewModel @Inject constructor(
         users: List<User>,
         startDate: LocalDate,
         endDate: LocalDate
-    ): SparseArray<MutableMap<LocalDate, List<Routine>>> {
-        var acc = SparseArray<MutableMap<LocalDate, List<Routine>>>()
+    ): SparseArray<MutableMap<LocalDate, RoutineGroup>> {
+        var acc = SparseArray<MutableMap<LocalDate, RoutineGroup>>()
 
         val my = fetchRoutineOrEmpty(userId = null, startDate, endDate)
-        acc = acc.copyAndPut(0, my.routineCache)
+            .routineCache.mapValues { (_, list) -> list.toRoutineGroup() }.toMutableMap()
+        acc = acc.copyAndPut(0, my)
 
         users.drop(1).forEach { friend ->
             val cache = fetchRoutineOrEmpty(friend.id, startDate, endDate)
+                .routineCache.mapValues { (_, list) -> list.toRoutineGroup() }.toMutableMap()
             val userIdx = users.indexOfFirst { it.id == friend.id }
-            if (userIdx != -1) acc = acc.copyAndPut(userIdx, cache.routineCache)
+            if (userIdx != -1) acc = acc.copyAndPut(userIdx, cache)
         }
         return acc
     }
@@ -206,10 +209,12 @@ class HomeViewModel @Inject constructor(
 
     private fun recomputeIsNotMedicine(
         users: List<User>,
-        cache: SparseArray<MutableMap<LocalDate, List<Routine>>>
+        cache: SparseArray<MutableMap<LocalDate, RoutineGroup>>
     ): List<User> {
         return users.mapIndexed { idx, user ->
-            val hasAny = cache[idx]?.values?.any { it.isNotEmpty() } == true
+            val hasAny = cache[idx]?.values?.any {
+                it.haveToTake.isNotEmpty() || it.taken.isNotEmpty()
+            } == true
             user.copy(isNotMedicine = !hasAny)
         }
     }

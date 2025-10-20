@@ -39,6 +39,7 @@ internal fun UserInfoCard(
 
     Column(
         modifier = Modifier
+            .padding(vertical = 16.dp)
             .shadow(
                 offsetX = 0.dp,
                 offsetY = 4.dp,
@@ -55,17 +56,13 @@ internal fun UserInfoCard(
             modifier = Modifier.size(52.dp),
             imageUrl = feedback.profileImageUrl,
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             text = feedback.nickName,
             style = YakssokTheme.typography.subtitle2,
             color = YakssokTheme.color.grey600
         )
-
         Spacer(modifier = Modifier.height(4.dp))
-
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -98,9 +95,7 @@ internal fun UserInfoCard(
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(4.dp))
-
         if (isNagging) {
             YakssokButton(
                 modifier = Modifier.height(40.dp),
