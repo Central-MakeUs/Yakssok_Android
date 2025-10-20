@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -33,14 +32,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
+import com.pillsquad.yakssok.core.designsystem.util.ShadowDirection
 import com.pillsquad.yakssok.core.designsystem.util.shadow
 import com.pillsquad.yakssok.core.model.FeedbackTarget
-import com.pillsquad.yakssok.core.model.Routine
+import com.pillsquad.yakssok.core.model.FeedbackType
 import com.pillsquad.yakssok.core.model.User
-import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
 import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
+import com.pillsquad.yakssok.core.ui.component.dailyMedicineList
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
@@ -49,6 +49,7 @@ import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import com.pillsquad.yakssok.feature.home.model.RoutineGroup
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -152,37 +153,76 @@ private fun HomeScreen(
     onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit,
 ) {
-    val scrollState = rememberScrollState()
     val showFeedbackSection by remember(state.feedbackTargetList) {
         derivedStateOf { state.feedbackTargetList.isNotEmpty() }
     }
 
-    Column(
+    val routineGroup = state.routineCache[state.selectedUserIdx]?.get(state.selectedDate)
+    val today = LocalDate.today()
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .background(YakssokTheme.color.grey100)
-            .verticalScroll(scrollState)
+            .background(YakssokTheme.color.grey50)
     ) {
-        if (showFeedbackSection) {
-            FeedbackSection(
-                feedbackTargetList = state.feedbackTargetList,
-                onClickFeedback = onClickFeedback
+        if (true) {
+            item {
+                FeedbackSection(
+                    feedbackTargetList = listOf(
+                        FeedbackTarget(
+                            userId = 1,
+                            nickName = "인우마스터",
+                            profileImageUrl = "",
+                            feedbackType = FeedbackType.NAG,
+                            routineCount = 1,
+                            routineList = emptyList()
+                        )
+                    ),
+                    onClickFeedback = onClickFeedback
+                )
+            }
+        }
+
+        item {
+            HomeContent(
+                userProfileList = state.userList,
+                routineCache = state.routineCache,
+                selectedDate = state.selectedDate,
+                selectedUserIdx = state.selectedUserIdx,
+                isRounded = true,
+                onClickUser = onClickUser,
+                onSelectDate = onSelectDate,
+                onClickRoutine = onClickRoutine,
+                onNavigateMate = onNavigateMate,
+                onNavigateRoutine = onNavigateRoutine,
+                onNavigateCalendar = onNavigateCalendar
             )
         }
 
-        HomeContent(
-            userProfileList = state.userList,
-            routineCache = state.routineCache,
-            selectedDate = state.selectedDate,
-            selectedUserIdx = state.selectedUserIdx,
-            isRounded = showFeedbackSection,
-            onClickUser = onClickUser,
-            onSelectDate = onSelectDate,
-            onClickRoutine = onClickRoutine,
-            onNavigateMate = onNavigateMate,
-            onNavigateRoutine = onNavigateRoutine,
-            onNavigateCalendar = onNavigateCalendar
-        )
+        if (routineGroup == null || routineGroup.isEmpty()) {
+            val isNeverAlarm =
+                state.userList.getOrNull(state.selectedUserIdx)?.isNotMedicine ?: false
+            item {
+                NoMedicineColumn(
+                    isNeverAlarm = isNeverAlarm,
+                    onNavigateToRoutine = onNavigateRoutine
+                )
+            }
+        } else {
+            val isCheckBoxVisible = (state.selectedUserIdx == 0) && (state.selectedDate == today)
+            dailyMedicineList(
+                haveToTake = routineGroup.haveToTake,
+                taken = routineGroup.taken,
+                isCheckBoxVisible = isCheckBoxVisible,
+                onItemClick = onClickRoutine,
+                onNavigateToRoute = onNavigateRoutine
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
     }
 }
 
@@ -191,9 +231,10 @@ private fun FeedbackSection(
     feedbackTargetList: List<FeedbackTarget>,
     onClickFeedback: (FeedbackTarget) -> Unit
 ) {
-    Spacer(modifier = Modifier.height(16.dp))
     LazyRow(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(YakssokTheme.color.grey100)
     ) {
         item { Spacer(modifier = Modifier.width(16.dp)) }
 
@@ -208,13 +249,26 @@ private fun FeedbackSection(
             Spacer(modifier = Modifier.width(16.dp))
         }
     }
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier
+        .background(YakssokTheme.color.grey100)
+        .fillMaxWidth()
+        .height(22.dp)
+        .shadow(
+            offsetX = 0.dp,
+            offsetY = 4.dp,
+            blur = 12.dp,
+            color = Color.Black.copy(alpha = 0.15f),
+            direction = ShadowDirection.BOTTOM
+        )
+        .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+        .background(YakssokTheme.color.grey50)
+    )
 }
 
 @Composable
 private fun HomeContent(
     userProfileList: List<User>,
-    routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>>,
+    routineCache: SparseArray<MutableMap<LocalDate, RoutineGroup>>,
     selectedDate: LocalDate,
     selectedUserIdx: Int,
     isRounded: Boolean,
@@ -230,24 +284,12 @@ private fun HomeContent(
     val topPadding = if (isRounded) 32.dp else 10.dp
 
     val today = LocalDate.today()
-    val weekDates by remember {
-        derivedStateOf { calculateCurrentWeek(today) }
-    }
-
-    val selectedUser = userProfileList.getOrNull(selectedUserIdx) ?: return
-    val routineList = routineCache[selectedUserIdx]?.get(selectedDate) ?: emptyList()
+    val weekDates by remember { derivedStateOf { calculateCurrentWeek(today) } }
 
     Column(
         modifier = Modifier
-            .shadow(
-                offsetX = 0.dp,
-                offsetY = 4.dp,
-                blur = 12.dp,
-                color = Color.Black.copy(alpha = 0.15f),
-            )
-            .clip(shape)
-            .background(YakssokTheme.color.grey50)
-            .padding(top = topPadding, start = 16.dp, end = 16.dp),
+            .padding(top = 10.dp, start = 16.dp, end = 16.dp)
+            .background(YakssokTheme.color.grey50),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MateLazyRow(
@@ -264,22 +306,6 @@ private fun HomeContent(
             onNavigateCalendar = onNavigateCalendar
         )
         Spacer(modifier = Modifier.height(32.dp))
-
-        if (routineList.isEmpty()) {
-            NoMedicineColumn(
-                isNeverAlarm = selectedUser.isNotMedicine,
-                onNavigateToRoutine = onNavigateRoutine
-            )
-        } else {
-            val isCheckBoxVisible = (selectedUserIdx == 0) && (selectedDate == today)
-            DailyMedicineList(
-                routineList = routineList,
-                isCheckBoxVisible = isCheckBoxVisible,
-                onItemClick = onClickRoutine,
-                onNavigateToRoute = onNavigateRoutine
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

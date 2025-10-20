@@ -18,9 +18,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.ui.component.DailyMedicineList
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
+import com.pillsquad.yakssok.core.ui.component.dailyMedicineList
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
@@ -138,25 +138,31 @@ internal fun CalendarScreen(
             }
 
             item {
-                if (uiState.routineCache.isEmpty()) {
+
+            }
+
+            if (uiState.routineCache.isEmpty()) {
+                item {
                     NoMedicineColumn(
                         modifier = modifier,
                         isNeverAlarm = false,
                         onNavigateToRoutine = onNavigateRoutine
                     )
-                } else {
-                    val isCheckBoxVisible =
-                        (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
-
-                    DailyMedicineList(
-                        modifier = modifier,
-                        isCheckBoxVisible = isCheckBoxVisible,
-                        routineList = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
-                            ?: emptyList(),
-                        onItemClick = onRoutineClick,
-                        onNavigateToRoute = onNavigateRoutine
-                    )
                 }
+            } else {
+                val isCheckBoxVisible =
+                    (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
+
+                dailyMedicineList(
+                    modifier = modifier,
+                    isCheckBoxVisible = isCheckBoxVisible,
+                    haveToTake = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
+                        ?: emptyList(),
+                    taken = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
+                        ?: emptyList(),
+                    onItemClick = onRoutineClick,
+                    onNavigateToRoute = onNavigateRoutine
+                )
             }
 
             item {

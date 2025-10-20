@@ -21,7 +21,7 @@ sealed interface HomeUiState {
             )
         ),
         val feedbackTargetList: List<FeedbackTarget> = emptyList(),
-        val routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>> = SparseArray(),
+        val routineCache: SparseArray<MutableMap<LocalDate, RoutineGroup>> = SparseArray(),
         val remindList: List<Routine> = emptyList()
     ) : HomeUiState
 }

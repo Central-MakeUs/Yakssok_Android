@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun DailyMedicineRow(
+    modifier: Modifier = Modifier,
     routine: Routine,
     isFeedback: Boolean = false,
     isCheckBoxVisible: Boolean = false,
@@ -61,7 +62,7 @@ fun DailyMedicineRow(
     val formattedTime = formatLocalTime(routine.intakeTime)
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .defaultMinSize(minHeight = 56.dp)
