@@ -3,6 +3,7 @@ package com.pillsquad.yakssok.feature.home
 import android.util.SparseArray
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
-import com.pillsquad.yakssok.core.designsystem.util.ShadowDirection
 import com.pillsquad.yakssok.core.designsystem.util.shadow
 import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.FeedbackType
@@ -165,19 +165,10 @@ private fun HomeScreen(
             .fillMaxWidth()
             .background(YakssokTheme.color.grey50)
     ) {
-        if (true) {
+        if (showFeedbackSection) {
             item {
                 FeedbackSection(
-                    feedbackTargetList = listOf(
-                        FeedbackTarget(
-                            userId = 1,
-                            nickName = "인우마스터",
-                            profileImageUrl = "",
-                            feedbackType = FeedbackType.NAG,
-                            routineCount = 1,
-                            routineList = emptyList()
-                        )
-                    ),
+                    feedbackTargetList = state.feedbackTargetList,
                     onClickFeedback = onClickFeedback
                 )
             }
@@ -186,15 +177,12 @@ private fun HomeScreen(
         item {
             HomeContent(
                 userProfileList = state.userList,
-                routineCache = state.routineCache,
                 selectedDate = state.selectedDate,
                 selectedUserIdx = state.selectedUserIdx,
-                isRounded = true,
+                isRounded = showFeedbackSection,
                 onClickUser = onClickUser,
                 onSelectDate = onSelectDate,
-                onClickRoutine = onClickRoutine,
                 onNavigateMate = onNavigateMate,
-                onNavigateRoutine = onNavigateRoutine,
                 onNavigateCalendar = onNavigateCalendar
             )
         }
@@ -219,10 +207,7 @@ private fun HomeScreen(
             )
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
+        item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
 
@@ -249,34 +234,17 @@ private fun FeedbackSection(
             Spacer(modifier = Modifier.width(16.dp))
         }
     }
-    Spacer(modifier = Modifier
-        .background(YakssokTheme.color.grey100)
-        .fillMaxWidth()
-        .height(22.dp)
-        .shadow(
-            offsetX = 0.dp,
-            offsetY = 4.dp,
-            blur = 12.dp,
-            color = Color.Black.copy(alpha = 0.15f),
-            direction = ShadowDirection.BOTTOM
-        )
-        .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-        .background(YakssokTheme.color.grey50)
-    )
 }
 
 @Composable
 private fun HomeContent(
     userProfileList: List<User>,
-    routineCache: SparseArray<MutableMap<LocalDate, RoutineGroup>>,
     selectedDate: LocalDate,
     selectedUserIdx: Int,
     isRounded: Boolean,
     onClickUser: (Int) -> Unit,
     onSelectDate: (LocalDate) -> Unit,
-    onClickRoutine: (Int) -> Unit,
     onNavigateMate: () -> Unit,
-    onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit
 ) {
     val shape =
@@ -286,26 +254,41 @@ private fun HomeContent(
     val today = LocalDate.today()
     val weekDates by remember { derivedStateOf { calculateCurrentWeek(today) } }
 
-    Column(
-        modifier = Modifier
-            .padding(top = 10.dp, start = 16.dp, end = 16.dp)
-            .background(YakssokTheme.color.grey50),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        MateLazyRow(
-            userList = userProfileList,
-            selectedUserIdx = selectedUserIdx,
-            onNavigateMate = onNavigateMate,
-            onMateClick = onClickUser
+        Spacer(modifier = Modifier
+            .background(YakssokTheme.color.grey100)
+            .matchParentSize()
+            .shadow(
+                color = Color.Black.copy(alpha = 0.15f),
+                blur = 12.dp,
+                offsetY = 4.dp,
+                shape = shape
+            )
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        WeekDataSelector(
-            weekDates = weekDates,
-            selectedDate = selectedDate,
-            onDateSelected = onSelectDate,
-            onNavigateCalendar = onNavigateCalendar
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+        Column(
+            modifier = Modifier
+                .clip(shape)
+                .background(YakssokTheme.color.grey50)
+                .padding(top = topPadding, start = 16.dp, end = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MateLazyRow(
+                userList = userProfileList,
+                selectedUserIdx = selectedUserIdx,
+                onNavigateMate = onNavigateMate,
+                onMateClick = onClickUser
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            WeekDataSelector(
+                weekDates = weekDates,
+                selectedDate = selectedDate,
+                onDateSelected = onSelectDate,
+                onNavigateCalendar = onNavigateCalendar
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }
 
