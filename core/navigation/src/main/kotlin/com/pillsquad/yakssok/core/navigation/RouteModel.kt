@@ -16,7 +16,7 @@ sealed interface Route {
     data object Alert : Route
 
     @Serializable
-    data object Mate: Route
+    data class Mate(val code: String): Route
 
     @Serializable
     data object MyPage: Route

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +50,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun MateRoute(
     viewModel: MateViewModel = hiltViewModel(),
+    code: String,
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -61,6 +63,10 @@ internal fun MateRoute(
             is MateEvent.PostSuccess -> isComplete = true
             is MateEvent.ShowErrorSnackbar -> showErrorSnackbar(it.throwable)
         }
+    }
+
+    LaunchedEffect(code) {
+        viewModel.updateInputCode(code)
     }
 
     if (isComplete) {
@@ -267,6 +273,7 @@ private fun ShareInviteButton(
 }
 
 private fun buildInviteMessage(userName: String, code: String, link: String): String {
+    val inviteLink = "$link?code=$code"
     return """
         ${userName}님이 함께 약 챙기자고 해요.
         가끔 잊어버릴 수도 있으니까,
@@ -276,6 +283,6 @@ private fun buildInviteMessage(userName: String, code: String, link: String): St
         ${userName}님의 코드: $code
         
         👇 여기를 들어오면 같이 챙길 수 있어요
-        $link
+        $inviteLink
     """.trimIndent()
 }
