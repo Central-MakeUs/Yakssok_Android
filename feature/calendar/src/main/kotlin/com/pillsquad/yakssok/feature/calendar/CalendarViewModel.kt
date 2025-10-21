@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.calendar
 
-import android.util.Log
 import android.util.SparseArray
 import androidx.core.util.size
 import androidx.lifecycle.ViewModel
@@ -13,6 +12,8 @@ import com.pillsquad.yakssok.core.model.UserCache
 import com.pillsquad.yakssok.feature.calendar.model.CalendarCacheManager
 import com.pillsquad.yakssok.feature.calendar.model.CalendarConfig
 import com.pillsquad.yakssok.feature.calendar.model.CalendarUiModel
+import com.pillsquad.yakssok.feature.calendar.model.toRoutineGroup
+import com.pillsquad.yakssok.feature.calendar.model.toRoutineList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,11 +70,11 @@ class CalendarViewModel @Inject constructor(
 
         if (userIdx != 0 || date != today) return
 
-        val updated = currentMap[date]?.map {
+        val updated = currentMap[date]?.toRoutineList()?.map {
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return
 
-        val newUserMap = currentMap.toMutableMap().apply { put(date, updated) }
+        val newUserMap = currentMap.toMutableMap().apply { put(date, updated.toRoutineGroup()) }
         val newCache = uiState.value.routineCache.copyAndPut(userIdx, newUserMap)
 
         _uiState.update { it.copy(routineCache = newCache) }
