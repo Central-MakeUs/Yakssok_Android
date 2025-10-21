@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.main
 
-import android.app.Activity
 import android.app.ComponentCaller
 import android.content.Intent
 import android.os.Bundle
