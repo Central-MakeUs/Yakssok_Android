@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.util.isEmpty
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.today
@@ -73,6 +72,7 @@ internal fun CalendarScreen(
 ) {
     val modifier = Modifier.padding(horizontal = 16.dp)
     val today = LocalDate.today()
+    val routineGroup = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
 
     Column(
         modifier = Modifier
@@ -120,10 +120,6 @@ internal fun CalendarScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
-            item {
                 Spacer(
                     modifier = Modifier
                         .height(8.dp)
@@ -137,15 +133,13 @@ internal fun CalendarScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            item {
-
-            }
-
-            if (uiState.routineCache.isEmpty()) {
+            if (routineGroup == null || routineGroup.isEmpty()) {
+                val isNeverAlarm =
+                    uiState.userList.getOrNull(uiState.selectedUserIdx)?.isNotMedicine ?: false
                 item {
                     NoMedicineColumn(
                         modifier = modifier,
-                        isNeverAlarm = false,
+                        isNeverAlarm = isNeverAlarm,
                         onNavigateToRoutine = onNavigateRoutine
                     )
                 }
@@ -155,10 +149,8 @@ internal fun CalendarScreen(
 
                 dailyMedicineList(
                     isCheckBoxVisible = isCheckBoxVisible,
-                    haveToTake = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
-                        ?: emptyList(),
-                    taken = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
-                        ?: emptyList(),
+                    haveToTake = routineGroup.haveToTake,
+                    taken = routineGroup.taken,
                     onItemClick = onRoutineClick,
                     onNavigateToRoute = onNavigateRoutine
                 )

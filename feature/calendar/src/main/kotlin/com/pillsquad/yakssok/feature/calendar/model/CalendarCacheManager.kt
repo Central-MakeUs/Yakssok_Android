@@ -6,14 +6,14 @@ import com.pillsquad.yakssok.core.model.UserCache
 import kotlinx.datetime.LocalDate
 
 class CalendarCacheManager(
-    private val routineCache: SparseArray<MutableMap<LocalDate, List<Routine>>>,
+    private val routineCache: SparseArray<MutableMap<LocalDate, RoutineGroup>>,
     private val takenCache: SparseArray<MutableMap<LocalDate, Boolean>>
 ) {
 
     fun merge(userIdx: Int, cache: UserCache) {
         val currentRoutine = routineCache[userIdx] ?: mutableMapOf()
         val newRoutine = currentRoutine.toMutableMap().apply {
-            cache.routineCache.forEach { (date, list) -> this[date] = list }
+            cache.routineCache.forEach { (date, list) -> this[date] = list.toRoutineGroup() }
         }
         routineCache.put(userIdx, newRoutine)
 
@@ -26,7 +26,7 @@ class CalendarCacheManager(
 
     fun updateRoutine(userIdx: Int, date: LocalDate, routines: List<Routine>) {
         val routineMap = routineCache[userIdx] ?: mutableMapOf()
-        routineMap[date] = routines
+        routineMap[date] = routines.toRoutineGroup()
         routineCache.put(userIdx, routineMap)
 
         updateTaken(userIdx, date)
@@ -34,8 +34,8 @@ class CalendarCacheManager(
 
     fun updateTaken(userIdx: Int, date: LocalDate) {
         val routineMap = routineCache[userIdx] ?: return
-        val routineList = routineMap[date] ?: return
-        val allTaken = routineList.all { it.isTaken }
+        val routineGroup = routineMap[date] ?: return
+        val allTaken = !routineGroup.isEmpty() && routineGroup.haveToTake.isEmpty()
 
         val takenMap = takenCache[userIdx] ?: mutableMapOf()
         takenMap[date] = allTaken
