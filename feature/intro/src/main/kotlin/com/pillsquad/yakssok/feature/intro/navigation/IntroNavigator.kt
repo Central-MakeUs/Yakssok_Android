@@ -13,7 +13,7 @@ fun NavController.navigateIntro(navOptions: NavOptions) {
 
 fun NavGraphBuilder.introNavGraph(
     onNavigateHome: () -> Unit,
-    onNavigateMate: () -> Unit
+    onNavigateMate: (String) -> Unit,
 ) {
     composable<Route.Intro> {
         IntroRoute(

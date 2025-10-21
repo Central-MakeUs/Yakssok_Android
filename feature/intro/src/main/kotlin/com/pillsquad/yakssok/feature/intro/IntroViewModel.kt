@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 sealed class IntroEvent {
     data object NavigateHome: IntroEvent()
-    data object NavigateHomeThenMate: IntroEvent()
+    data class NavigateHomeThenMate(val code: String): IntroEvent()
     data class ShowErrorSnackbar(val throwable: Throwable): IntroEvent()
     data object ShowForceUpdate: IntroEvent()
     data object ShowSoftUpdate: IntroEvent()
@@ -51,6 +51,7 @@ class IntroViewModel @Inject constructor(
     private val _event = MutableSharedFlow<IntroEvent>()
     val event = _event.asSharedFlow()
 
+    private var pendingInviteCode: String? = null
     private var launchFromOneLink: Boolean = false
     init { checkAppUpdate() }
 
@@ -115,12 +116,17 @@ class IntroViewModel @Inject constructor(
         }
     }
 
+    fun setPendingInviteCode(code: String) {
+        pendingInviteCode = code
+    }
+
     fun postPushAgreement(pushAgreement: Boolean) {
         viewModelScope.launch {
             postUserDevicesUseCase(pushAgreement)
                 .onSuccess {
                     if (launchFromOneLink) {
-                        _event.emit(IntroEvent.NavigateHomeThenMate)
+                        _event.emit(IntroEvent.NavigateHomeThenMate(pendingInviteCode ?: ""))
+                        pendingInviteCode = null
                         launchFromOneLink = false
                     } else {
                         _event.emit(IntroEvent.NavigateHome)

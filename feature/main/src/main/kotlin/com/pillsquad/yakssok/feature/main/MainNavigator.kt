@@ -61,8 +61,8 @@ internal class MainNavigator(
         navController.navigateAlert(defaultNavOptions)
     }
 
-    fun navigateMate() {
-        navController.navigateMate(defaultNavOptions)
+    fun navigateMate(code: String = "") {
+        navController.navigateMate(code, defaultNavOptions)
     }
 
     fun navigateInfo(title: String, url: String) {

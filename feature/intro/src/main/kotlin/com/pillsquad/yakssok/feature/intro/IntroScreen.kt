@@ -53,7 +53,7 @@ import com.pillsquad.yakssok.feature.intro.util.startUpdate
 internal fun IntroRoute(
     viewModel: IntroViewModel = hiltViewModel(),
     onNavigateHome: () -> Unit = {},
-    onNavigateMate: () -> Unit = {}
+    onNavigateMate: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -97,9 +97,9 @@ internal fun IntroRoute(
     CollectEvent(viewModel.event) {
         when (it) {
             IntroEvent.NavigateHome -> onNavigateHome()
-            IntroEvent.NavigateHomeThenMate -> {
+            is IntroEvent.NavigateHomeThenMate -> {
                 onNavigateHome()
-                onNavigateMate()
+                onNavigateMate(it.code)
             }
             is IntroEvent.ShowErrorSnackbar -> showErrorSnackBar(it.throwable)
             IntroEvent.ShowSoftUpdate -> startUpdate(activity, 0) { showUpdateDialog = 0 }
@@ -139,6 +139,10 @@ internal fun IntroRoute(
 
     LaunchedEffect(Unit) {
         val uri = activity.intent?.data
+        val inviteCode = uri?.getQueryParameter("code")
+
+        if (!inviteCode.isNullOrBlank()) viewModel.setPendingInviteCode(inviteCode)
+
         val fromOneLink =
             uri?.host.equals("yakssok.onelink.me", ignoreCase = true) ||
                     uri?.scheme.equals("yakssok", ignoreCase = true)
