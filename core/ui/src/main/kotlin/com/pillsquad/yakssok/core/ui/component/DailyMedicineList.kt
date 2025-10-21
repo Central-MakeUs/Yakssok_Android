@@ -1,7 +1,9 @@
 package com.pillsquad.yakssok.core.ui.component
 
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -23,10 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,10 +43,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
 import com.pillsquad.yakssok.core.ui.ext.customInsets
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
 
 fun LazyListScope.dailyMedicineList(
@@ -52,58 +59,31 @@ fun LazyListScope.dailyMedicineList(
     onItemClick: (Int) -> Unit,
     onNavigateToRoute: () -> Unit
 ) {
-    val rows = buildMedRows(haveToTake, taken) { it.intakeTime }
-
-    NestedScrollConnection
-
-    item {
-        TitleRow(
-            title = stringResource(R.string.have_to_take),
-            onNavigateToRoute = onNavigateToRoute
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp)
-                .background(YakssokTheme.color.grey50)
-        )
-    }
-
-    items(haveToTake, key = { it.routineId ?: it.hashCode() }) { medicine ->
-        MedicineRowItem(
-            routine = medicine,
-            isCheckBoxVisible = isCheckBoxVisible,
-            onMoveRequest = { medicine.routineId?.let { onItemClick(it) } }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-
-    item {
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .background(YakssokTheme.color.grey50)
-        )
-        TitleRow(stringResource(R.string.taked_medicine))
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp)
-                .background(YakssokTheme.color.grey50)
-        )
-    }
+    val rows = buildMedRows(haveToTake, taken)
 
     items(
-        items = taken,
-        key = { it.routineId ?: it.hashCode() }
-    ) { medicine ->
-        MedicineRowItem(
-            routine = medicine,
-            isCheckBoxVisible = isCheckBoxVisible,
-            onMoveRequest = { medicine.routineId?.let { onItemClick(it) } }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        items = rows,
+        key = {
+            when (it) {
+                is MedRow.Header -> it.id
+                is MedRow.Entry -> it.routine.routineId ?: it.hashCode()
+            }
+        }
+    ) { row ->
+        when (row) {
+            is MedRow.Header -> {
+                TitleRow(row.title, onNavigateToRoute)
+            }
+
+            is MedRow.Entry -> {
+                MedicineRowItem(
+                    routine = row.routine,
+                    isCheckBoxVisible = isCheckBoxVisible,
+                    onMoveRequest = { r -> r.routineId?.let(onItemClick) }
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+        }
     }
 }
 
@@ -114,6 +94,7 @@ fun LazyItemScope.MedicineRowItem(
     isCheckBoxVisible: Boolean,
     onMoveRequest: (Routine) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var stage by rememberSaveable { mutableIntStateOf(0) } // 0=정상, 1=축소중, 2=확대중
     val scale by animateFloatAsState(
         targetValue = when (stage) {
@@ -126,7 +107,10 @@ fun LazyItemScope.MedicineRowItem(
             if (stage == 1) {
                 // 축소 끝 → 리스트 이동
                 onMoveRequest(routine)
-                stage = 2
+                scope.launch {
+                    delay(240)
+                    stage = 2
+                }
             } else if (stage == 2) {
                 // 팅! 끝 → 원래 크기로 복귀
                 stage = 0
@@ -136,7 +120,13 @@ fun LazyItemScope.MedicineRowItem(
 
     DailyMedicineRow(
         modifier = Modifier
-            .animateItem()
+            .zIndex(if (stage == 1) 0f else 1f)
+            .animateItem(
+                placementSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
             .graphicsLayer(scaleX = scale, scaleY = scale)
             .padding(horizontal = 16.dp),
         isCheckBoxVisible = isCheckBoxVisible,
@@ -197,14 +187,13 @@ private sealed interface MedRow {
 
 private fun buildMedRows(
     haveToTake: List<Routine>,
-    taken: List<Routine>,
-    timeKey: LocalTime
+    taken: List<Routine>
 ): List<MedRow> {
     val rows = mutableListOf<MedRow>()
     rows += MedRow.Header("먹을 약", "HEADER_NOT_TAKEN")
-    rows += haveToTake.sortedBy(timeKey).map { MedRow.Entry(it) }
+    rows += haveToTake.sortedBy { it.intakeTime }.map { MedRow.Entry(it) }
     rows += MedRow.Header("복용 완료", "HEADER_TAKEN")
-    rows += taken.sortedBy(timeKey).map { MedRow.Entry(it) }
+    rows += taken.sortedBy { it.intakeTime }.map { MedRow.Entry(it) }
     return rows
 }
 

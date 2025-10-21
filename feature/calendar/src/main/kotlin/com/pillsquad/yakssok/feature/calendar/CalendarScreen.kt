@@ -154,7 +154,6 @@ internal fun CalendarScreen(
                     (uiState.selectedUserIdx == 0) && (uiState.selectedDate == today)
 
                 dailyMedicineList(
-                    modifier = modifier,
                     isCheckBoxVisible = isCheckBoxVisible,
                     haveToTake = uiState.routineCache[uiState.selectedUserIdx]?.get(uiState.selectedDate)
                         ?: emptyList(),
