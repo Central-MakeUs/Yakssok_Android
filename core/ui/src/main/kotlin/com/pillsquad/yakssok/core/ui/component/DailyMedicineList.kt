@@ -106,8 +106,9 @@ fun LazyItemScope.MedicineRowItem(
         finishedListener = {
             if (stage == 1) {
                 // 축소 끝 → 리스트 이동
-                onMoveRequest(routine)
                 scope.launch {
+                    delay(60)
+                    onMoveRequest(routine)
                     delay(240)
                     stage = 2
                 }
