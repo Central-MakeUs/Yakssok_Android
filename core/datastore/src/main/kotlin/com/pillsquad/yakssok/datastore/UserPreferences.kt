@@ -158,7 +158,9 @@ class UserPreferences @Inject constructor(
 
     suspend fun clearAllData() {
         dataStore.edit {
+            val tutorialState = it[TUTORIAL_COMPLETE]
             it.clear()
+            saveTutorialComplete(tutorialState ?: false)
         }
     }
 }

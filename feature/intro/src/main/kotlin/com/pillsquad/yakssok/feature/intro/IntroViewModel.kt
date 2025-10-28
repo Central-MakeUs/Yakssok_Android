@@ -11,6 +11,7 @@ import com.pillsquad.yakssok.core.domain.usecase.GetAppUpdateStatusUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetTokenFlowUseCase
 import com.pillsquad.yakssok.core.domain.usecase.LoginUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostUserDevicesUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PostUserTutorialCompleteUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PutUserInitialUseCase
 import com.pillsquad.yakssok.core.domain.usecase.TestLoginUseCase
 import com.pillsquad.yakssok.core.model.DomainException
@@ -43,7 +44,8 @@ class IntroViewModel @Inject constructor(
     private val getTokenFlowUseCase: GetTokenFlowUseCase,
     private val putUserInitialUseCase: PutUserInitialUseCase,
     private val postUserDevicesUseCase: PostUserDevicesUseCase,
-    private val getAppUpdateStatusUseCase: GetAppUpdateStatusUseCase
+    private val getAppUpdateStatusUseCase: GetAppUpdateStatusUseCase,
+    private val postUserTutorialCompleteUseCase: PostUserTutorialCompleteUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(IntroUiModel())
     val uiState = _uiState.asStateFlow()
