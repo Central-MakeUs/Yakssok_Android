@@ -2,6 +2,7 @@ package com.pillsquad.yakssok.core.data.repository
 
 import com.pillsquad.yakssok.core.domain.repository.UserPreferencesRepository
 import com.pillsquad.yakssok.datastore.UserLocalDataSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,4 +17,12 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     override suspend fun getPushAgreement(): Boolean =
         userLocalDataSource.pushAgreementFlow.firstOrNull() ?: false
+
+    override suspend fun getTutorialComplete(): Flow<Boolean> {
+        return userLocalDataSource.tutorialCompleteFlow
+    }
+
+    override suspend fun saveTutorialComplete(isComplete: Boolean) {
+        userLocalDataSource.saveTutorialComplete(isComplete)
+    }
 }
