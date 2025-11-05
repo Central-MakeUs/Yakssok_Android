@@ -16,6 +16,7 @@ interface YakssokColor {
     val grey800: Color
     val grey900: Color
     val grey950: Color
+    val black: Color
     val primary50: Color
     val primary100: Color
     val primary200: Color
@@ -48,6 +49,7 @@ object YakssokLightColor : YakssokColor {
     override val grey800 = Color(0xFF464646)
     override val grey900 = Color(0xFF3D3D3D)
     override val grey950 = Color(0xFF202020)
+    override val black = Color(0xFF000000)
     override val primary50 = Color(0xFFFFF2ED)
     override val primary100 = Color(0xFFFFE3D6)
     override val primary200 = Color(0xFFFDC2AB)

@@ -18,7 +18,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     override suspend fun getPushAgreement(): Boolean =
         userLocalDataSource.pushAgreementFlow.firstOrNull() ?: false
 
-    override suspend fun getTutorialComplete(): Flow<Boolean> {
+    override fun getTutorialComplete(): Flow<Boolean> {
         return userLocalDataSource.tutorialCompleteFlow
     }
 
