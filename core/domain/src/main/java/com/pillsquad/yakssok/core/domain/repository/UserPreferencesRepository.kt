@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 interface UserPreferencesRepository {
     suspend fun saveFcmToken(token: String)
     suspend fun getPushAgreement(): Boolean
-    suspend fun getTutorialComplete(): Flow<Boolean>
+    fun getTutorialComplete(): Flow<Boolean>
     suspend fun saveTutorialComplete(isComplete: Boolean = true)
 }

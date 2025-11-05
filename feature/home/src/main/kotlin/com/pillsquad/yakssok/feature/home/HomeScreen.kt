@@ -1,6 +1,5 @@
 package com.pillsquad.yakssok.feature.home
 
-import android.util.SparseArray
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
 import com.pillsquad.yakssok.core.model.FeedbackTarget
-import com.pillsquad.yakssok.core.model.FeedbackType
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
@@ -46,10 +44,10 @@ import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
+import com.pillsquad.yakssok.feature.home.component.TutorialColumn
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
-import com.pillsquad.yakssok.feature.home.model.RoutineGroup
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -66,6 +64,7 @@ internal fun HomeRoute(
     onNavigateCalendar: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isTutorialComplete by viewModel.isTutorialComplete.collectAsStateWithLifecycle()
     val showSnackbar = LocalShowErrorSnackBar.current
     var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
 
@@ -102,44 +101,76 @@ internal fun HomeRoute(
         )
     }
 
-    PullToRefreshColumn(
+    TutorialColumn(
+        uiState = uiState,
+        isTutorialNeed = !isTutorialComplete,
         refreshState = refreshState,
         isRefreshing = isRefreshing,
-        scaleFraction = scaleFraction,
+        highlightRect = null,
         onRefresh = onRefresh,
-        topBar = {
-            YakssokTopAppBar(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                isLogo = true,
-                onNavigateAlert = onNavigateAlert,
-                onNavigateMy = onNavigateMyPage
+        scaleFraction = scaleFraction,
+        onNavigateAlert = onNavigateAlert,
+        onNavigateMyPage = onNavigateMyPage,
+        onNextClick = {},
+    ) { state ->
+        if (isTutorialComplete && state.remindList.isNotEmpty()) {
+            RemindDialog(
+                name = state.userList.firstOrNull()?.nickName.orEmpty(),
+                routineList = state.remindList,
+                onDismiss = viewModel::clearRemindState
             )
         }
-    ) {
-        when (val state = uiState) {
-            is HomeUiState.Loading -> HomeSkeleton(showFeedbackSection = true)
-            is HomeUiState.Success -> {
-                state.remindList.firstOrNull()?.let {
-                    RemindDialog(
-                        name = state.userList.firstOrNull()?.nickName.orEmpty(),
-                        routineList = state.remindList,
-                        onDismiss = viewModel::clearRemindState
-                    )
-                }
 
-                HomeScreen(
-                    state = state,
-                    onClickUser = viewModel::onMateClick,
-                    onSelectDate = viewModel::onSelectedDate,
-                    onClickRoutine = viewModel::onRoutineClick,
-                    onClickFeedback = { feedbackTarget = it },
-                    onNavigateMate = onNavigateMate,
-                    onNavigateRoutine = onNavigateRoutine,
-                    onNavigateCalendar = onNavigateCalendar
-                )
-            }
-        }
+        HomeScreen(
+            state = state,
+            onClickUser = viewModel::onMateClick,
+            onSelectDate = viewModel::onSelectedDate,
+            onClickRoutine = viewModel::onRoutineClick,
+            onClickFeedback = { feedbackTarget = it },
+            onNavigateMate = onNavigateMate,
+            onNavigateRoutine = onNavigateRoutine,
+            onNavigateCalendar = onNavigateCalendar
+        )
     }
+//
+//    PullToRefreshColumn(
+//        refreshState = refreshState,
+//        isRefreshing = isRefreshing,
+//        scaleFraction = scaleFraction,
+//        onRefresh = onRefresh,
+//        topBar = {
+//            YakssokTopAppBar(
+//                modifier = Modifier.padding(horizontal = 16.dp),
+//                isLogo = true,
+//                onNavigateAlert = onNavigateAlert,
+//                onNavigateMy = onNavigateMyPage
+//            )
+//        }
+//    ) {
+//        when (val state = uiState) {
+//            is HomeUiState.Loading -> HomeSkeleton(showFeedbackSection = true)
+//            is HomeUiState.Success -> {
+//                state.remindList.firstOrNull()?.let {
+//                    RemindDialog(
+//                        name = state.userList.firstOrNull()?.nickName.orEmpty(),
+//                        routineList = state.remindList,
+//                        onDismiss = viewModel::clearRemindState
+//                    )
+//                }
+//
+//                HomeScreen(
+//                    state = state,
+//                    onClickUser = viewModel::onMateClick,
+//                    onSelectDate = viewModel::onSelectedDate,
+//                    onClickRoutine = viewModel::onRoutineClick,
+//                    onClickFeedback = { feedbackTarget = it },
+//                    onNavigateMate = onNavigateMate,
+//                    onNavigateRoutine = onNavigateRoutine,
+//                    onNavigateCalendar = onNavigateCalendar
+//                )
+//            }
+//        }
+//    }
 }
 
 @Composable
@@ -156,8 +187,7 @@ private fun HomeScreen(
     val showFeedbackSection by remember(state.feedbackTargetList) {
         derivedStateOf { state.feedbackTargetList.isNotEmpty() }
     }
-
-    val routineGroup = state.routineCache[state.selectedUserIdx]?.get(state.selectedDate)
+    val routineGroup = state.routineGroup
     val today = LocalDate.today()
 
     LazyColumn(
@@ -249,8 +279,6 @@ private fun HomeContent(
 ) {
     val shape =
         if (isRounded) RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp) else RectangleShape
-    val topPadding = if (isRounded) 32.dp else 10.dp
-
     val today = LocalDate.today()
     val weekDates by remember { derivedStateOf { calculateCurrentWeek(today) } }
 
@@ -271,7 +299,7 @@ private fun HomeContent(
             modifier = Modifier
                 .clip(shape)
                 .background(YakssokTheme.color.grey50)
-                .padding(top = topPadding, start = 16.dp, end = 16.dp),
+                .padding(top = if (isRounded) 32.dp else 10.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MateLazyRow(

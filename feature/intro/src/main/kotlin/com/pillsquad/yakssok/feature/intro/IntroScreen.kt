@@ -84,7 +84,13 @@ internal fun IntroRoute(
         }
     }
 
-    OnResumeEffect { viewModel.checkAppUpdate() }
+    OnResumeEffect {
+        viewModel.checkAppUpdate()
+        if (pendingCheck) {
+            pendingCheck = false
+            viewModel.postPushAgreement(isNotificationGranted(context))
+        }
+    }
 
     BackHandler {
         if (uiState.isHaveToSignup && !uiState.isLoading) {
@@ -107,17 +113,6 @@ internal fun IntroRoute(
             IntroEvent.ShowNetworkDialog -> showUpdateDialog = 2
             IntroEvent.ShowErrorDialog -> showUpdateDialog = 3
         }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME && pendingCheck) {
-                pendingCheck = false
-                viewModel.postPushAgreement(isNotificationGranted(context))
-            }
-        }
-        lifecycleOwner?.lifecycle?.addObserver(observer)
-        onDispose { lifecycleOwner?.lifecycle?.removeObserver(observer) }
     }
 
     LaunchedEffect(uiState.loginSuccess) {

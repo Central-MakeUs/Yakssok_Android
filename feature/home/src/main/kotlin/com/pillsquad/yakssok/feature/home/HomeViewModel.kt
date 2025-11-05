@@ -9,6 +9,7 @@ import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.domain.usecase.GetFeedbackTargetUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
+import com.pillsquad.yakssok.core.domain.usecase.GetUserTutorialCompleteUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
 import com.pillsquad.yakssok.core.model.User
@@ -22,10 +23,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DateTimeUnit
@@ -43,13 +46,20 @@ class HomeViewModel @Inject constructor(
     private val getUserRoutineUseCase: GetUserRoutineUseCase,
     private val getFeedbackTargetUseCase: GetFeedbackTargetUseCase,
     private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
-    private val postFeedbackUseCase: PostFeedbackUseCase
+    private val postFeedbackUseCase: PostFeedbackUseCase,
+    private val getTutorialCompleteUseCase: GetUserTutorialCompleteUseCase
 ) : ViewModel() {
     private val _errorFlow = MutableSharedFlow<Throwable>()
     val errorFlow = _errorFlow.asSharedFlow()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState = _uiState.asStateFlow()
+
+    val isTutorialComplete = getTutorialCompleteUseCase().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false
+    )
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
 
