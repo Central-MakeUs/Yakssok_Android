@@ -36,9 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +51,7 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.ui.R
 import com.pillsquad.yakssok.core.ui.ext.customInsets
+import com.pillsquad.yakssok.core.ui.ext.toRect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalTime
@@ -57,7 +61,8 @@ fun LazyListScope.dailyMedicineList(
     haveToTake: List<Routine>,
     taken: List<Routine>,
     onItemClick: (Int) -> Unit,
-    onNavigateToRoute: () -> Unit
+    onNavigateToRoute: () -> Unit,
+    onMeasure: (Rect) -> Unit = { _ -> }
 ) {
     val rows = buildMedRows(haveToTake, taken)
 
@@ -72,7 +77,8 @@ fun LazyListScope.dailyMedicineList(
     ) { row ->
         when (row) {
             is MedRow.Header -> {
-                TitleRow(row.title, onNavigateToRoute)
+                TitleRow(row.title, onNavigateToRoute, onMeasure)
+                Spacer(modifier = Modifier.padding(8.dp))
             }
 
             is MedRow.Entry -> {
@@ -139,8 +145,11 @@ fun LazyItemScope.MedicineRowItem(
 @Composable
 private fun TitleRow(
     title: String,
-    onNavigateToRoute: (() -> Unit)? = null
+    onNavigateToRoute: (() -> Unit)? = null,
+    onMeasure: (Rect) -> Unit = { _ -> }
 ) {
+    val density = LocalDensity.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,17 +165,23 @@ private fun TitleRow(
         )
 
         onNavigateToRoute?.let {
-            AddButton(onClick = it)
+            AddButton(
+                modifier = Modifier.onGloballyPositioned { coords ->
+                    onMeasure(coords.toRect(density, 4.dp, 4.dp))
+                },
+                onClick = it
+            )
         }
     }
 }
 
 @Composable
 private fun AddButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     IconButton(
-        modifier = Modifier
+        modifier = modifier
             .clip(CircleShape)
             .background(YakssokTheme.color.grey100)
             .size(28.dp),

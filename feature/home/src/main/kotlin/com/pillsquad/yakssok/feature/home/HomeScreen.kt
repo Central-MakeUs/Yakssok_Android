@@ -113,14 +113,15 @@ internal fun HomeRoute(
     TutorialColumn(
         uiState = uiState,
         isTutorialNeed = !isTutorialComplete,
+        highlightRect = rectMap[targetKeyState],
+        targetKey = targetKeyState,
         refreshState = refreshState,
         isRefreshing = isRefreshing,
-        highlightRect = rectMap[targetKeyState],
         onRefresh = onRefresh,
         scaleFraction = scaleFraction,
         onNavigateAlert = onNavigateAlert,
         onNavigateMyPage = onNavigateMyPage,
-        onNextClick = {},
+        onNextClick = viewModel::changeTutorialStep,
     ) { state ->
         if (isTutorialComplete && state.remindList.isNotEmpty()) {
             RemindDialog(
@@ -225,7 +226,8 @@ private fun HomeScreen(
                 onClickUser = onClickUser,
                 onSelectDate = onSelectDate,
                 onNavigateMate = onNavigateMate,
-                onNavigateCalendar = onNavigateCalendar
+                onNavigateCalendar = onNavigateCalendar,
+                onMeasure = onMeasure
             )
         }
 
@@ -245,7 +247,8 @@ private fun HomeScreen(
                 taken = routineGroup.taken,
                 isCheckBoxVisible = isCheckBoxVisible,
                 onItemClick = onClickRoutine,
-                onNavigateToRoute = onNavigateRoutine
+                onNavigateToRoute = onNavigateRoutine,
+                onMeasure = { rect -> onMeasure(TutorialTargetKey.ADD_ROUTINE, rect) }
             )
         }
 
@@ -293,7 +296,8 @@ private fun HomeContent(
     onClickUser: (Int) -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onNavigateMate: () -> Unit,
-    onNavigateCalendar: () -> Unit
+    onNavigateCalendar: () -> Unit,
+    onMeasure: (TutorialTargetKey, Rect) -> Unit
 ) {
     val shape =
         if (isRounded) RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp) else RectangleShape
@@ -325,7 +329,8 @@ private fun HomeContent(
                 userList = userProfileList,
                 selectedUserIdx = selectedUserIdx,
                 onNavigateMate = onNavigateMate,
-                onMateClick = onClickUser
+                onMateClick = onClickUser,
+                onMeasure = { rect -> onMeasure(TutorialTargetKey.ADD_FRIEND, rect) }
             )
             Spacer(modifier = Modifier.height(8.dp))
             WeekDataSelector(
