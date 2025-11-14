@@ -16,7 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -28,18 +32,26 @@ import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
 import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.FeedbackType
+import com.pillsquad.yakssok.core.ui.ext.toRect
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.feature.home.R
 
 @Composable
 internal fun UserInfoCard(
+    modifier: Modifier = Modifier,
     feedback: FeedbackTarget,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onMeasure: (Rect) -> Unit = { _ -> }
 ) {
     val isNagging = feedback.feedbackType == FeedbackType.NAG
+    val density = LocalDensity.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 16.dp)
+            .onGloballyPositioned {
+                onMeasure(it.toRect(density, 8.dp, 8.dp))
+            }
             .shadow(
                 offsetX = 0.dp,
                 offsetY = 4.dp,

@@ -18,14 +18,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +46,8 @@ import com.pillsquad.yakssok.core.ui.component.dailyMedicineList
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
+import com.pillsquad.yakssok.core.ui.ext.toRect
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.TutorialColumn
@@ -52,6 +58,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlin.collections.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +74,8 @@ internal fun HomeRoute(
     val isTutorialComplete by viewModel.isTutorialComplete.collectAsStateWithLifecycle()
     val showSnackbar = LocalShowErrorSnackBar.current
     var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
+    val rectMap = remember { mutableStateMapOf<TutorialTargetKey, Rect>() }
+    val targetKeyState by viewModel.currentTargetKey.collectAsStateWithLifecycle(TutorialTargetKey.EMPTY)
 
     val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
@@ -106,7 +115,7 @@ internal fun HomeRoute(
         isTutorialNeed = !isTutorialComplete,
         refreshState = refreshState,
         isRefreshing = isRefreshing,
-        highlightRect = null,
+        highlightRect = rectMap[targetKeyState],
         onRefresh = onRefresh,
         scaleFraction = scaleFraction,
         onNavigateAlert = onNavigateAlert,
@@ -129,7 +138,8 @@ internal fun HomeRoute(
             onClickFeedback = { feedbackTarget = it },
             onNavigateMate = onNavigateMate,
             onNavigateRoutine = onNavigateRoutine,
-            onNavigateCalendar = onNavigateCalendar
+            onNavigateCalendar = onNavigateCalendar,
+            onMeasure = { key, rect -> rectMap[key] = rect }
         )
     }
 //
@@ -183,6 +193,7 @@ private fun HomeScreen(
     onNavigateMate: () -> Unit,
     onNavigateRoutine: () -> Unit,
     onNavigateCalendar: () -> Unit,
+    onMeasure: (TutorialTargetKey, Rect) -> Unit
 ) {
     val showFeedbackSection by remember(state.feedbackTargetList) {
         derivedStateOf { state.feedbackTargetList.isNotEmpty() }
@@ -199,7 +210,8 @@ private fun HomeScreen(
             item {
                 FeedbackSection(
                     feedbackTargetList = state.feedbackTargetList,
-                    onClickFeedback = onClickFeedback
+                    onClickFeedback = onClickFeedback,
+                    onMeasure = onMeasure
                 )
             }
         }
@@ -244,7 +256,8 @@ private fun HomeScreen(
 @Composable
 private fun FeedbackSection(
     feedbackTargetList: List<FeedbackTarget>,
-    onClickFeedback: (FeedbackTarget) -> Unit
+    onClickFeedback: (FeedbackTarget) -> Unit,
+    onMeasure: (TutorialTargetKey, Rect) -> Unit
 ) {
     LazyRow(
         modifier = Modifier
@@ -258,7 +271,12 @@ private fun FeedbackSection(
 
             UserInfoCard(
                 feedback = feedbackTarget,
-                onClick = { onClickFeedback(feedbackTarget) }
+                onClick = { onClickFeedback(feedbackTarget) },
+                onMeasure = {
+                    if (index == 0) {
+                        onMeasure(TutorialTargetKey.FEEDBACK_ITEM, it)
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -285,15 +303,16 @@ private fun HomeContent(
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Spacer(modifier = Modifier
-            .background(YakssokTheme.color.grey100)
-            .matchParentSize()
-            .shadow(
-                color = Color.Black.copy(alpha = 0.15f),
-                blur = 12.dp,
-                offsetY = 4.dp,
-                shape = shape
-            )
+        Spacer(
+            modifier = Modifier
+                .background(YakssokTheme.color.grey100)
+                .matchParentSize()
+                .shadow(
+                    color = Color.Black.copy(alpha = 0.15f),
+                    blur = 12.dp,
+                    offsetY = 4.dp,
+                    shape = shape
+                )
         )
         Column(
             modifier = Modifier

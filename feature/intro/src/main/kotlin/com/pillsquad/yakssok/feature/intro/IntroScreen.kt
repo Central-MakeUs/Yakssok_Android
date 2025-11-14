@@ -59,7 +59,6 @@ internal fun IntroRoute(
 
     var showTestDialogShow by remember { mutableStateOf(false) }
 
-    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val context = LocalContext.current
     val activity = LocalView.current.context as Activity
     val showErrorSnackBar = LocalShowErrorSnackBar.current
