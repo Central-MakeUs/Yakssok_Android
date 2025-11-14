@@ -18,15 +18,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.ext.customInsets
+import com.pillsquad.yakssok.core.ui.ext.toPx
 import com.pillsquad.yakssok.feature.home.HomeSkeleton
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 
@@ -106,7 +108,9 @@ private fun TutorialOverlay(
     highlightRect: Rect?,
     onNextClick: () -> Unit
 ) {
+    val density = LocalDensity.current
     val overlayColor = YakssokTheme.color.black.copy(alpha = 0.7f)
+    val overlayRadius = 16.dp.toPx(density)
 
     Canvas(
         modifier = Modifier
@@ -117,16 +121,27 @@ private fun TutorialOverlay(
                 onClick = onNextClick
             )
     ) {
-        drawRect(color = overlayColor)
+        val path = Path().apply {
+            // 전체 영역
+            addRect(Rect(0f, 0f, size.width, size.height))
 
-        highlightRect?.let {
-            drawRoundRect(
-                color = Color.Transparent,
-                topLeft = Offset(it.left, it.top),
-                size = it.size,
-                cornerRadius = CornerRadius(16f, 16f),
-                blendMode = BlendMode.Clear
-            )
+            // 하이라이트 영역 빼기
+            highlightRect?.let {
+                addRoundRect(
+                    RoundRect(
+                        rect = it,
+                        cornerRadius = CornerRadius(overlayRadius, overlayRadius)
+                    )
+                )
+            }
+
+            // 차집합 (EvenOdd)
+            fillType = PathFillType.EvenOdd
         }
+
+        drawPath(
+            path = path,
+            color = overlayColor
+        )
     }
 }

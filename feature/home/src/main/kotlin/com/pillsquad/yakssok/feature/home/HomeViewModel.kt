@@ -14,6 +14,7 @@ import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserCache
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
 import com.pillsquad.yakssok.feature.home.model.RoutineGroup
 import com.pillsquad.yakssok.feature.home.model.toRoutineGroup
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -47,7 +49,7 @@ class HomeViewModel @Inject constructor(
     private val getFeedbackTargetUseCase: GetFeedbackTargetUseCase,
     private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
     private val postFeedbackUseCase: PostFeedbackUseCase,
-    private val getTutorialCompleteUseCase: GetUserTutorialCompleteUseCase
+    getTutorialCompleteUseCase: GetUserTutorialCompleteUseCase
 ) : ViewModel() {
     private val _errorFlow = MutableSharedFlow<Throwable>()
     val errorFlow = _errorFlow.asSharedFlow()
@@ -62,6 +64,17 @@ class HomeViewModel @Inject constructor(
     )
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
+
+    private val _tutorialStep = MutableStateFlow(0)
+    val tutorialStep = _tutorialStep.asStateFlow()
+    val currentTargetKey = tutorialStep.map {  step ->
+        when (step) {
+            0 -> TutorialTargetKey.FEEDBACK_ITEM
+            1 -> TutorialTargetKey.FEEDBACK_BUTTON
+            2 -> TutorialTargetKey.NOTIFICATION
+            else -> TutorialTargetKey.EMPTY
+        }
+    }
 
     private val today get() = LocalDate.today()
     private val now get() = LocalTime.now()
