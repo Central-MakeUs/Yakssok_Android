@@ -67,11 +67,13 @@ class HomeViewModel @Inject constructor(
 
     private val _tutorialStep = MutableStateFlow(0)
     val tutorialStep = _tutorialStep.asStateFlow()
-    val currentTargetKey = tutorialStep.map {  step ->
+    val currentTargetKey = tutorialStep.map { step ->
         when (step) {
-            0 -> TutorialTargetKey.FEEDBACK_ITEM
-            1 -> TutorialTargetKey.FEEDBACK_BUTTON
-            2 -> TutorialTargetKey.NOTIFICATION
+            0 -> TutorialTargetKey.ADD_FRIEND
+            1 -> TutorialTargetKey.ADD_ROUTINE
+            2 -> TutorialTargetKey.FEEDBACK_ITEM
+            3 -> TutorialTargetKey.FEEDBACK_BUTTON
+            4 -> TutorialTargetKey.NOTIFICATION
             else -> TutorialTargetKey.EMPTY
         }
     }
@@ -188,6 +190,10 @@ class HomeViewModel @Inject constructor(
         (_uiState.value as? HomeUiState.Success)?.let {
             _uiState.value = it.copy(isInit = false, remindList = emptyList())
         }
+    }
+
+    fun changeTutorialStep() {
+        _tutorialStep.value++
     }
 
     private suspend fun buildRoutineCache(

@@ -21,13 +21,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.R
+import com.pillsquad.yakssok.core.ui.ext.toRect
 
 @Composable
 fun MateLazyRow(
@@ -38,8 +42,11 @@ fun MateLazyRow(
     iconSize: Int = 20,
     iconButtonColor: Color = YakssokTheme.color.grey100,
     onNavigateMate: (() -> Unit)? = null,
-    onMateClick: (Int) -> Unit = {}
+    onMateClick: (Int) -> Unit = {},
+    onMeasure: (Rect) -> Unit = {}
 ) {
+    val density = LocalDensity.current
+
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -59,6 +66,9 @@ fun MateLazyRow(
             item {
                 Column {
                     AddIconButton(
+                        modifier = Modifier.onGloballyPositioned {
+                            onMeasure(it.toRect(density, 8.dp, 8.dp))
+                        },
                         size = imgSize,
                         iconSize = iconSize,
                         iconButtonColor = iconButtonColor,
@@ -102,13 +112,14 @@ fun MateItem(
 
 @Composable
 private fun AddIconButton(
+    modifier: Modifier = Modifier,
     size: Int,
     iconSize: Int,
     iconButtonColor: Color,
     onClick: () -> Unit
 ) {
     IconButton(
-        modifier = Modifier
+        modifier = modifier
             .size(size.dp)
             .clip(CircleShape)
             .background(iconButtonColor),

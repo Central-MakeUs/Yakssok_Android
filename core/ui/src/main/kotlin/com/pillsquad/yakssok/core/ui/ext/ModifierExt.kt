@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.pillsquad.yakssok.core.ui.model.Location
 
 @Composable
 fun Modifier.customInsets(
@@ -46,4 +48,15 @@ fun Modifier.yakssokDefault(color: Color): Modifier {
         .customInsets(top = true, bottom = true)
         .padding(horizontal = 16.dp)
         .padding(bottom = 16.dp)
+}
+
+fun getAlignmentByLocation(loc: Location): Alignment {
+    return when (loc) {
+        Location.TOP_START -> Alignment.TopStart
+        Location.TOP_END -> Alignment.TopEnd
+        Location.TOP_CENTER -> Alignment.TopCenter
+        Location.BOTTOM_START -> Alignment.BottomStart
+        Location.BOTTOM_END -> Alignment.BottomEnd
+        Location.BOTTOM_CENTER -> Alignment.BottomCenter
+    }
 }
