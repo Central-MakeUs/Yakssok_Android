@@ -8,5 +8,5 @@ class GetMateListUseCase @Inject constructor(
     private val friendRepository: FriendRepository
 ) {
     suspend operator fun invoke(): Result<List<User>> =
-        friendRepository.getFollowerList()
+        friendRepository.getMateList()
 }
