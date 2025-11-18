@@ -4,8 +4,6 @@ import com.pillsquad.yakssok.core.domain.repository.FriendRepository
 import com.pillsquad.yakssok.core.domain.repository.UserRepository
 import com.pillsquad.yakssok.core.model.User
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
@@ -15,7 +13,7 @@ class GetUserProfileListUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): Result<List<User>> = supervisorScope {
         val myDef = async { runCatching { userRepository.getMyUser() } }
-        val followingDef = async { friendRepository.getFollowingList() }
+        val followingDef = async { friendRepository.getMateList() }
 
         val me = myDef.await().getOrElse { return@supervisorScope Result.failure(it) }
         val others = followingDef.await().getOrElse { return@supervisorScope Result.failure(it) }
