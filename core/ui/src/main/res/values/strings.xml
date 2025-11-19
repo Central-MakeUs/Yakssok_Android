@@ -25,7 +25,7 @@
     <string name="feedback_button_highlight">전송버튼</string>
     <string name="feedback_button_second">을 눌러\n얼른 먹으라고 잔소리해요!</string>
 
-    <string name="notification_first">잔소리 전송완료!🥳\n튜토리얼이 끝났어요\n이제 본격적으로 </string>
+    <string name="notification_first">잔소리 전송완료! 🥳\n튜토리얼이 끝났어요\n이제 본격적으로 </string>
     <string name="notification_highlight">\'약쏙\'을 시작</string>
     <string name="notification_second">해볼까요?</string>
 

@@ -72,8 +72,9 @@ class HomeViewModel @Inject constructor(
             0 -> TutorialTargetKey.ADD_FRIEND
             1 -> TutorialTargetKey.ADD_ROUTINE
             2 -> TutorialTargetKey.FEEDBACK_ITEM
-            3 -> TutorialTargetKey.FEEDBACK_BUTTON
-            4 -> TutorialTargetKey.NOTIFICATION
+            3-> TutorialTargetKey.EMPTY
+            4 -> TutorialTargetKey.FEEDBACK_BUTTON
+            5 -> TutorialTargetKey.NOTIFICATION
             else -> TutorialTargetKey.EMPTY
         }
     }

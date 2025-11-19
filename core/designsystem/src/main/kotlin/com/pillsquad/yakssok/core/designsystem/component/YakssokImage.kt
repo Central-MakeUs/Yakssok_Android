@@ -1,7 +1,5 @@
 package com.pillsquad.yakssok.core.designsystem.component
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
@@ -10,25 +8,64 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.pillsquad.yakssok.core.designsystem.R
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
-import androidx.core.net.toUri
 
 @Composable
 fun YakssokImage(
     modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
     flag: Int = 0,
     imageUrl: String,
     contentDescription: String? = null,
     isStroke: Boolean = false,
 ) {
-    val shape = CircleShape
+    YakssokDefaultImage(
+        modifier = modifier,
+        shape = shape,
+        flag = flag,
+        model = imageUrl.toHttpsOrNull(),
+        contentDescription = contentDescription,
+        isStroke = isStroke,
+    )
+}
+
+@Composable
+fun YakssokImage(
+    modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
+    flag: Int = 0,
+    resource: Int = R.drawable.img_notification,
+    contentDescription: String? = null,
+    isStroke: Boolean = false,
+) {
+    YakssokDefaultImage(
+        modifier = modifier,
+        shape = shape,
+        flag = flag,
+        model = resource,
+        contentDescription = contentDescription,
+        isStroke = isStroke,
+    )
+}
+
+@Composable
+private fun YakssokDefaultImage(
+    modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
+    flag: Int = 0,
+    model: Any? = null,
+    contentDescription: String? = null,
+    isStroke: Boolean = false,
+) {
     val errorProfile = painterResource(
         when (flag % 3) {
             0 -> R.drawable.img_default_profile1
@@ -61,7 +98,7 @@ fun YakssokImage(
                         shape = shape,
                     ) else Modifier
             ),
-        model = imageUrl.toHttpsOrNull(),
+        model = model,
         contentScale = ContentScale.Crop,
         contentDescription = contentDescription ?: stringResource(R.string.yakssok_image),
         placeholder = errorProfile,

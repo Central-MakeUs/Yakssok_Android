@@ -54,6 +54,7 @@ import com.pillsquad.yakssok.feature.home.component.TutorialColumn
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
 import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import kotlinx.coroutines.delay
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -99,15 +100,12 @@ internal fun HomeRoute(
         }
     }
 
-    feedbackTarget?.let { feedback ->
-        FeedbackDialog(
-            feedback = feedback,
-            onDismiss = { feedbackTarget = null },
-            onConfirm = { userId, message, type ->
-                viewModel.postFeedback(userId, message, type)
-                feedbackTarget = null
-            }
-        )
+    LaunchedEffect(targetKeyState) {
+        if (targetKeyState == TutorialTargetKey.EMPTY && !isTutorialComplete && uiState is HomeUiState.Success) {
+            feedbackTarget = (uiState as HomeUiState.Success).feedbackTargetList[0]
+            delay(800)
+            viewModel.changeTutorialStep()
+        }
     }
 
     TutorialColumn(
@@ -122,6 +120,19 @@ internal fun HomeRoute(
         onNavigateAlert = onNavigateAlert,
         onNavigateMyPage = onNavigateMyPage,
         onNextClick = viewModel::changeTutorialStep,
+        onMeasure = { rect -> rectMap[TutorialTargetKey.NOTIFICATION] = rect },
+        dialog = {
+            feedbackTarget?.let { feedback ->
+                FeedbackDialog(
+                    feedback = feedback,
+                    onDismiss = { feedbackTarget = null },
+                    onConfirm = { userId, message, type ->
+                        viewModel.postFeedback(userId, message, type)
+                        feedbackTarget = null
+                    }
+                )
+            }
+        }
     ) { state ->
         if (isTutorialComplete && state.remindList.isNotEmpty()) {
             RemindDialog(
@@ -143,6 +154,8 @@ internal fun HomeRoute(
             onMeasure = { key, rect -> rectMap[key] = rect }
         )
     }
+
+
 //
 //    PullToRefreshColumn(
 //        refreshState = refreshState,
