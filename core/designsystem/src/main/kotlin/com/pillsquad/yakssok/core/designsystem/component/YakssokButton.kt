@@ -59,7 +59,7 @@ fun YakssokButton(
                 ) {
                     Icon(
                         painter = painterResource(id = icon),
-                        contentDescription = "login button"
+                        contentDescription = "yakssok button icon"
                     )
                 }
             }
