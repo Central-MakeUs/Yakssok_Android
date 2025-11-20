@@ -2,7 +2,6 @@ package com.pillsquad.yakssok.feature.home
 
 import android.util.SparseArray
 import androidx.core.util.size
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.common.today
@@ -11,26 +10,22 @@ import com.pillsquad.yakssok.core.domain.usecase.GetUserProfileListUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserRoutineUseCase
 import com.pillsquad.yakssok.core.domain.usecase.GetUserTutorialCompleteUseCase
 import com.pillsquad.yakssok.core.domain.usecase.PostFeedbackUseCase
+import com.pillsquad.yakssok.core.domain.usecase.PostUserTutorialCompleteUseCase
 import com.pillsquad.yakssok.core.domain.usecase.UpdateRoutineTakenUseCase
+import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.model.UserCache
+import com.pillsquad.yakssok.core.ui.base.BaseViewModel
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
-import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import com.pillsquad.yakssok.feature.home.model.HomeIntent
+import com.pillsquad.yakssok.feature.home.model.HomeSideEffect
+import com.pillsquad.yakssok.feature.home.model.HomeState
 import com.pillsquad.yakssok.feature.home.model.RoutineGroup
 import com.pillsquad.yakssok.feature.home.model.toRoutineGroup
 import com.pillsquad.yakssok.feature.home.model.toRoutineList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DateTimeUnit
@@ -49,108 +44,103 @@ class HomeViewModel @Inject constructor(
     private val getFeedbackTargetUseCase: GetFeedbackTargetUseCase,
     private val updateRoutineTakenUseCase: UpdateRoutineTakenUseCase,
     private val postFeedbackUseCase: PostFeedbackUseCase,
+    private val postUserTutorialCompleteUseCase: PostUserTutorialCompleteUseCase,
     getTutorialCompleteUseCase: GetUserTutorialCompleteUseCase
-) : ViewModel() {
-    private val _errorFlow = MutableSharedFlow<Throwable>()
-    val errorFlow = _errorFlow.asSharedFlow()
-
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
-    val uiState = _uiState.asStateFlow()
-
-    val isTutorialComplete = getTutorialCompleteUseCase().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = false
-    )
-
-    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
-
-    private val _tutorialStep = MutableStateFlow(0)
-    val tutorialStep = _tutorialStep.asStateFlow()
-    val currentTargetKey = tutorialStep.map { step ->
-        when (step) {
-            0 -> TutorialTargetKey.ADD_FRIEND
-            1 -> TutorialTargetKey.ADD_ROUTINE
-            2 -> TutorialTargetKey.FEEDBACK_ITEM
-            3-> TutorialTargetKey.EMPTY
-            4 -> TutorialTargetKey.FEEDBACK_BUTTON
-            5 -> TutorialTargetKey.NOTIFICATION
-            else -> TutorialTargetKey.EMPTY
-        }
-    }
-
+) : BaseViewModel<HomeIntent, HomeState, HomeSideEffect>(HomeState()) {
     private val today get() = LocalDate.today()
     private val now get() = LocalTime.now()
 
     init {
-        viewModelScope.launch { refreshTrigger.emit(Unit) }
-
         viewModelScope.launch {
-            refreshTrigger
-                .mapLatest { loadHome() }
-                .catch { throwable -> _errorFlow.emit(throwable) }
-                .collect { _uiState.value = it }
+            getTutorialCompleteUseCase().collect { isComplete ->
+                intent { copy(isTutorialComplete = isComplete) }
+            }
+        }
+
+        onIntent(HomeIntent.LoadInitial)
+    }
+
+    override fun onIntent(intent: HomeIntent) {
+        when (intent) {
+            HomeIntent.LoadInitial -> loadHome(initialLoad = true)
+            HomeIntent.Refresh -> loadHome(initialLoad = false)
+            HomeIntent.ClearRemind -> clearRemind()
+            HomeIntent.CloseFBDialog -> setFeedbackTarget(fbTarget = null)
+            HomeIntent.NextTutorialStep -> nextTutorialStep()
+            HomeIntent.NavigateToAlert -> postSideEffect(HomeSideEffect.NavigateToAlert)
+            HomeIntent.NavigateToCalendar -> postSideEffect(HomeSideEffect.NavigateToCalendar)
+            HomeIntent.NavigateToMate -> postSideEffect(HomeSideEffect.NavigateToMate)
+            HomeIntent.NavigateToMyPage -> postSideEffect(HomeSideEffect.NavigateToMyPage)
+            HomeIntent.NavigateToRoutine -> postSideEffect(HomeSideEffect.NavigateToRoutine)
+            is HomeIntent.SelectDate -> selectDate(date = intent.date)
+            is HomeIntent.SelectUser -> selectUser(idx = intent.idx)
+            is HomeIntent.ToggleRoutine -> toggleRoutine(routineId = intent.routineId)
+            is HomeIntent.PostFeedback -> postFeedback(intentData = intent)
+            is HomeIntent.SetFeedbackDialog -> setFeedbackTarget(fbTarget = intent.feedbackTarget)
         }
     }
 
-    fun refresh() {
-        viewModelScope.launch { refreshTrigger.emit(Unit) }
-    }
+    private fun loadHome(initialLoad: Boolean) {
+        viewModelScope.launch {
+            intent { copy(isLoading = initialLoad, isRefreshing = !initialLoad) }
 
-    private suspend fun loadHome(): HomeUiState {
-        val previous = _uiState.value as? HomeUiState.Success
+            val previous = currentState
 
-        return supervisorScope {
-            val users = getUserProfileListUseCase().getOrElse { throwable ->
-                _errorFlow.emit(throwable)
-                previous?.userList ?: HomeUiState.Success().userList
-            }
-
-            val (start, end) = getStartEndDate()
-            val routineDef = async { buildRoutineCache(users, start, end) }
-            val targetsDef = async {
-                getFeedbackTargetUseCase()
+            supervisorScope {
+                val users = getUserProfileListUseCase()
                     .getOrElse { throwable ->
-                        _errorFlow.emit(throwable)
-                        emptyList()
+                        postSideEffect(HomeSideEffect.ShowError(throwable = throwable))
+                        previous.userList
                     }
+
+                val (start, end) = getStartEndDate()
+
+                val routineDef = async { buildRoutineCache(users, start, end) }
+                val targetsDef = async {
+                    getFeedbackTargetUseCase()
+                        .getOrElse { throwable ->
+                            postSideEffect(HomeSideEffect.ShowError(throwable = throwable))
+                            emptyList()
+                        }
+                }
+
+                val cache = routineDef.await()
+                val targets = targetsDef.await()
+                val adjustedUsers = recomputeIsNotMedicine(users, cache)
+
+                val todayRemind =
+                    cache[0]?.get(today)?.haveToTake?.filter { it.isFeedbackRoutine(now) }.orEmpty()
+
+                val shouldShowRemind = (previous.isInit) && todayRemind.isNotEmpty()
+
+                intent {
+                    copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        isInit = false,
+                        selectedDate = previous.selectedDate.takeIf { !initialLoad } ?: today,
+                        selectedUserIdx = previous.selectedUserIdx,
+                        userList = adjustedUsers,
+                        feedbackTargetList = targets,
+                        routineCache = cache,
+                        remindList = if (shouldShowRemind) todayRemind else (previous.remindList)
+                    )
+                }
             }
-
-            val cache = routineDef.await()
-            val targets = targetsDef.await()
-
-            val adjustedUsers = recomputeIsNotMedicine(users, cache)
-            val todayRemind =
-                cache[0]?.get(today)?.haveToTake?.filter { it.isFeedbackRoutine(now) }.orEmpty()
-            val shouldShowRemind = (previous?.isInit ?: true) && todayRemind.isNotEmpty()
-
-            HomeUiState.Success(
-                isInit = previous?.isInit ?: true,
-                userList = adjustedUsers,
-                selectedDate = previous?.selectedDate ?: today,
-                selectedUserIdx = previous?.selectedUserIdx ?: 0,
-                routineCache = cache,
-                remindList = if (shouldShowRemind) todayRemind else (previous?.remindList
-                    ?: emptyList()),
-                feedbackTargetList = targets
-            )
         }
     }
 
-    fun onSelectedDate(date: LocalDate) {
-        (_uiState.value as? HomeUiState.Success)?.let {
-            _uiState.value = it.copy(selectedDate = date)
-        }
+
+    private fun selectDate(date: LocalDate) {
+        intent { copy(selectedDate = date) }
     }
 
-    fun onMateClick(userIdx: Int) {
-        (_uiState.value as? HomeUiState.Success)?.let {
-            _uiState.value = it.copy(selectedUserIdx = userIdx)
-        }
+    private fun selectUser(idx: Int) {
+        intent { copy(selectedUserIdx = idx) }
     }
 
-    fun onRoutineClick(routineId: Int) {
-        val state = _uiState.value as? HomeUiState.Success ?: return
+    private fun toggleRoutine(routineId: Int) {
+        val state = currentState
         val userIdx = state.selectedUserIdx
         val date = state.selectedDate
         if (userIdx != 0 || date != today) return
@@ -160,41 +150,93 @@ class HomeViewModel @Inject constructor(
             if (it.routineId == routineId) it.copy(isTaken = !it.isTaken) else it
         } ?: return
 
-        val newUserMap = currentMap.toMutableMap().apply { put(date, updated.toRoutineGroup()) }
+        val newUserMap = currentMap.toMutableMap().apply {
+            put(date, updated.toRoutineGroup())
+        }
         val newCache = state.routineCache.copyAndPut(userIdx, newUserMap)
 
-        _uiState.value = state.copy(routineCache = newCache)
+        intent { copy(routineCache = newCache) }
 
         viewModelScope.launch {
             updateRoutineTakenUseCase(routineId)
-                .onFailure { throwable -> _errorFlow.emit(throwable) }
-        }
-    }
-
-    fun postFeedback(userId: Int, message: String, type: String) {
-        viewModelScope.launch {
-            postFeedbackUseCase(userId, message, type)
-                .onSuccess {
-                    (_uiState.value as? HomeUiState.Success)?.let { state ->
-                        val newList = state.feedbackTargetList.filter { it.userId != userId }
-                        _uiState.value = state.copy(
-                            feedbackTargetList = newList,
-                        )
-                    }
-                }.onFailure { throwable ->
-                    _errorFlow.emit(throwable)
+                .onFailure { throwable ->
+                    postSideEffect(HomeSideEffect.ShowError(throwable))
                 }
         }
     }
 
-    fun clearRemindState() {
-        (_uiState.value as? HomeUiState.Success)?.let {
-            _uiState.value = it.copy(isInit = false, remindList = emptyList())
+    fun postFeedback(intentData: HomeIntent.PostFeedback) {
+        viewModelScope.launch {
+            postFeedbackUseCase(intentData.userId, intentData.message, intentData.type)
+                .onSuccess {
+                    val newList = currentState.feedbackTargetList
+                        .filter { it.userId != intentData.userId }
+
+                    intent { copy(feedbackTargetList = newList) }
+                }
+                .onFailure { throwable ->
+                    postSideEffect(HomeSideEffect.ShowError(throwable))
+                }
+
+            setFeedbackTarget(null)
         }
     }
 
-    fun changeTutorialStep() {
-        _tutorialStep.value++
+    private fun clearRemind() {
+        intent { copy(remindList = emptyList()) }
+    }
+
+    // 피드백 다이얼로그 타겟 설정 및 삭제
+    private fun setFeedbackTarget(fbTarget: FeedbackTarget?) {
+        intent { copy(feedbackDialogTarget = fbTarget) }
+    }
+
+    private fun nextTutorialStep() {
+        val newStep = currentState.tutorialStep + 1
+        intent { copy(tutorialStep = newStep) }
+        updateTutorialTarget(newStep)
+    }
+
+    private fun updateTutorialTarget(step: Int) {
+        val key = when (step) {
+            0 -> TutorialTargetKey.ADD_FRIEND
+            1 -> TutorialTargetKey.ADD_ROUTINE
+            2 -> TutorialTargetKey.FEEDBACK_ITEM
+            3 -> {
+                val feedbackTarget = currentState.feedbackTargetList[0]
+                setFeedbackTarget(feedbackTarget)
+                TutorialTargetKey.EMPTY
+            }
+            4 -> TutorialTargetKey.FEEDBACK_BUTTON
+            5 -> {
+                setFeedbackTarget(null)
+                TutorialTargetKey.NOTIFICATION
+                // delay -> 변경
+            }
+            6 -> TutorialTargetKey.NOTIFICATION_COMPLETE
+            7 -> {
+                endTutorial()
+                TutorialTargetKey.END
+            }
+            else -> {
+                TutorialTargetKey.EMPTY
+            }
+        }
+
+        intent { copy(currentTargetKey = key) }
+    }
+
+    private fun endTutorial() {
+        viewModelScope.launch {
+            postUserTutorialCompleteUseCase()
+                .onSuccess {
+                    onIntent(HomeIntent.LoadInitial)
+                }
+                .onFailure {
+                    intent { copy(isTutorialComplete = false) }
+                    onIntent(HomeIntent.LoadInitial)
+                }
+        }
     }
 
     private suspend fun buildRoutineCache(
@@ -225,13 +267,13 @@ class HomeViewModel @Inject constructor(
         return if (userId == null) {
             getUserRoutineUseCase(startDate, endDate)
                 .getOrElse { throwable ->
-                    _errorFlow.emit(throwable)
+                    postSideEffect(HomeSideEffect.ShowError(throwable = throwable))
                     UserCache.empty()
                 }
         } else {
             getUserRoutineUseCase(userId, startDate, endDate)
                 .getOrElse { throwable ->
-                    _errorFlow.emit(throwable)
+                    postSideEffect(HomeSideEffect.ShowError(throwable = throwable))
                     UserCache.empty()
                 }
         }

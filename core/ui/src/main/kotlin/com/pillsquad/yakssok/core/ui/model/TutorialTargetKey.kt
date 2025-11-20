@@ -29,7 +29,7 @@ enum class TutorialTargetKey(val loc: Location, val textGroupRes: ExplainTextGro
         )
     ),
     FEEDBACK_BUTTON(
-        loc = Location.TOP_END,
+        loc = Location.BOTTOM_END,
         textGroupRes = ExplainTextGroupRes(
             R.string.empty,
             R.string.feedback_button_highlight,
@@ -39,12 +39,28 @@ enum class TutorialTargetKey(val loc: Location, val textGroupRes: ExplainTextGro
     NOTIFICATION(
         loc = Location.TOP_CENTER,
         textGroupRes = ExplainTextGroupRes(
+            R.string.empty,
+            R.string.empty,
+            R.string.empty
+        )
+    ),
+    NOTIFICATION_COMPLETE(
+        loc = Location.TOP_CENTER,
+        textGroupRes = ExplainTextGroupRes(
             R.string.notification_first,
             R.string.notification_highlight,
             R.string.notification_second
         )
     ),
     EMPTY(
+        loc = Location.TOP_START,
+        textGroupRes = ExplainTextGroupRes(
+            R.string.empty,
+            R.string.empty,
+            R.string.empty
+        )
+    ),
+    END(
         loc = Location.TOP_START,
         textGroupRes = ExplainTextGroupRes(
             R.string.empty,

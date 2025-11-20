@@ -33,8 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -49,20 +51,23 @@ import com.pillsquad.yakssok.core.model.Routine
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.DailyMedicineRow
 import com.pillsquad.yakssok.core.ui.ext.customInsets
+import com.pillsquad.yakssok.core.ui.ext.toRect
 
 @Composable
 internal fun FeedbackDialog(
     feedback: FeedbackTarget,
+    initialText: String = "",
     onDismiss: () -> Unit,
-    onConfirm: (Int, String, String) -> Unit
+    onConfirm: (Int, String, String) -> Unit,
+    onMeasure: (Rect) -> Unit
 ) {
-    val scrollState = rememberScrollState()
     val density = LocalDensity.current
-    val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
+    val scrollState = rememberScrollState()
+    val imeHeight = WindowInsets.ime.getBottom(density)
 
     val isNagging = feedback.feedbackType == FeedbackType.NAG
-    val hintText = if (isNagging) "한 줄 잔소리" else "한 줄 칭찬"
 
+    val hintText = if (isNagging) "한 줄 잔소리" else "한 줄 칭찬"
     val textList = if (isNagging) {
         listOf("얼른 먹어요!", "약 놓쳤어요!", "건강 챙겨요!", "먹을 때까지 숨 참을게요 흡!")
     } else {
@@ -70,8 +75,8 @@ internal fun FeedbackDialog(
     }
 
     var selectedTextIdx by remember { mutableStateOf<Int?>(null) }
-    var feedbackMessage by remember { mutableStateOf("") }
-    var enabled by remember { mutableStateOf(false) }
+    var feedbackMessage by remember { mutableStateOf(initialText) }
+    var enabled by remember { mutableStateOf(feedbackMessage.isNotBlank()) }
 
     val confirmColor = when {
         isNagging && enabled -> YakssokTheme.color.primary400
@@ -80,7 +85,10 @@ internal fun FeedbackDialog(
     }
     val contentColor = if (enabled) YakssokTheme.color.grey50 else YakssokTheme.color.grey400
 
-    LaunchedEffect(selectedTextIdx, feedbackMessage) {
+    LaunchedEffect(
+        selectedTextIdx,
+        feedbackMessage
+    ) {
         enabled = selectedTextIdx != null || feedbackMessage.isNotBlank()
     }
 
@@ -97,7 +105,6 @@ internal fun FeedbackDialog(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             )
-            .imePadding()
             .verticalScroll(scrollState)
             .customInsets(top = true, bottom = true),
         verticalArrangement = Arrangement.Bottom,
@@ -105,6 +112,7 @@ internal fun FeedbackDialog(
     ) {
         Column(
             modifier = Modifier
+                .imePadding()
                 .padding(bottom = 16.dp)
                 .fillMaxWidth(0.92f)
                 .clickable(
@@ -135,128 +143,82 @@ internal fun FeedbackDialog(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            DialogContent(
-                isNagging = isNagging,
-                routineList = feedback.routineList,
-                textList = textList,
-                selectedTextIdx = selectedTextIdx,
-                hintText = hintText,
-                feedbackMessage = feedbackMessage,
-                onSelectedTextChange = {
-                    selectedTextIdx = it
-                    feedbackMessage = ""
-                },
-                onFeedbackMessageChange = {
-                    feedbackMessage = it
-                }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                YakssokButton(
-                    modifier = Modifier.weight(1f),
-                    text = "닫기",
-                    backgroundColor = YakssokTheme.color.grey100,
-                    onClick = onDismiss
-                )
-                YakssokButton(
-                    modifier = Modifier.weight(2.7f),
-                    text = "전송",
-                    contentColor = contentColor,
-                    backgroundColor = confirmColor,
-                    enabled = enabled,
-                    onClick = {
-                        val message = feedbackMessage.ifEmpty {
-                            textList[selectedTextIdx ?: 0]
-                        }
-                        val type = if (isNagging) "nag" else "praise"
-                        onConfirm(feedback.userId, message, type)
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DialogContent(
-    isNagging: Boolean,
-    routineList: List<Routine>,
-    textList: List<String>,
-    selectedTextIdx: Int?,
-    hintText: String,
-    feedbackMessage: String,
-    onSelectedTextChange: (Int?) -> Unit,
-    onFeedbackMessageChange: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .imePadding()
-    ) {
-        if (routineList.size > 3) {
-            val itemHeight = 56.dp
-            val maxVisibleItems = 4
-            val scrollState = rememberScrollState()
-
-            Column(
-                modifier = Modifier
-                    .height(itemHeight * maxVisibleItems + 24.dp)
-                    .verticalScroll(scrollState)
-            ) {
-                routineList.forEach {
-                    DailyMedicineRow(
-                        routine = it,
-                        isFeedback = true,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-        } else {
-            routineList.forEach {
+            feedback.routineList.forEach {
                 DailyMedicineRow(
                     routine = it,
                     isFeedback = true,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        HorizontalDivider(color = YakssokTheme.color.grey200)
+            HorizontalDivider(color = YakssokTheme.color.grey200)
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        SelectFeedbackRow(
-            textList = textList,
-            isNagging = isNagging,
-            selectedTextIdx = selectedTextIdx,
-            onTextChange = {
-                if (feedbackMessage.isEmpty()) {
-                    onSelectedTextChange(it)
+            SelectFeedbackRow(
+                textList = textList,
+                isNagging = isNagging,
+                selectedTextIdx = selectedTextIdx,
+                onTextChange = {
+                    if (feedbackMessage.isEmpty()) {
+                        selectedTextIdx = it
+                        feedbackMessage = ""
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(
+                modifier = Modifier
+                    .onGloballyPositioned {
+                        onMeasure(it.toRect(density, 16.dp, 16.dp))
+                    }
+            ) {
+                YakssokTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = feedbackMessage,
+                    onValueChange = {
+                        if (it.isNotBlank()) selectedTextIdx = null
+                        feedbackMessage = it
+                    },
+                    hint = hintText,
+                    maxLength = 15,
+                    isShowCounter = true,
+                    isShowClear = true
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    YakssokButton(
+                        modifier = Modifier.weight(1f),
+                        text = "닫기",
+                        backgroundColor = YakssokTheme.color.grey100,
+                        onClick = onDismiss
+                    )
+                    YakssokButton(
+                        modifier = Modifier.weight(2.7f),
+                        text = "전송",
+                        contentColor = contentColor,
+                        backgroundColor = confirmColor,
+                        enabled = enabled,
+                        onClick = {
+                            val message = feedbackMessage.ifEmpty {
+                                textList[selectedTextIdx ?: 0]
+                            }
+                            val type = if (isNagging) "nag" else "praise"
+                            onConfirm(feedback.userId, message, type)
+                        }
+                    )
                 }
             }
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        YakssokTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = feedbackMessage,
-            onValueChange = {
-                if (it.isNotBlank()) onSelectedTextChange(null)
-                onFeedbackMessageChange(it)
-            },
-            hint = hintText,
-            maxLength = 15,
-            isShowCounter = true,
-            isShowClear = true
-        )
+        }
     }
 }
 

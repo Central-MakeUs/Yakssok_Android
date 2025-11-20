@@ -22,7 +22,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         return userLocalDataSource.tutorialCompleteFlow
     }
 
-    override suspend fun saveTutorialComplete(isComplete: Boolean) {
+    override suspend fun saveTutorialComplete(isComplete: Boolean): Result<Unit> = runCatching {
         userLocalDataSource.saveTutorialComplete(isComplete)
     }
 }
