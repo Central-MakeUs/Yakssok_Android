@@ -25,7 +25,9 @@ import com.pillsquad.yakssok.feature.home.model.toRoutineGroup
 import com.pillsquad.yakssok.feature.home.model.toRoutineList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.DateTimeUnit
@@ -49,6 +51,9 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel<HomeIntent, HomeState, HomeSideEffect>(HomeState()) {
     private val today get() = LocalDate.today()
     private val now get() = LocalTime.now()
+
+    private val autoSteps = setOf(3, 5)
+    private var autoJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -198,6 +203,10 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun updateTutorialTarget(step: Int) {
+        if (step in autoSteps) {
+            runAutoAdvance()
+        }
+
         val key = when (step) {
             0 -> TutorialTargetKey.ADD_FRIEND
             1 -> TutorialTargetKey.ADD_ROUTINE
@@ -211,7 +220,6 @@ class HomeViewModel @Inject constructor(
             5 -> {
                 setFeedbackTarget(null)
                 TutorialTargetKey.NOTIFICATION
-                // delay -> 변경
             }
             6 -> TutorialTargetKey.NOTIFICATION_COMPLETE
             7 -> {
@@ -236,6 +244,16 @@ class HomeViewModel @Inject constructor(
                     intent { copy(isTutorialComplete = false) }
                     onIntent(HomeIntent.LoadInitial)
                 }
+        }
+    }
+
+    private fun runAutoAdvance() {
+        autoJob?.cancel() // 중복 방지
+
+        autoJob = viewModelScope.launch {
+            delay(700L)
+
+            nextTutorialStep()
         }
     }
 
