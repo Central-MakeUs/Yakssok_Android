@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tutorial_button">시작하기</string>
+    <string name="initial_text">약 까먹었네? 얼른 먹어!</string>
+
+    <string name="example_notification_iamge">약쏙 알림 예시</string>
+
+    <string name="notification_title">김약쏙 님이 잔소리해요!</string>
+    <string name="notification_content">약 까먹었네? 얼른 먹어! 💊</string>
+    <string name="notification_time">3:00 pm</string>
+
+    <string name="remind_dialog_title">%1$s님,\n지금 드셔야 할 약이에요</string>
+    <string name="dialog_close">닫기</string>
+    <string name="divider">구분선</string>
+
+    <string name="not_taken_title">안먹은 약ㆍ</string>
+    <string name="routine_count">%1$d개</string>
+    <string name="all_taken_title">다먹었어요!</string>
+    <string name="image_allet">축하 이모지</string>
+    <string name="btn_nag">잔소리 보내기</string>
+    <string name="btn_praise">칭찬 보내기</string>
+
+    <string name="calendar_title">%1$d년 %2$d월</string>
+    <string name="calendar">캘린더</string>
+    <string name="navigate_calendar_description">캘린더 이동 아이콘</string>
+
+    <string-array name="day_labels">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
+
+    <string name="empty" />
 </resources>

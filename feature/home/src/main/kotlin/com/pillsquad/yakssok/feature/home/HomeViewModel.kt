@@ -216,16 +216,19 @@ class HomeViewModel @Inject constructor(
                 setFeedbackTarget(feedbackTarget)
                 TutorialTargetKey.EMPTY
             }
+
             4 -> TutorialTargetKey.FEEDBACK_BUTTON
             5 -> {
                 setFeedbackTarget(null)
                 TutorialTargetKey.NOTIFICATION
             }
+
             6 -> TutorialTargetKey.NOTIFICATION_COMPLETE
             7 -> {
                 endTutorial()
                 TutorialTargetKey.END
             }
+
             else -> {
                 TutorialTargetKey.EMPTY
             }

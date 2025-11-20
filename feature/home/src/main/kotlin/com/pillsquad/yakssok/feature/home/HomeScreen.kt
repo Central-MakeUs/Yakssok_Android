@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -120,7 +121,9 @@ internal fun HomeRoute(
             state.feedbackDialogTarget?.let { feedback ->
                 FeedbackDialog(
                     feedback = feedback,
-                    initialText = if (state.isTutorialComplete) "" else "약 까먹었네? 얼른 먹어!",
+                    initialText = stringResource(
+                        if (state.isTutorialComplete) R.string.empty else R.string.initial_text
+                    ),
                     onDismiss = {
                         viewModel.onIntent(HomeIntent.CloseFBDialog)
                     },

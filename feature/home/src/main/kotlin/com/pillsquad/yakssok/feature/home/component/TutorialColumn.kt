@@ -285,7 +285,7 @@ private fun ExampleNotification(
         YakssokImage(
             modifier = Modifier.size(45.dp),
             shape = RoundedCornerShape(8.dp),
-            contentDescription = "약쏙 알림 예시"
+            contentDescription = stringResource(R.string.example_notification_iamge)
         )
         Spacer(modifier = Modifier.padding(12.dp))
         NotificationContent()
@@ -303,18 +303,18 @@ private fun NotificationContent() {
             Text(
                 color = YakssokTheme.color.black,
                 style = YakssokTheme.typography.subtitle2,
-                text = "김약쏙 님이 잔소리해요!"
+                text = stringResource(R.string.notification_title)
             )
             Text(
                 color = YakssokTheme.color.grey800,
                 style = YakssokTheme.typography.body2,
-                text = "약 까먹었네? 얼른 먹어! \uD83D\uDC8A"
+                text = stringResource(R.string.notification_content)
             )
         }
         Text(
             color = YakssokTheme.color.grey400,
             style = YakssokTheme.typography.body2,
-            text = "3:00 pm"
+            text = stringResource(R.string.notification_time)
         )
     }
 }

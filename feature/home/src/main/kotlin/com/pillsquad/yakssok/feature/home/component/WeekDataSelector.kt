@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pillsquad.yakssok.core.common.today
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
@@ -61,7 +63,11 @@ private fun CalendarHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "${selectedDate.year}년 ${selectedDate.month.number}월",
+            text = stringResource(
+                R.string.calendar_title,
+                selectedDate.year,
+                selectedDate.month.number
+            ),
             style = YakssokTheme.typography.body2,
             color = YakssokTheme.color.grey500
         )
@@ -71,13 +77,13 @@ private fun CalendarHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "캘린더",
+                text = stringResource(R.string.calendar),
                 style = YakssokTheme.typography.body2,
                 color = YakssokTheme.color.grey400
             )
             Icon(
                 painter = painterResource(R.drawable.ic_arrow),
-                contentDescription = null,
+                contentDescription = stringResource(R.string.navigate_calendar_description),
                 tint = YakssokTheme.color.grey400
             )
         }
@@ -91,7 +97,7 @@ private fun RowCalendar(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
 ) {
-    val dayLabels = listOf("월", "화", "수", "목", "금", "토", "일")
+    val dayLabels = stringArrayResource(R.array.day_labels)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -100,7 +106,8 @@ private fun RowCalendar(
         weekDates.forEachIndexed { idx, date ->
             val isSelected = (date == selectedDate)
             val label = dayLabels[idx]
-            val textStyle = if (isSelected) YakssokTheme.typography.subtitle2 else YakssokTheme.typography.body1
+            val textStyle =
+                if (isSelected) YakssokTheme.typography.subtitle2 else YakssokTheme.typography.body1
             val weekColor = if (date == today) {
                 YakssokTheme.color.primary400
             } else {

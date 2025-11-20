@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -82,17 +83,22 @@ internal fun UserInfoCard(
                 Text(
                     buildAnnotatedString {
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey500)) {
-                            append("안먹은 약ㆍ")
+                            append(stringResource(R.string.not_taken_title))
                         }
                         withStyle(style = SpanStyle(color = YakssokTheme.color.grey900)) {
-                            append("${feedback.routineCount}개")
+                            append(
+                                stringResource(
+                                    R.string.routine_count,
+                                    feedback.routineCount
+                                )
+                            )
                         }
                     },
                     style = YakssokTheme.typography.body2,
                 )
             } else {
                 Text(
-                    text = "다먹었어요!",
+                    text = stringResource(R.string.all_taken_title),
                     style = YakssokTheme.typography.body2,
                     color = YakssokTheme.color.grey500
                 )
@@ -102,7 +108,7 @@ internal fun UserInfoCard(
                 Icon(
                     modifier = Modifier.size(21.dp),
                     painter = painterResource(R.drawable.img_alleat),
-                    contentDescription = "congratuation",
+                    contentDescription = stringResource(R.string.image_allet),
                     tint = Color.Unspecified
                 )
             }
@@ -111,7 +117,7 @@ internal fun UserInfoCard(
         if (isNagging) {
             YakssokButton(
                 modifier = Modifier.height(40.dp),
-                text = "잔소리 보내기",
+                text = stringResource(R.string.btn_nag),
                 round = 8.dp,
                 contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
                 backgroundColor = YakssokTheme.color.grey900,
@@ -123,7 +129,7 @@ internal fun UserInfoCard(
                 modifier = Modifier
                     .width(120.dp)
                     .height(40.dp),
-                text = "칭찬 보내기",
+                text = stringResource(R.string.btn_praise),
                 round = 8.dp,
                 contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
                 backgroundColor = YakssokTheme.color.subBlue,
