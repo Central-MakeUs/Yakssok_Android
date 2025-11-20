@@ -110,8 +110,10 @@ internal fun HomeRoute(
         onNavigateMyPage = {
             viewModel.onIntent(HomeIntent.NavigateToMyPage)
         },
-        onNextClick = {
-            viewModel.onIntent(HomeIntent.NextTutorialStep)
+        onClickNextStep = {
+            if (state.tutorialStep !in listOf(3, 5)) {
+                viewModel.onIntent(HomeIntent.NextTutorialStep)
+            }
         },
         onMeasure = { rect -> rectMap[TutorialTargetKey.NOTIFICATION_COMPLETE] = rect },
         dialog = {

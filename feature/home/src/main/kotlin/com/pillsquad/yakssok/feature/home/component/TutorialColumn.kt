@@ -68,7 +68,7 @@ internal fun TutorialColumn(
     scaleFraction: () -> Float = { 1f },
     onNavigateAlert: () -> Unit = {},
     onNavigateMyPage: () -> Unit = {},
-    onNextClick: () -> Unit = {},
+    onClickNextStep: () -> Unit = {},
     onMeasure: (Rect) -> Unit = { _ -> },
     dialog: @Composable () -> Unit = {},
     onSuccess: @Composable () -> Unit
@@ -116,7 +116,7 @@ internal fun TutorialColumn(
                 isOverlay = !hideOverlay,
                 overlayAlaph = overlayAlpha,
                 highlightRect = highlightRect,
-                onNextClick = onNextClick
+                onClickNextStep = onClickNextStep
             )
 
             if (isExplainVisible) {
@@ -154,7 +154,7 @@ internal fun TutorialColumn(
                     ),
                     text = stringResource(R.string.tutorial_button),
                     contentColor = YakssokTheme.color.grey50,
-                    onClick = onNextClick
+                    onClick = onClickNextStep
                 )
             }
         }
@@ -199,7 +199,7 @@ private fun TutorialOverlay(
     isOverlay: Boolean = true,
     overlayAlaph: Float = 0.7f,
     highlightRect: Rect?,
-    onNextClick: () -> Unit
+    onClickNextStep: () -> Unit
 ) {
     val overlayRadius = 16.dp.toPx(density)
     val overlayColor = if (isOverlay) {
@@ -232,7 +232,7 @@ private fun TutorialOverlay(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = onNextClick
+                onClick = onClickNextStep
             )
     ) {
         drawPath(path = overlayPath, color = overlayColor)
