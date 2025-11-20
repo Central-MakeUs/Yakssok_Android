@@ -1,15 +1,12 @@
 package com.pillsquad.yakssok.feature.home.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,15 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.pillsquad.yakssok.core.common.formatLocalTime
-import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.model.Routine
-import com.pillsquad.yakssok.core.ui.R
-import com.pillsquad.yakssok.core.ui.component.DailyMedicineRow
 import com.pillsquad.yakssok.core.ui.component.YakssokDialog
+import com.pillsquad.yakssok.feature.home.R
 
 @Composable
 internal fun RemindDialog(
@@ -44,8 +37,8 @@ internal fun RemindDialog(
     onDismiss: () -> Unit,
 ) {
     YakssokDialog(
-        title = "${name}님,\n지금 드셔야 할 약이에요",
-        confirmText = "닫기",
+        title = stringResource(R.string.remind_dialog_title, name),
+        confirmText = stringResource(R.string.dialog_close),
         onDismiss = onDismiss,
         onConfirm = onDismiss,
         confirmContentColor = YakssokTheme.color.grey400,
@@ -113,7 +106,7 @@ private fun RoutineItem(
                 modifier = Modifier
                     .width(1.dp)
                     .height(10.dp),
-                painter = painterResource(R.drawable.ic_divider),
+                painter = painterResource(com.pillsquad.yakssok.core.ui.R.drawable.ic_divider),
                 contentDescription = stringResource(R.string.divider),
                 tint = Color.Unspecified
             )
