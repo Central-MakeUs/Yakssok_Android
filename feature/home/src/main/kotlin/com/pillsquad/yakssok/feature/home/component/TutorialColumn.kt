@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
@@ -57,17 +56,14 @@ import com.pillsquad.yakssok.core.ui.model.Location
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.feature.home.HomeSkeleton
 import com.pillsquad.yakssok.feature.home.R
-import com.pillsquad.yakssok.feature.home.model.HomeUiState
+import com.pillsquad.yakssok.feature.home.model.HomeState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TutorialColumn(
-    uiState: HomeUiState,
-    isTutorialNeed: Boolean,
+    state: HomeState,
     highlightRect: Rect? = null,
-    targetKey: TutorialTargetKey,
     refreshState: PullToRefreshState = rememberPullToRefreshState(),
-    isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
     scaleFraction: () -> Float = { 1f },
     onNavigateAlert: () -> Unit = {},
@@ -75,10 +71,11 @@ internal fun TutorialColumn(
     onNextClick: () -> Unit = {},
     onMeasure: (Rect) -> Unit = { _ -> },
     dialog: @Composable () -> Unit = {},
-    onSuccess: @Composable (state: HomeUiState.Success) -> Unit
+    onSuccess: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
     val screenHeightPx = LocalWindowInfo.current.containerSize.height
+
     var explainRect by remember { mutableStateOf<Rect?>(null) }
 
     val textTopDp = remember(highlightRect, density) {
@@ -95,77 +92,66 @@ internal fun TutorialColumn(
         explainRect?.let { with(density) { it.bottom.toDp() + 20.dp } } ?: textTopDp
     }
 
-    val isEmpty = targetKey == TutorialTargetKey.EMPTY
+    val isExplainVisible = !state.currentTargetKey.shouldHideExplain() && highlightRect != null
+    val isNotificationVisible = state.currentTargetKey.isNotificationKey()
+    val hideOverlay = state.currentTargetKey.shouldHideOverlay()
+    val overlayAlpha = if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION) 0.3f else 0.7f
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        PullToRefreshColumn(
+    Box(modifier = Modifier.fillMaxSize()) {
+        MainContent(
+            state = state,
             refreshState = refreshState,
-            isRefreshing = isRefreshing,
             scaleFraction = scaleFraction,
             onRefresh = onRefresh,
-            topBar = {
-                YakssokTopAppBar(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    isLogo = true,
-                    onNavigateAlert = onNavigateAlert,
-                    onNavigateMy = onNavigateMyPage
-                )
-            }
-        ) {
-            when (val state = uiState) {
-                is HomeUiState.Loading -> HomeSkeleton(showFeedbackSection = true)
-                is HomeUiState.Success -> onSuccess(state)
-            }
-        }
+            onNavigateAlert = onNavigateAlert,
+            onNavigateMyPage = onNavigateMyPage,
+            onSuccess = onSuccess
+        )
 
         dialog()
 
-        if (isTutorialNeed) {
+        if (!state.isTutorialComplete) {
             TutorialOverlay(
                 density = density,
-                isOverlay = !isEmpty,
+                isOverlay = !hideOverlay,
+                overlayAlaph = overlayAlpha,
                 highlightRect = highlightRect,
                 onNextClick = onNextClick
             )
 
-            if (!isEmpty) {
+            if (isExplainVisible) {
                 ExplainText(
                     modifier = Modifier
-                        .align(getAlignmentByLocation(targetKey.loc))
+                        .align(getAlignmentByLocation(state.currentTargetKey.loc))
                         .padding(
                             start = 32.dp,
-                            top = if (targetKey.loc.isTop) textTopDp else 0.dp,
+                            top = if (state.currentTargetKey.loc.isTop) textTopDp else 0.dp,
                             end = 32.dp,
-                            bottom = if (!targetKey.loc.isTop) textBottomDp else 0.dp
+                            bottom = if (!state.currentTargetKey.loc.isTop) textBottomDp else 0.dp
                         )
                         .onGloballyPositioned {
                             explainRect = it.toRect(density)
                         },
-                    firstContent = stringResource(targetKey.textGroupRes.firstContent),
-                    highlightContent = stringResource(targetKey.textGroupRes.highlightContent),
-                    secondContent = stringResource(targetKey.textGroupRes.secondContent)
+                    firstContent = stringResource(state.currentTargetKey.textGroupRes.firstContent),
+                    highlightContent = stringResource(state.currentTargetKey.textGroupRes.highlightContent),
+                    secondContent = stringResource(state.currentTargetKey.textGroupRes.secondContent)
                 )
             }
 
-            if (targetKey == TutorialTargetKey.NOTIFICATION) {
+            if (isNotificationVisible) {
                 ExampleNotification(
-                    modifier = Modifier
-                        .padding(top = 72.dp, start = 16.dp, end = 16.dp)
-                        .fillMaxWidth()
-                        .onGloballyPositioned {
-                            onMeasure(it.toRect(density))
-                        }
+                    density = density,
+                    onMeasure = onMeasure
                 )
+            }
 
+            if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION_COMPLETE) {
                 YakssokButton(
-                    modifier = Modifier
-                        .padding(
-                            start = 72.dp,
-                            end = 72.dp,
-                            top = explainTopDp,
-                        ),
+                    modifier = Modifier.padding(
+                        start = 72.dp,
+                        end = 72.dp,
+                        top = explainTopDp,
+                    ),
                     text = stringResource(R.string.tutorial_button),
                     contentColor = YakssokTheme.color.grey50,
                     onClick = onNextClick
@@ -175,34 +161,66 @@ internal fun TutorialColumn(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainContent(
+    state: HomeState,
+    refreshState: PullToRefreshState,
+    scaleFraction: () -> Float,
+    onRefresh: () -> Unit,
+    onNavigateAlert: () -> Unit,
+    onNavigateMyPage: () -> Unit,
+    onSuccess: @Composable () -> Unit
+) {
+    PullToRefreshColumn(
+        refreshState = refreshState,
+        isRefreshing = state.isRefreshing,
+        scaleFraction = scaleFraction,
+        onRefresh = onRefresh,
+        topBar = {
+            YakssokTopAppBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                isLogo = true,
+                onNavigateAlert = onNavigateAlert,
+                onNavigateMy = onNavigateMyPage
+            )
+        }) {
+        if (state.isLoading) {
+            HomeSkeleton(showFeedbackSection = true)
+        } else {
+            onSuccess()
+        }
+    }
+}
+
 @Composable
 private fun TutorialOverlay(
     density: Density,
     isOverlay: Boolean = true,
+    overlayAlaph: Float = 0.7f,
     highlightRect: Rect?,
     onNextClick: () -> Unit
 ) {
     val overlayRadius = 16.dp.toPx(density)
     val overlayColor = if (isOverlay) {
-        YakssokTheme.color.black.copy(alpha = 0.7f)
+        YakssokTheme.color.black.copy(alpha = overlayAlaph)
     } else {
         Color.Transparent
     }
+
+    val interactionSource = remember { MutableInteractionSource() }
 
     var canvasSize by remember { mutableStateOf(Size.Zero) }
     val overlayPath = remember(highlightRect, canvasSize, overlayRadius) {
         Path().apply {
             addRect(Rect(0f, 0f, canvasSize.width, canvasSize.height))
-
             highlightRect?.let {
                 addRoundRect(
                     RoundRect(
-                        rect = it,
-                        cornerRadius = CornerRadius(overlayRadius, overlayRadius)
+                        rect = it, cornerRadius = CornerRadius(overlayRadius, overlayRadius)
                     )
                 )
             }
-
             fillType = PathFillType.EvenOdd
         }
     }
@@ -212,15 +230,12 @@ private fun TutorialOverlay(
             .fillMaxSize()
             .onSizeChanged { size -> canvasSize = size.toSize() }
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = interactionSource,
                 indication = null,
                 onClick = onNextClick
             )
     ) {
-        drawPath(
-            path = overlayPath,
-            color = overlayColor
-        )
+        drawPath(path = overlayPath, color = overlayColor)
     }
 }
 
@@ -245,21 +260,24 @@ private fun ExplainText(
     // body1이 기본 스타일 => SpanStyle의 color만 override
     Text(
         modifier = modifier
-            .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(YakssokTheme.color.grey900)
-            .padding(10.dp),
-        text = annotatedText,
-        style = YakssokTheme.typography.body1
+            .padding(10.dp), text = annotatedText, style = YakssokTheme.typography.body1
     )
 }
 
 @Composable
 private fun ExampleNotification(
-    modifier: Modifier = Modifier
+    density: Density,
+    onMeasure: (Rect) -> Unit
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
+            .padding(top = 72.dp, start = 16.dp, end = 16.dp)
+            .fillMaxWidth()
+            .onGloballyPositioned {
+                onMeasure(it.toRect(density))
+            }
             .clip(RoundedCornerShape(21.dp))
             .background(YakssokTheme.color.grey150)
             .padding(start = 9.dp, end = 14.dp, top = 17.dp, bottom = 17.dp)
@@ -270,33 +288,51 @@ private fun ExampleNotification(
             contentDescription = "약쏙 알림 예시"
         )
         Spacer(modifier = Modifier.padding(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    color = YakssokTheme.color.black,
-                    style = YakssokTheme.typography.subtitle2,
-                    text = "김약쏙 님이 잔소리해요!"
-                )
-                Text(
-                    color = YakssokTheme.color.grey800,
-                    style = YakssokTheme.typography.body2,
-                    text = "약 까먹었네? 얼른 먹어! \uD83D\uDC8A"
-                )
-            }
+        NotificationContent()
+    }
+}
+
+@Composable
+private fun NotificationContent() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
             Text(
-                color = YakssokTheme.color.grey400,
+                color = YakssokTheme.color.black,
+                style = YakssokTheme.typography.subtitle2,
+                text = "김약쏙 님이 잔소리해요!"
+            )
+            Text(
+                color = YakssokTheme.color.grey800,
                 style = YakssokTheme.typography.body2,
-                text = "3:00 pm"
+                text = "약 까먹었네? 얼른 먹어! \uD83D\uDC8A"
             )
         }
+        Text(
+            color = YakssokTheme.color.grey400,
+            style = YakssokTheme.typography.body2,
+            text = "3:00 pm"
+        )
     }
 }
 
 private val Location.isTop: Boolean
-    get() = this == Location.TOP_START ||
-            this == Location.TOP_END ||
-            this == Location.TOP_CENTER
+    get() = this == Location.TOP_START || this == Location.TOP_END || this == Location.TOP_CENTER
+
+private val hiddenExplainKeys = setOf(
+    TutorialTargetKey.NOTIFICATION,
+    TutorialTargetKey.EMPTY,
+    TutorialTargetKey.END
+)
+
+private fun TutorialTargetKey.shouldHideExplain(): Boolean =
+    this in hiddenExplainKeys
+
+private fun TutorialTargetKey.isNotificationKey(): Boolean =
+    this == TutorialTargetKey.NOTIFICATION || this == TutorialTargetKey.NOTIFICATION_COMPLETE
+
+private fun TutorialTargetKey.shouldHideOverlay(): Boolean =
+    this == TutorialTargetKey.EMPTY || this == TutorialTargetKey.END

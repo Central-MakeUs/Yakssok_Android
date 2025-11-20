@@ -19,47 +19,40 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pillsquad.yakssok.core.common.today
-import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.designsystem.util.shadow
 import com.pillsquad.yakssok.core.model.FeedbackTarget
 import com.pillsquad.yakssok.core.model.User
 import com.pillsquad.yakssok.core.ui.component.MateLazyRow
 import com.pillsquad.yakssok.core.ui.component.NoMedicineColumn
-import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
 import com.pillsquad.yakssok.core.ui.component.dailyMedicineList
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
-import com.pillsquad.yakssok.core.ui.ext.toRect
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.feature.home.component.FeedbackDialog
 import com.pillsquad.yakssok.feature.home.component.RemindDialog
 import com.pillsquad.yakssok.feature.home.component.TutorialColumn
 import com.pillsquad.yakssok.feature.home.component.UserInfoCard
 import com.pillsquad.yakssok.feature.home.component.WeekDataSelector
-import com.pillsquad.yakssok.feature.home.model.HomeUiState
-import kotlinx.coroutines.delay
+import com.pillsquad.yakssok.feature.home.model.HomeIntent
+import com.pillsquad.yakssok.feature.home.model.HomeSideEffect
+import com.pillsquad.yakssok.feature.home.model.HomeState
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.collections.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,135 +64,113 @@ internal fun HomeRoute(
     onNavigateMyPage: () -> Unit,
     onNavigateCalendar: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isTutorialComplete by viewModel.isTutorialComplete.collectAsStateWithLifecycle()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val showSnackbar = LocalShowErrorSnackBar.current
-    var feedbackTarget by remember { mutableStateOf<FeedbackTarget?>(null) }
-    val rectMap = remember { mutableStateMapOf<TutorialTargetKey, Rect>() }
-    val targetKeyState by viewModel.currentTargetKey.collectAsStateWithLifecycle(TutorialTargetKey.EMPTY)
-
     val refreshState = rememberPullToRefreshState()
-    var isRefreshing by remember { mutableStateOf(false) }
+    val rectMap = remember { mutableStateMapOf<TutorialTargetKey, Rect>() }
 
     val scaleFraction = {
-        if (isRefreshing) 1f
+        if (state.isRefreshing) 1f
         else LinearOutSlowInEasing.transform(refreshState.distanceFraction).coerceIn(0f, 1f)
     }
 
-    val onRefresh: () -> Unit = {
-        isRefreshing = true
-        viewModel.refresh()
-    }
-
-    OnResumeEffect { viewModel.refresh() }
-    CollectEvent(viewModel.errorFlow) { showSnackbar(it) }
-
-    LaunchedEffect(uiState) {
-        if (uiState is HomeUiState.Success) {
-            isRefreshing = false
+    OnResumeEffect { viewModel.onIntent(HomeIntent.Refresh) }
+    CollectEvent(
+        flow = viewModel.sideEffect,
+        onEvent = { effect ->
+            when (effect) {
+                is HomeSideEffect.ShowError -> showSnackbar(effect.throwable)
+                HomeSideEffect.NavigateToMate -> onNavigateMate()
+                HomeSideEffect.NavigateToRoutine -> onNavigateRoutine()
+                HomeSideEffect.NavigateToCalendar -> onNavigateCalendar()
+                HomeSideEffect.NavigateToAlert -> onNavigateAlert()
+                HomeSideEffect.NavigateToMyPage -> onNavigateMyPage()
+            }
         }
-    }
+    )
 
-    LaunchedEffect(targetKeyState) {
-        if (targetKeyState == TutorialTargetKey.EMPTY && !isTutorialComplete && uiState is HomeUiState.Success) {
-            feedbackTarget = (uiState as HomeUiState.Success).feedbackTargetList[0]
-            delay(800)
-            viewModel.changeTutorialStep()
+    LaunchedEffect(rectMap.size) {
+        val rect = rectMap[TutorialTargetKey.ADD_FRIEND]
+        if (!state.isTutorialComplete && rect != null && state.tutorialStep < 0) {
+            viewModel.onIntent(HomeIntent.NextTutorialStep)
         }
     }
 
     TutorialColumn(
-        uiState = uiState,
-        isTutorialNeed = !isTutorialComplete,
-        highlightRect = rectMap[targetKeyState],
-        targetKey = targetKeyState,
+        state = state,
+        highlightRect = rectMap[state.currentTargetKey],
         refreshState = refreshState,
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
+        onRefresh = {
+            viewModel.onIntent(HomeIntent.Refresh)
+        },
         scaleFraction = scaleFraction,
-        onNavigateAlert = onNavigateAlert,
-        onNavigateMyPage = onNavigateMyPage,
-        onNextClick = viewModel::changeTutorialStep,
-        onMeasure = { rect -> rectMap[TutorialTargetKey.NOTIFICATION] = rect },
+        onNavigateAlert = {
+            viewModel.onIntent(HomeIntent.NavigateToAlert)
+        },
+        onNavigateMyPage = {
+            viewModel.onIntent(HomeIntent.NavigateToMyPage)
+        },
+        onNextClick = {
+            viewModel.onIntent(HomeIntent.NextTutorialStep)
+        },
+        onMeasure = { rect -> rectMap[TutorialTargetKey.NOTIFICATION_COMPLETE] = rect },
         dialog = {
-            feedbackTarget?.let { feedback ->
+            state.feedbackDialogTarget?.let { feedback ->
                 FeedbackDialog(
                     feedback = feedback,
-                    onDismiss = { feedbackTarget = null },
+                    initialText = if (state.isTutorialComplete) "" else "약 까먹었네? 얼른 먹어!",
+                    onDismiss = {
+                        viewModel.onIntent(HomeIntent.CloseFBDialog)
+                    },
                     onConfirm = { userId, message, type ->
-                        viewModel.postFeedback(userId, message, type)
-                        feedbackTarget = null
-                    }
+                        viewModel.onIntent(HomeIntent.PostFeedback(userId, message, type))
+                    },
+                    onMeasure = { rect -> rectMap[TutorialTargetKey.FEEDBACK_BUTTON] = rect }
                 )
             }
         }
-    ) { state ->
-        if (isTutorialComplete && state.remindList.isNotEmpty()) {
+    ) {
+        if (state.isTutorialComplete && state.remindList.isNotEmpty()) {
             RemindDialog(
                 name = state.userList.firstOrNull()?.nickName.orEmpty(),
                 routineList = state.remindList,
-                onDismiss = viewModel::clearRemindState
+                onDismiss = {
+                    viewModel.onIntent(HomeIntent.ClearRemind)
+                }
             )
         }
 
         HomeScreen(
             state = state,
-            onClickUser = viewModel::onMateClick,
-            onSelectDate = viewModel::onSelectedDate,
-            onClickRoutine = viewModel::onRoutineClick,
-            onClickFeedback = { feedbackTarget = it },
-            onNavigateMate = onNavigateMate,
-            onNavigateRoutine = onNavigateRoutine,
-            onNavigateCalendar = onNavigateCalendar,
+            onClickUser = { idx ->
+                viewModel.onIntent(HomeIntent.SelectUser(idx))
+            },
+            onSelectDate = { date ->
+                viewModel.onIntent(HomeIntent.SelectDate(date))
+            },
+            onClickRoutine = { routineId ->
+                viewModel.onIntent(HomeIntent.ToggleRoutine(routineId))
+            },
+            onClickFeedback = { fbTarget ->
+                viewModel.onIntent(HomeIntent.SetFeedbackDialog(fbTarget))
+            },
+            onNavigateMate = {
+                viewModel.onIntent(HomeIntent.NavigateToMate)
+            },
+            onNavigateRoutine = {
+                viewModel.onIntent(HomeIntent.NavigateToRoutine)
+            },
+            onNavigateCalendar = {
+                viewModel.onIntent(HomeIntent.NavigateToCalendar)
+            },
             onMeasure = { key, rect -> rectMap[key] = rect }
         )
     }
-
-
-//
-//    PullToRefreshColumn(
-//        refreshState = refreshState,
-//        isRefreshing = isRefreshing,
-//        scaleFraction = scaleFraction,
-//        onRefresh = onRefresh,
-//        topBar = {
-//            YakssokTopAppBar(
-//                modifier = Modifier.padding(horizontal = 16.dp),
-//                isLogo = true,
-//                onNavigateAlert = onNavigateAlert,
-//                onNavigateMy = onNavigateMyPage
-//            )
-//        }
-//    ) {
-//        when (val state = uiState) {
-//            is HomeUiState.Loading -> HomeSkeleton(showFeedbackSection = true)
-//            is HomeUiState.Success -> {
-//                state.remindList.firstOrNull()?.let {
-//                    RemindDialog(
-//                        name = state.userList.firstOrNull()?.nickName.orEmpty(),
-//                        routineList = state.remindList,
-//                        onDismiss = viewModel::clearRemindState
-//                    )
-//                }
-//
-//                HomeScreen(
-//                    state = state,
-//                    onClickUser = viewModel::onMateClick,
-//                    onSelectDate = viewModel::onSelectedDate,
-//                    onClickRoutine = viewModel::onRoutineClick,
-//                    onClickFeedback = { feedbackTarget = it },
-//                    onNavigateMate = onNavigateMate,
-//                    onNavigateRoutine = onNavigateRoutine,
-//                    onNavigateCalendar = onNavigateCalendar
-//                )
-//            }
-//        }
-//    }
 }
 
 @Composable
 private fun HomeScreen(
-    state: HomeUiState.Success,
+    state: HomeState,
     onClickUser: (Int) -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onClickRoutine: (Int) -> Unit,
