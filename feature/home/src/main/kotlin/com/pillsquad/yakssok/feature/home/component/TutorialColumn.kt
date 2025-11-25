@@ -49,11 +49,12 @@ import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.component.PullToRefreshColumn
-import com.pillsquad.yakssok.core.ui.ext.getAlignmentByLocation
 import com.pillsquad.yakssok.core.ui.ext.toPx
 import com.pillsquad.yakssok.core.ui.ext.toRect
-import com.pillsquad.yakssok.core.ui.model.Location
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.isNotificationKey
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.shouldHideExplain
+import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.shouldHideOverlay
 import com.pillsquad.yakssok.feature.home.HomeSkeleton
 import com.pillsquad.yakssok.feature.home.R
 import com.pillsquad.yakssok.feature.home.model.HomeState
@@ -122,12 +123,12 @@ internal fun TutorialColumn(
             if (isExplainVisible) {
                 ExplainText(
                     modifier = Modifier
-                        .align(getAlignmentByLocation(state.currentTargetKey.loc))
+                        .align(state.currentTargetKey.loc.alignment)
                         .padding(
                             start = 32.dp,
-                            top = if (state.currentTargetKey.loc.isTop) textTopDp else 0.dp,
+                            top = if (state.currentTargetKey.loc.isTop()) textTopDp else 0.dp,
                             end = 32.dp,
-                            bottom = if (!state.currentTargetKey.loc.isTop) textBottomDp else 0.dp
+                            bottom = if (!state.currentTargetKey.loc.isTop()) textBottomDp else 0.dp
                         )
                         .onGloballyPositioned {
                             explainRect = it.toRect(density)
@@ -318,21 +319,3 @@ private fun NotificationContent() {
         )
     }
 }
-
-private val Location.isTop: Boolean
-    get() = this == Location.TOP_START || this == Location.TOP_END || this == Location.TOP_CENTER
-
-private val hiddenExplainKeys = setOf(
-    TutorialTargetKey.NOTIFICATION,
-    TutorialTargetKey.EMPTY,
-    TutorialTargetKey.END
-)
-
-private fun TutorialTargetKey.shouldHideExplain(): Boolean =
-    this in hiddenExplainKeys
-
-private fun TutorialTargetKey.isNotificationKey(): Boolean =
-    this == TutorialTargetKey.NOTIFICATION || this == TutorialTargetKey.NOTIFICATION_COMPLETE
-
-private fun TutorialTargetKey.shouldHideOverlay(): Boolean =
-    this == TutorialTargetKey.EMPTY || this == TutorialTargetKey.END

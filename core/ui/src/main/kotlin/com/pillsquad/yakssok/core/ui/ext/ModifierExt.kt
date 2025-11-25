@@ -49,14 +49,3 @@ fun Modifier.yakssokDefault(color: Color): Modifier {
         .padding(horizontal = 16.dp)
         .padding(bottom = 16.dp)
 }
-
-fun getAlignmentByLocation(loc: Location): Alignment {
-    return when (loc) {
-        Location.TOP_START -> Alignment.TopStart
-        Location.TOP_END -> Alignment.TopEnd
-        Location.TOP_CENTER -> Alignment.TopCenter
-        Location.BOTTOM_START -> Alignment.BottomStart
-        Location.BOTTOM_END -> Alignment.BottomEnd
-        Location.BOTTOM_CENTER -> Alignment.BottomCenter
-    }
-}
