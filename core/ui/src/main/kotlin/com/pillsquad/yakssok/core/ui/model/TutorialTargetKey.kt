@@ -1,6 +1,7 @@
 package com.pillsquad.yakssok.core.ui.model
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.Alignment
 import com.pillsquad.yakssok.core.ui.R
 
 enum class TutorialTargetKey(val loc: Location, val textGroupRes: ExplainTextGroupRes) {
@@ -67,11 +68,36 @@ enum class TutorialTargetKey(val loc: Location, val textGroupRes: ExplainTextGro
             R.string.empty,
             R.string.empty
         )
-    )
+    );
+
+    companion object {
+        private val hiddenExplainKeys = setOf(
+            EMPTY,
+            NOTIFICATION,
+            END
+        )
+
+        fun TutorialTargetKey.shouldHideExplain(): Boolean =
+            this in hiddenExplainKeys
+
+        fun TutorialTargetKey.isNotificationKey(): Boolean =
+            this == NOTIFICATION || this == NOTIFICATION_COMPLETE
+
+        fun TutorialTargetKey.shouldHideOverlay(): Boolean =
+            this == EMPTY || this == END
+    }
 }
 
-enum class Location {
-    TOP_START, TOP_END, TOP_CENTER, BOTTOM_START, BOTTOM_END, BOTTOM_CENTER
+enum class Location(
+    val alignment: Alignment
+) {
+    TOP_START(Alignment.TopStart),
+    TOP_END(Alignment.TopEnd),
+    TOP_CENTER(Alignment.TopCenter),
+    BOTTOM_START(Alignment.BottomStart),
+    BOTTOM_END(Alignment.BottomEnd),
+    BOTTOM_CENTER(Alignment.BottomCenter);
+    fun isTop(): Boolean = this == TOP_START || this == TOP_END || this == TOP_CENTER
 }
 
 data class ExplainTextGroupRes(
