@@ -168,7 +168,11 @@ internal fun HomeRoute(
             onNavigateCalendar = {
                 viewModel.onIntent(HomeIntent.NavigateToCalendar)
             },
-            onMeasure = { key, rect -> rectMap[key] = rect }
+            onMeasure = { key, rect ->
+                if (!rectMap.containsKey(key)) {
+                    rectMap[key] = rect
+                }
+            }
         )
     }
 }
