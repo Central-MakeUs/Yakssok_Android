@@ -197,14 +197,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun nextTutorialStep() {
-        val newStep = (currentState.tutorialStep + 1) % 7
+        val newStep = currentState.tutorialStep + 1
         intent { copy(tutorialStep = newStep) }
         updateTutorialTarget(newStep)
     }
 
     private fun updateTutorialTarget(step: Int) {
-        step.debugLog("updateTutorialTarget")
-
         if (step in autoSteps) {
             runAutoAdvance()
         }

@@ -1,11 +1,7 @@
 package com.pillsquad.yakssok.feature.home.component
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector4D
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,16 +28,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
@@ -50,7 +45,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.component.YakssokImage
 import com.pillsquad.yakssok.core.designsystem.component.YakssokTopAppBar
@@ -63,22 +57,20 @@ import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.isNotific
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.shouldHideExplain
 import com.pillsquad.yakssok.feature.home.HomeSkeleton
 import com.pillsquad.yakssok.feature.home.R
+import com.pillsquad.yakssok.feature.home.model.FADE_DURATION
+import com.pillsquad.yakssok.feature.home.model.HIGHLIGHT_DURATION
 import com.pillsquad.yakssok.feature.home.model.HomeState
+import com.pillsquad.yakssok.feature.home.model.OVERLAY_ALPHA_DIM
+import com.pillsquad.yakssok.feature.home.model.OVERLAY_ALPHA_FULL
+import com.pillsquad.yakssok.feature.home.model.OVERLAY_FADE_DURATION
+import com.pillsquad.yakssok.feature.home.model.TutorialTransitionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private val RectVectorConverter = TwoWayConverter<Rect, AnimationVector4D>(
-    convertToVector = { rect ->
-        AnimationVector4D(rect.left, rect.top, rect.right, rect.bottom)
-    },
-    convertFromVector = { vector ->
-        Rect(vector.v1, vector.v2, vector.v3, vector.v4)
-    }
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TutorialColumn(
+    modifier: Modifier = Modifier,
     state: HomeState,
     highlightRect: Rect? = null,
     refreshState: PullToRefreshState = rememberPullToRefreshState(),
@@ -94,109 +86,16 @@ internal fun TutorialColumn(
     val density = LocalDensity.current
     val screenHeightPx = LocalWindowInfo.current.containerSize.height
 
-    val rectAnim = remember {
-        Animatable(
-            initialValue = Rect(0f, 0f, 0f, 0f),
-            typeConverter = RectVectorConverter
-        )
-    }
-    val overlayAlphaAnim = remember { Animatable(0.7f) }
-    val explainAlphaAnim = remember { Animatable(0f) }
+    var isExplainVisible by remember(highlightRect) { mutableStateOf(false) }
 
-    var previousStep by remember { mutableIntStateOf(state.tutorialStep) }
-    var previousHighlight by remember { mutableStateOf<Rect?>(null) }
+    val transitionState = rememberTutorialTransitionState(
+        tutorialStep = state.tutorialStep,
+        currentTargetKey = state.currentTargetKey,
+        highlightRect = highlightRect,
+        changeExplainVisible = { isExplainVisible = true }
+    )
 
-    var isVisible by remember(highlightRect) { mutableStateOf(false) }
-
-    val animatedHighlight: Rect? = remember(highlightRect, rectAnim.value) {
-        if (highlightRect == null) {
-            null
-        } else {
-            val current = rectAnim.value
-            if (current.width == 0f && current.height == 0f) {
-                // 애니메이션 최초 실행 전에는 highlightRect를 그대로 사용
-                highlightRect
-            } else {
-                current
-            }
-        }
-    }
-
-    // step에 따른 overlayAlpha, explainAlpha, highlightRect 애니메이션 처리
-    LaunchedEffect(state.tutorialStep) {
-        val fromStep = previousStep
-        val toStep = state.tutorialStep
-        val fromRect = previousHighlight
-        val toRect = highlightRect
-
-        // overlayAlpha 애니메이션 (2→3, 3→4, 4→5, 5→6 포함 전체 step 대응)
-        val targetAlpha = when (state.currentTargetKey) {
-            TutorialTargetKey.EMPTY,
-            TutorialTargetKey.END -> 0f
-
-            TutorialTargetKey.NOTIFICATION -> 0.3f
-            TutorialTargetKey.NOTIFICATION_COMPLETE -> 0.7f
-
-            else -> 0.7f
-        }
-
-        val isMovingHighlightStep =
-            (fromStep == 0 && toStep == 1 || fromStep == 1 && toStep == 2) && fromRect != null && toRect != null
-
-        val highlightDuration = 700
-
-        launch {
-            explainAlphaAnim.snapTo(0f)
-
-            isVisible = true
-
-            when (toStep) {
-                0 -> explainAlphaAnim.snapTo(1f)
-
-                4, 6 -> {
-                    explainAlphaAnim.animateTo(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 250)
-                    )
-                }
-
-                else -> {
-
-                    delay((highlightDuration * 0.9).toLong())
-                    explainAlphaAnim.animateTo(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 250)
-                    )
-                }
-            }
-        }
-
-        launch {
-            overlayAlphaAnim.animateTo(
-                targetValue = targetAlpha,
-                animationSpec = tween(durationMillis = 300)
-            )
-        }
-
-        if (isMovingHighlightStep) {
-            // Rect 이동 애니메이션
-            launch {
-                rectAnim.animateTo(
-                    targetValue = toRect,
-                    animationSpec = tween(
-                        durationMillis = highlightDuration,
-                        easing = LinearOutSlowInEasing
-                    )
-                )
-            }
-        } else {
-            // Rect 이동 애니메이션이 필요 없는 경우: 그냥 스냅
-            rectAnim.snapTo(toRect ?: Rect(0f, 0f, 0f, 0f))
-        }
-
-        previousStep = toStep
-        previousHighlight = toRect
-    }
+    val animatedHighlight = transitionState.currentRect
 
     val textTopDp = remember(highlightRect) {
         highlightRect?.let {
@@ -204,13 +103,13 @@ internal fun TutorialColumn(
         } ?: 24.dp
     }
 
-    val textBottomDp = remember(highlightRect) {
+    val textBottomDp = remember(highlightRect, screenHeightPx) {
         highlightRect?.let {
             with(density) { screenHeightPx.toDp() - it.top.toDp() } + 24.dp
         } ?: 24.dp
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         MainContent(
             state = state,
             refreshState = refreshState,
@@ -226,27 +125,26 @@ internal fun TutorialColumn(
         if (!state.isTutorialComplete) {
             TutorialOverlay(
                 density = density,
-                overlayAlaph = overlayAlphaAnim.value,
+                overlayAlpha = transitionState.overlayAlpha,
                 highlightRect = animatedHighlight,
                 onClickNextStep = onClickNextStep
             )
 
-            if (!state.currentTargetKey.shouldHideExplain() && isVisible) {
+            if (!state.currentTargetKey.shouldHideExplain() && isExplainVisible) {
                 Column(
                     modifier = Modifier
-                        .align(state.currentTargetKey.loc.alignment),
+                        .align(state.currentTargetKey.loc.alignment)
+                        .graphicsLayer { alpha = transitionState.explainAlpha },
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ExplainText(
-                        modifier = Modifier
-                            .padding(
-                                start = 32.dp,
-                                top = if (state.currentTargetKey.loc.isTop()) textTopDp else 0.dp,
-                                end = 32.dp,
-                                bottom = if (!state.currentTargetKey.loc.isTop()) textBottomDp else 0.dp
-                            )
-                            .alpha(explainAlphaAnim.value),
+                        modifier = Modifier.padding(
+                            start = 32.dp,
+                            top = if (state.currentTargetKey.loc.isTop()) textTopDp else 0.dp,
+                            end = 32.dp,
+                            bottom = if (!state.currentTargetKey.loc.isTop()) textBottomDp else 0.dp
+                        ),
                         firstContent = stringResource(state.currentTargetKey.textGroupRes.firstContent),
                         highlightContent = stringResource(state.currentTargetKey.textGroupRes.highlightContent),
                         secondContent = stringResource(state.currentTargetKey.textGroupRes.secondContent)
@@ -254,9 +152,7 @@ internal fun TutorialColumn(
 
                     if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION_COMPLETE) {
                         YakssokButton(
-                            modifier = Modifier
-                                .padding(horizontal = 72.dp)
-                                .alpha(explainAlphaAnim.value),
+                            modifier = Modifier.padding(horizontal = 72.dp),
                             text = stringResource(R.string.tutorial_button),
                             contentColor = YakssokTheme.color.grey50,
                             onClick = onClickNextStep
@@ -273,6 +169,93 @@ internal fun TutorialColumn(
             }
         }
     }
+}
+
+@Composable
+private fun rememberTutorialTransitionState(
+    tutorialStep: Int,
+    currentTargetKey: TutorialTargetKey,
+    highlightRect: Rect?,
+    changeExplainVisible: () -> Unit
+): TutorialTransitionState {
+    val state = remember {
+        TutorialTransitionState(
+            initialOverlayAlpha = OVERLAY_ALPHA_FULL,
+            initialRect = Rect.Zero
+        )
+    }
+
+    var previousStep by remember { mutableIntStateOf(tutorialStep) }
+    var previousHighlight by remember { mutableStateOf<Rect?>(null) }
+
+    LaunchedEffect(tutorialStep, highlightRect) {
+        val fromStep = previousStep
+        val toStep = tutorialStep
+        val fromRect = previousHighlight
+        val toRect = highlightRect
+
+        val targetAlpha = when (currentTargetKey) {
+            TutorialTargetKey.EMPTY,
+            TutorialTargetKey.END -> 0f
+
+            TutorialTargetKey.NOTIFICATION -> OVERLAY_ALPHA_DIM
+            TutorialTargetKey.NOTIFICATION_COMPLETE -> OVERLAY_ALPHA_FULL
+            else -> OVERLAY_ALPHA_FULL
+        }
+
+        val isMovingHighlightStep =
+            (fromStep == 0 && toStep == 1 || fromStep == 1 && toStep == 2) && fromRect != null && toRect != null
+
+        launch {
+            state.explainAlphaAnim.snapTo(0f)
+
+            changeExplainVisible()
+
+            when (toStep) {
+                0 -> state.explainAlphaAnim.snapTo(1f)
+                4, 6 -> {
+                    state.explainAlphaAnim.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = FADE_DURATION)
+                    )
+                }
+
+                else -> {
+                    delay((HIGHLIGHT_DURATION * 0.9).toLong())
+                    state.explainAlphaAnim.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = FADE_DURATION)
+                    )
+                }
+            }
+        }
+
+        launch {
+            state.overlayAlphaAnim.animateTo(
+                targetValue = targetAlpha,
+                animationSpec = tween(durationMillis = OVERLAY_FADE_DURATION)
+            )
+        }
+
+        if (isMovingHighlightStep) {
+            launch {
+                state.rectAnim.animateTo(
+                    targetValue = toRect,
+                    animationSpec = tween(
+                        durationMillis = HIGHLIGHT_DURATION,
+                        easing = LinearOutSlowInEasing
+                    )
+                )
+            }
+        } else {
+            state.rectAnim.snapTo(toRect ?: Rect.Zero)
+        }
+
+        previousStep = toStep
+        previousHighlight = toRect
+    }
+
+    return state
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -298,7 +281,8 @@ private fun MainContent(
                 onNavigateAlert = onNavigateAlert,
                 onNavigateMy = onNavigateMyPage
             )
-        }) {
+        }
+    ) {
         if (state.isLoading) {
             HomeSkeleton(showFeedbackSection = true)
         } else {
@@ -310,42 +294,46 @@ private fun MainContent(
 @Composable
 private fun TutorialOverlay(
     density: Density,
-    overlayAlaph: Float = 0.7f,
+    overlayAlpha: Float = 0.7f,
     highlightRect: Rect?,
     onClickNextStep: () -> Unit
 ) {
-    val overlayRadius = 16.dp.toPx(density)
-    val overlayColor = YakssokTheme.color.black.copy(alpha = overlayAlaph)
-
+    val overlayRadiusPx = 16.dp.toPx(density)
+    val overlayBaseColor = YakssokTheme.color.black
     val interactionSource = remember { MutableInteractionSource() }
 
-    var canvasSize by remember { mutableStateOf(Size.Zero) }
-    val overlayPath = remember(highlightRect, canvasSize, overlayRadius) {
-        Path().apply {
-            addRect(Rect(0f, 0f, canvasSize.width, canvasSize.height))
-            highlightRect?.let {
-                addRoundRect(
-                    RoundRect(
-                        rect = it, cornerRadius = CornerRadius(overlayRadius, overlayRadius)
-                    )
-                )
-            }
-            fillType = PathFillType.EvenOdd
-        }
-    }
-
-    Canvas(
+    Spacer(
         modifier = Modifier
             .fillMaxSize()
-            .onSizeChanged { size -> canvasSize = size.toSize() }
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClickNextStep
             )
-    ) {
-        drawPath(path = overlayPath, color = overlayColor)
-    }
+            .drawWithCache {
+                val overlayPath = Path().apply {
+                    addRect(Rect(0f, 0f, size.width, size.height))
+                    highlightRect?.let { rect ->
+                        if (rect.width > 0 && rect.height > 0) {
+                            addRoundRect(
+                                RoundRect(
+                                    rect = rect,
+                                    cornerRadius = CornerRadius(overlayRadiusPx, overlayRadiusPx)
+                                )
+                            )
+                        }
+                    }
+                    fillType = PathFillType.EvenOdd
+                }
+
+                onDrawBehind {
+                    drawPath(
+                        path = overlayPath,
+                        color = overlayBaseColor.copy(alpha = overlayAlpha)
+                    )
+                }
+            }
+    )
 }
 
 @Composable
@@ -382,12 +370,18 @@ private fun ExampleNotification(
     density: Density,
     onMeasure: (Rect) -> Unit
 ) {
+    var measuredRect by remember { mutableStateOf<Rect?>(null) }
+
     Row(
         modifier = Modifier
             .padding(top = 72.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
-            .onGloballyPositioned {
-                onMeasure(it.toRect(density))
+            .onGloballyPositioned { coordinates ->
+                val newRect = coordinates.toRect(density)
+                if (measuredRect != newRect) {
+                    measuredRect = newRect
+                    onMeasure(newRect)
+                }
             }
             .clip(RoundedCornerShape(16.dp))
             .background(YakssokTheme.color.grey150)
