@@ -1,5 +1,10 @@
 package com.pillsquad.yakssok.feature.home.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector4D
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,18 +24,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -54,10 +61,20 @@ import com.pillsquad.yakssok.core.ui.ext.toRect
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.isNotificationKey
 import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.shouldHideExplain
-import com.pillsquad.yakssok.core.ui.model.TutorialTargetKey.Companion.shouldHideOverlay
 import com.pillsquad.yakssok.feature.home.HomeSkeleton
 import com.pillsquad.yakssok.feature.home.R
 import com.pillsquad.yakssok.feature.home.model.HomeState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+private val RectVectorConverter = TwoWayConverter<Rect, AnimationVector4D>(
+    convertToVector = { rect ->
+        AnimationVector4D(rect.left, rect.top, rect.right, rect.bottom)
+    },
+    convertFromVector = { vector ->
+        Rect(vector.v1, vector.v2, vector.v3, vector.v4)
+    }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,26 +94,121 @@ internal fun TutorialColumn(
     val density = LocalDensity.current
     val screenHeightPx = LocalWindowInfo.current.containerSize.height
 
-    var explainRect by remember { mutableStateOf<Rect?>(null) }
+    val rectAnim = remember {
+        Animatable(
+            initialValue = Rect(0f, 0f, 0f, 0f),
+            typeConverter = RectVectorConverter
+        )
+    }
+    val overlayAlphaAnim = remember { Animatable(0.7f) }
+    val explainAlphaAnim = remember { Animatable(0f) }
 
-    val textTopDp = remember(highlightRect, density) {
-        highlightRect?.let { with(density) { it.bottom.toDp() } + 24.dp } ?: 24.dp
+    var previousStep by remember { mutableIntStateOf(state.tutorialStep) }
+    var previousHighlight by remember { mutableStateOf<Rect?>(null) }
+
+    var isVisible by remember(highlightRect) { mutableStateOf(false) }
+
+    val animatedHighlight: Rect? = remember(highlightRect, rectAnim.value) {
+        if (highlightRect == null) {
+            null
+        } else {
+            val current = rectAnim.value
+            if (current.width == 0f && current.height == 0f) {
+                // 애니메이션 최초 실행 전에는 highlightRect를 그대로 사용
+                highlightRect
+            } else {
+                current
+            }
+        }
     }
 
-    val textBottomDp = remember(highlightRect, density, screenHeightPx) {
+    // step에 따른 overlayAlpha, explainAlpha, highlightRect 애니메이션 처리
+    LaunchedEffect(state.tutorialStep) {
+        val fromStep = previousStep
+        val toStep = state.tutorialStep
+        val fromRect = previousHighlight
+        val toRect = highlightRect
+
+        // overlayAlpha 애니메이션 (2→3, 3→4, 4→5, 5→6 포함 전체 step 대응)
+        val targetAlpha = when (state.currentTargetKey) {
+            TutorialTargetKey.EMPTY,
+            TutorialTargetKey.END -> 0f
+
+            TutorialTargetKey.NOTIFICATION -> 0.3f
+            TutorialTargetKey.NOTIFICATION_COMPLETE -> 0.7f
+
+            else -> 0.7f
+        }
+
+        val isMovingHighlightStep =
+            (fromStep == 0 && toStep == 1 || fromStep == 1 && toStep == 2) && fromRect != null && toRect != null
+
+        val highlightDuration = 700
+
+        launch {
+            explainAlphaAnim.snapTo(0f)
+
+            isVisible = true
+
+            when (toStep) {
+                0 -> explainAlphaAnim.snapTo(1f)
+
+                4, 6 -> {
+                    explainAlphaAnim.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 250)
+                    )
+                }
+
+                else -> {
+
+                    delay((highlightDuration * 0.9).toLong())
+                    explainAlphaAnim.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(durationMillis = 250)
+                    )
+                }
+            }
+        }
+
+        launch {
+            overlayAlphaAnim.animateTo(
+                targetValue = targetAlpha,
+                animationSpec = tween(durationMillis = 300)
+            )
+        }
+
+        if (isMovingHighlightStep) {
+            // Rect 이동 애니메이션
+            launch {
+                rectAnim.animateTo(
+                    targetValue = toRect,
+                    animationSpec = tween(
+                        durationMillis = highlightDuration,
+                        easing = LinearOutSlowInEasing
+                    )
+                )
+            }
+        } else {
+            // Rect 이동 애니메이션이 필요 없는 경우: 그냥 스냅
+            rectAnim.snapTo(toRect ?: Rect(0f, 0f, 0f, 0f))
+        }
+
+        previousStep = toStep
+        previousHighlight = toRect
+    }
+
+    val textTopDp = remember(highlightRect) {
+        highlightRect?.let {
+            with(density) { it.bottom.toDp() } + 24.dp
+        } ?: 24.dp
+    }
+
+    val textBottomDp = remember(highlightRect) {
         highlightRect?.let {
             with(density) { screenHeightPx.toDp() - it.top.toDp() } + 24.dp
         } ?: 24.dp
     }
-
-    val explainTopDp = remember(explainRect, textTopDp, density) {
-        explainRect?.let { with(density) { it.bottom.toDp() + 20.dp } } ?: textTopDp
-    }
-
-    val isExplainVisible = !state.currentTargetKey.shouldHideExplain() && highlightRect != null
-    val isNotificationVisible = state.currentTargetKey.isNotificationKey()
-    val hideOverlay = state.currentTargetKey.shouldHideOverlay()
-    val overlayAlpha = if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION) 0.3f else 0.7f
 
     Box(modifier = Modifier.fillMaxSize()) {
         MainContent(
@@ -114,48 +226,49 @@ internal fun TutorialColumn(
         if (!state.isTutorialComplete) {
             TutorialOverlay(
                 density = density,
-                isOverlay = !hideOverlay,
-                overlayAlaph = overlayAlpha,
-                highlightRect = highlightRect,
+                overlayAlaph = overlayAlphaAnim.value,
+                highlightRect = animatedHighlight,
                 onClickNextStep = onClickNextStep
             )
 
-            if (isExplainVisible) {
-                ExplainText(
+            if (!state.currentTargetKey.shouldHideExplain() && isVisible) {
+                Column(
                     modifier = Modifier
-                        .align(state.currentTargetKey.loc.alignment)
-                        .padding(
-                            start = 32.dp,
-                            top = if (state.currentTargetKey.loc.isTop()) textTopDp else 0.dp,
-                            end = 32.dp,
-                            bottom = if (!state.currentTargetKey.loc.isTop()) textBottomDp else 0.dp
+                        .align(state.currentTargetKey.loc.alignment),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ExplainText(
+                        modifier = Modifier
+                            .padding(
+                                start = 32.dp,
+                                top = if (state.currentTargetKey.loc.isTop()) textTopDp else 0.dp,
+                                end = 32.dp,
+                                bottom = if (!state.currentTargetKey.loc.isTop()) textBottomDp else 0.dp
+                            )
+                            .alpha(explainAlphaAnim.value),
+                        firstContent = stringResource(state.currentTargetKey.textGroupRes.firstContent),
+                        highlightContent = stringResource(state.currentTargetKey.textGroupRes.highlightContent),
+                        secondContent = stringResource(state.currentTargetKey.textGroupRes.secondContent)
+                    )
+
+                    if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION_COMPLETE) {
+                        YakssokButton(
+                            modifier = Modifier
+                                .padding(horizontal = 72.dp)
+                                .alpha(explainAlphaAnim.value),
+                            text = stringResource(R.string.tutorial_button),
+                            contentColor = YakssokTheme.color.grey50,
+                            onClick = onClickNextStep
                         )
-                        .onGloballyPositioned {
-                            explainRect = it.toRect(density)
-                        },
-                    firstContent = stringResource(state.currentTargetKey.textGroupRes.firstContent),
-                    highlightContent = stringResource(state.currentTargetKey.textGroupRes.highlightContent),
-                    secondContent = stringResource(state.currentTargetKey.textGroupRes.secondContent)
-                )
+                    }
+                }
             }
 
-            if (isNotificationVisible) {
+            if (state.currentTargetKey.isNotificationKey()) {
                 ExampleNotification(
                     density = density,
                     onMeasure = onMeasure
-                )
-            }
-
-            if (state.currentTargetKey == TutorialTargetKey.NOTIFICATION_COMPLETE) {
-                YakssokButton(
-                    modifier = Modifier.padding(
-                        start = 72.dp,
-                        end = 72.dp,
-                        top = explainTopDp,
-                    ),
-                    text = stringResource(R.string.tutorial_button),
-                    contentColor = YakssokTheme.color.grey50,
-                    onClick = onClickNextStep
                 )
             }
         }
@@ -197,17 +310,12 @@ private fun MainContent(
 @Composable
 private fun TutorialOverlay(
     density: Density,
-    isOverlay: Boolean = true,
     overlayAlaph: Float = 0.7f,
     highlightRect: Rect?,
     onClickNextStep: () -> Unit
 ) {
     val overlayRadius = 16.dp.toPx(density)
-    val overlayColor = if (isOverlay) {
-        YakssokTheme.color.black.copy(alpha = overlayAlaph)
-    } else {
-        Color.Transparent
-    }
+    val overlayColor = YakssokTheme.color.black.copy(alpha = overlayAlaph)
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -263,7 +371,9 @@ private fun ExplainText(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(YakssokTheme.color.grey900)
-            .padding(10.dp), text = annotatedText, style = YakssokTheme.typography.body1
+            .padding(10.dp),
+        text = annotatedText,
+        style = YakssokTheme.typography.body1
     )
 }
 
@@ -279,7 +389,7 @@ private fun ExampleNotification(
             .onGloballyPositioned {
                 onMeasure(it.toRect(density))
             }
-            .clip(RoundedCornerShape(21.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(YakssokTheme.color.grey150)
             .padding(start = 9.dp, end = 14.dp, top = 17.dp, bottom = 17.dp)
     ) {
