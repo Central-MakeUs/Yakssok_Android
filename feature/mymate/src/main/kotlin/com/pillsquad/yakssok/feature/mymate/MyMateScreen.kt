@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -24,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -95,20 +99,28 @@ private fun MyMateScreen(
 private fun MyMateContent(
     mateList: List<User>,
 ) {
+    val maxWidth = LocalWindowInfo.current.containerSize.width.dp
+    val itemWidth = 64.dp + 8.dp
+    val itemsPerRow = (maxWidth / itemWidth).toInt().coerceAtLeast(1)
+
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        mateList.forEachIndexed { idx, mate ->
-            Spacer(modifier = Modifier.width(4.dp))
+        mateList.forEach { mate ->
+            Box(
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                MateItem(
+                    user = mate,
+                    imgSize = 64,
+                )
+            }
+        }
 
-            MateItem(
-                user = mate,
-                imgSize = 64,
-            )
-
-            Spacer(modifier = Modifier.width(4.dp))
+        repeat(mateList.size % itemsPerRow) {
+            Spacer(modifier = Modifier.width(itemWidth))
         }
     }
 }
@@ -124,7 +136,10 @@ private fun MateTitle(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
                 text = title,
                 style = YakssokTheme.typography.body1,
