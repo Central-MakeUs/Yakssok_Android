@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_description">메이트를 추가하고 함께 약을 챙겨보세요!</string>
+    <string name="topbar_title">메이트</string>
+    <string name="mate_title">내 메이트</string>
+    <string name="mate_count">%1$d명</string>
+</resources>

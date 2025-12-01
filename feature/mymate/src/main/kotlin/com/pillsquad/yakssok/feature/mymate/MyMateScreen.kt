@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,13 +16,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,13 +71,15 @@ private fun MyMateScreen(
     onNavigateMate: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    val mateListSize = (uiState as? MyMateUiState.Success)?.mateList?.size ?: 0
+    val mateListSize by remember(uiState) {
+        derivedStateOf { (uiState as? MyMateUiState.Success)?.mateList?.size ?: 0 }
+    }
 
     Column(
         modifier = Modifier.yakssokDefault(YakssokTheme.color.grey100)
     ) {
         YakssokTopAppBar(
-            title = "메이트",
+            title = stringResource(com.pillsquad.yakssok.feature.mymate.R.string.topbar_title),
             onBackClick = onNavigateBack
         )
 
@@ -99,18 +105,18 @@ private fun MyMateScreen(
 private fun MyMateContent(
     mateList: List<User>,
 ) {
-    val maxWidth = LocalWindowInfo.current.containerSize.width.dp
-    val itemWidth = 64.dp + 8.dp
-    val itemsPerRow = (maxWidth / itemWidth).toInt().coerceAtLeast(1)
-
-    FlowRow(
+    LazyVerticalGrid(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        columns = GridCells.Adaptive(minSize = 64.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        mateList.forEach { mate ->
+        items(
+            items = mateList,
+            key = { it.id }
+        ) { mate ->
             Box(
-                modifier = Modifier.padding(horizontal = 4.dp)
+                contentAlignment = Alignment.Center
             ) {
                 MateItem(
                     user = mate,
@@ -118,16 +124,12 @@ private fun MyMateContent(
                 )
             }
         }
-
-        repeat(mateList.size % itemsPerRow) {
-            Spacer(modifier = Modifier.width(itemWidth))
-        }
     }
 }
 
 @Composable
 private fun MateTitle(
-    title: String = "내 메이트",
+    title: String = stringResource(com.pillsquad.yakssok.feature.mymate.R.string.mate_title),
     mateCount: Int,
     onNavigateMate: () -> Unit
 ) {
@@ -155,7 +157,10 @@ private fun MateTitle(
                     .padding(vertical = 2.dp, horizontal = 8.dp)
             ) {
                 Text(
-                    text = "${mateCount}명",
+                    text = stringResource(
+                        com.pillsquad.yakssok.feature.mymate.R.string.mate_count,
+                        mateCount
+                    ),
                     style = YakssokTheme.typography.body1,
                     color = YakssokTheme.color.grey800
                 )
@@ -194,7 +199,7 @@ private fun EmptyScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "메이트를 추가하고 함께 약을 챙겨보세요!",
+            text = stringResource(com.pillsquad.yakssok.feature.mymate.R.string.empty_description),
             color = YakssokTheme.color.grey700
         )
     }
