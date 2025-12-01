@@ -35,9 +35,7 @@ abstract class FirebaseModules {
         @Singleton
         fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
             val remoteConfig = FirebaseRemoteConfig.getInstance()
-            val configSettings = remoteConfigSettings {
-                minimumFetchIntervalInSeconds = 3600
-            }
+            val configSettings = remoteConfigSettings { minimumFetchIntervalInSeconds = 60 }
             remoteConfig.setConfigSettingsAsync(configSettings)
 
             return remoteConfig

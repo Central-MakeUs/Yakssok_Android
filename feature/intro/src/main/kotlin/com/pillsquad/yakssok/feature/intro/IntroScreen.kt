@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,27 +28,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.findViewTreeLifecycleOwner
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.pillsquad.yakssok.core.designsystem.component.YakssokButton
 import com.pillsquad.yakssok.core.designsystem.theme.YakssokTheme
 import com.pillsquad.yakssok.core.ui.compositionlocal.LocalShowErrorSnackBar
+import com.pillsquad.yakssok.core.ui.compositionlocal.LocalUpdateSnackBar
 import com.pillsquad.yakssok.core.ui.ext.CollectEvent
 import com.pillsquad.yakssok.core.ui.ext.OnResumeEffect
+import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
+import com.pillsquad.yakssok.core.ui.ext.openPlayStore
 import com.pillsquad.yakssok.core.ui.ext.yakssokDefault
 import com.pillsquad.yakssok.feature.intro.component.SettingAlertDialog
 import com.pillsquad.yakssok.feature.intro.component.TestAccountDialog
-import com.pillsquad.yakssok.core.ui.ext.isNotificationGranted
-import com.pillsquad.yakssok.core.ui.ext.openPlayStore
 import com.pillsquad.yakssok.feature.intro.component.UpdateDialog
-import com.pillsquad.yakssok.feature.intro.util.startUpdate
+import com.pillsquad.yakssok.feature.intro.util.await
+
+private const val FLEXIBLE = 0
+private const val IMMEDIATE = 1
+private const val FLEXDIALOG = 2
+private const val IMMEDIALOG = 3
 
 @Composable
 internal fun IntroRoute(
@@ -57,17 +67,42 @@ internal fun IntroRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var showTestDialogShow by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
-    val activity = LocalView.current.context as Activity
-    val showErrorSnackBar = LocalShowErrorSnackBar.current
+    val activity = context as? Activity ?: return
+    val appUpdateManager: AppUpdateManager = remember { AppUpdateManagerFactory.create(context) }
 
+    val showErrorSnackBar = LocalShowErrorSnackBar.current
+    val showUpdateSnackBar = LocalUpdateSnackBar.current
+
+    var updateMode by remember { mutableStateOf<Int?>(null) }
     var showSetting by remember { mutableStateOf(false) }
     var pendingCheck by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf<Int?>(null) }
-
+    var showTestDialogShow by remember { mutableStateOf(false) }
     var permissionRequested by rememberSaveable { mutableStateOf(false) }
+
+    val appUpdateResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        // 사용자가 업데이트를 취소하는 경우, 앱 종료
+        if (result.resultCode == Activity.RESULT_CANCELED) {
+            if (updateMode == AppUpdateType.IMMEDIATE) {
+                activity.finish()
+            } else {
+                viewModel.checkToken()
+            }
+        }
+    }
+
+    val installStateUpdatedListener = remember {
+        InstallStateUpdatedListener { state ->
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                showUpdateSnackBar {
+                    appUpdateManager.completeUpdate()
+                }
+            }
+        }
+    }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -81,6 +116,11 @@ internal fun IntroRoute(
         } else {
             viewModel.postPushAgreement(true)
         }
+    }
+
+    DisposableEffect(Unit) {
+        appUpdateManager.registerListener(installStateUpdatedListener)
+        onDispose { appUpdateManager.unregisterListener(installStateUpdatedListener) }
     }
 
     OnResumeEffect {
@@ -107,10 +147,10 @@ internal fun IntroRoute(
                 onNavigateMate(it.code)
             }
             is IntroEvent.ShowErrorSnackbar -> showErrorSnackBar(it.throwable)
-            IntroEvent.ShowSoftUpdate -> startUpdate(activity, 0) { showUpdateDialog = 0 }
-            IntroEvent.ShowForceUpdate -> startUpdate(activity, 1) { showUpdateDialog = 1 }
-            IntroEvent.ShowNetworkDialog -> showUpdateDialog = 2
-            IntroEvent.ShowErrorDialog -> showUpdateDialog = 3
+            IntroEvent.ShowSoftUpdate -> updateMode = FLEXIBLE
+            IntroEvent.ShowForceUpdate -> updateMode = IMMEDIATE
+            IntroEvent.ShowNetworkDialog -> showUpdateDialog = FLEXDIALOG
+            IntroEvent.ShowErrorDialog -> showUpdateDialog = IMMEDIALOG
         }
     }
 
@@ -128,6 +168,35 @@ internal fun IntroRoute(
                 permissionRequested = true
                 viewModel.postPushAgreement(true)
             }
+        }
+    }
+
+    LaunchedEffect(updateMode) {
+        val type = if (updateMode != null) {
+            if (updateMode == FLEXIBLE) AppUpdateType.FLEXIBLE else AppUpdateType.IMMEDIATE
+        } else {
+            return@LaunchedEffect
+        }
+
+        try {
+            val appUpdateInfo = appUpdateManager.appUpdateInfo.await()
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                if (appUpdateInfo.isUpdateTypeAllowed(type)) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        appUpdateResultLauncher,
+                        AppUpdateOptions.newBuilder(type).build()
+                    )
+                } else {
+                    showUpdateDialog = updateMode
+                }
+            } else {
+                showUpdateDialog = updateMode
+            }
+        } catch (e: Exception) {
+            Log.e("IntroRoute", "Error checking app update", e)
+            showUpdateDialog = updateMode
         }
     }
 

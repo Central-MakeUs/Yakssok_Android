@@ -11,8 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "com.pillsquad.yakssok"
-        versionCode = 19
-        versionName = "1.0.6"
+        versionCode = 22
+        versionName = "1.1.0"
         targetSdk = 36
 
         buildConfigField("String", "KAKAO_API_KEY", getProperty("KAKAO_API_KEY"))
