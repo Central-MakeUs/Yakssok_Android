@@ -7,4 +7,5 @@
     android:resizeMode="none"
     android:widgetCategory="home_screen"
     android:updatePeriodMillis="0"
+    android:previewImage="@drawable/img_medium_widget"
     android:initialLayout="@layout/glance_default_loading_layout"/>
