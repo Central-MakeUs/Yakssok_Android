@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.widget.screen
+package com.pillsquad.yakssok.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -12,6 +12,7 @@ import androidx.glance.background
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
+import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
@@ -21,44 +22,26 @@ import com.pillsquad.yakssok.widget.R
 import com.pillsquad.yakssok.widget.launchAppAction
 
 @Composable
-internal fun SquareCard(
+internal fun RectCard(
     title: String,
     subTitle: String,
-    progress: String,
-    isTaken: Boolean,
-    onAction: Action
 ) {
-    val imageResource = if (isTaken) {
-        R.drawable.ic_widget_logo_true
-    } else {
-        R.drawable.ic_widget_logo_false
-    }
-
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ColorProvider(Color(0xFFFFFFFF), Color(0xFFFFFFFF)))
             .clickable(launchAppAction())
-            .padding(20.dp),
+            .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        Image(
-            provider = ImageProvider(R.drawable.ic_widget_logo_true),
-            contentDescription = "복약 처리",
-            modifier = GlanceModifier
-                .width(80.dp)
-                .height(34.dp)
-//                .clickable(onClick = onAction)
-        )
-
-        Spacer(GlanceModifier.height(16.dp))
-
-        LargeText(title, 20)
-        SmallText(subTitle, 16)
-
-        Spacer(GlanceModifier.height(10.dp))
-
-        ExtraText(progress)
+        LargeText(title)
+        Column(
+            modifier = GlanceModifier.defaultWeight(),
+            horizontalAlignment = Alignment.Start,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            SmallText(text = subTitle, maxLines = 2)
+        }
     }
 }

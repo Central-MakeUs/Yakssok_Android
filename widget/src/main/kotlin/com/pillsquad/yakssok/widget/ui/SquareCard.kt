@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.widget.screen
+package com.pillsquad.yakssok.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -21,9 +21,10 @@ import com.pillsquad.yakssok.widget.R
 import com.pillsquad.yakssok.widget.launchAppAction
 
 @Composable
-internal fun RectCard(
+internal fun SquareCard(
     title: String,
     subTitle: String,
+    progress: String,
     isTaken: Boolean,
     onAction: Action
 ) {
@@ -38,9 +39,9 @@ internal fun RectCard(
             .fillMaxSize()
             .background(ColorProvider(Color(0xFFFFFFFF), Color(0xFFFFFFFF)))
             .clickable(launchAppAction())
-            .padding(vertical = 12.dp, horizontal = 16.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Image(
             provider = ImageProvider(R.drawable.ic_widget_logo_true),
@@ -48,12 +49,24 @@ internal fun RectCard(
             modifier = GlanceModifier
                 .width(60.dp)
                 .height(26.dp)
-//                .clickable(onAction)
+//                .clickable(onClick = onAction)
         )
 
-        Spacer(GlanceModifier.height(10.dp))
+        Spacer(GlanceModifier.height(12.dp))
 
-        LargeText(title)
-        SmallText(subTitle)
+        LargeText(title, 20)
+        SmallText(
+            text = subTitle,
+            size = 16,
+            maxLines = 2
+        )
+
+        Column(
+            modifier = GlanceModifier.defaultWeight(),
+            horizontalAlignment = Alignment.End,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            ExtraText(progress)
+        }
     }
 }

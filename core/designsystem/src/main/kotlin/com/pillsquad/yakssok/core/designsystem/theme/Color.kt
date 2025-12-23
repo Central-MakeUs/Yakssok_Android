@@ -98,4 +98,5 @@ object WidgetColor {
     val subGreen = Color(0xFF3ADE4D)
     val subBlue = Color(0xFF40B0FA)
     val subPink = Color(0xFFD224DB)
+    val white = Color(0xFFFFFFFF)
 }

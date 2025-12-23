@@ -1,4 +1,4 @@
-package com.pillsquad.yakssok.widget.screen
+package com.pillsquad.yakssok.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
@@ -25,7 +25,8 @@ internal fun LargeText(
             fontSize = size.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Start
-        )
+        ),
+        maxLines = 1
     )
 }
 
@@ -33,6 +34,7 @@ internal fun LargeText(
 internal fun SmallText(
     text: String,
     size: Int = 14,
+    maxLines: Int = 1
 ) {
     Text(
         text = text,
@@ -41,8 +43,9 @@ internal fun SmallText(
             fontFamily = FontFamily.SansSerif,
             fontSize = size.sp,
             fontWeight = FontWeight.Normal,
-            textAlign = TextAlign.Start
-        )
+            textAlign = TextAlign.Start,
+        ),
+        maxLines = maxLines
     )
 }
 
@@ -59,6 +62,7 @@ internal fun ExtraText(
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End
-        )
+        ),
+        maxLines = 1
     )
 }

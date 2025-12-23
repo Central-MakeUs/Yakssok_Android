@@ -2,7 +2,6 @@ package com.pillsquad.yakssok.widget
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
@@ -16,15 +15,14 @@ import androidx.glance.appwidget.provideContent
 import com.pillsquad.yakssok.core.common.now
 import com.pillsquad.yakssok.core.domain.usecase.widget.ObserveWidgetSnapshotUseCase
 import com.pillsquad.yakssok.core.model.WidgetItem
-import com.pillsquad.yakssok.widget.screen.RectCard
-import com.pillsquad.yakssok.widget.screen.SquareCard
-import com.pillsquad.yakssok.widget.screen.WideCard
+import com.pillsquad.yakssok.widget.ui.RectCard
+import com.pillsquad.yakssok.widget.ui.SquareCard
+import com.pillsquad.yakssok.widget.ui.WideCard
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalTime
 
 class YakssokWidget : GlanceAppWidget() {
@@ -41,9 +39,10 @@ class YakssokWidget : GlanceAppWidget() {
         val snapShot = deps.observeUseCase().invoke().first()
 
         provideContent {
+            val size = LocalSize.current
             val now = LocalTime.now()
+
             val candidate = findCandidate(snapShot.rows, now)
-            Log.e("YakssokWidget", "provideContent $candidate")
 
             val pillAction: Action = if (candidate != null) {
                 actionRunCallback<MarkTakenAction>(
@@ -53,27 +52,18 @@ class YakssokWidget : GlanceAppWidget() {
                 launchAppAction()
             }
 
-            val sub = candidate?.let {
-                val t = LocalTime.parse(it.intakeTime)
-                val h = if (t.hour == 0 || t.hour == 12) 12 else t.hour % 12
-                val ampm = if (t.hour < 12) "am" else "pm"
-                val m = t.minute.toString().padStart(2, '0')
-                "$ampm $h:$m ${it.medicationName}"
-            } ?: "오늘은 없어요!"
+            val sub = getSubTitle(candidate)
 
-            val size = LocalSize.current
             when (size.width) {
                 150.dp -> {
                     RectCard(
-                        title = "오늘 먹어야 할 약",
+                        title = "지금 먹을 약",
                         subTitle = sub,
-                        isTaken = candidate?.isTaken ?: false,
-                        onAction = pillAction
                     )
                 }
                 225.dp -> {
                     SquareCard(
-                        title = "오늘 먹어야 할 약",
+                        title = "지금 먹을 약",
                         subTitle = sub,
                         progress = snapShot.progress,
                         isTaken = candidate?.isTaken ?: false,
@@ -107,6 +97,14 @@ class YakssokWidget : GlanceAppWidget() {
             .maxByOrNull { (_, t) -> t }
             ?.first
     }
+
+    private fun getSubTitle(candidate: WidgetItem?): String = candidate?.let{
+        val t = LocalTime.parse(it.intakeTime)
+        val h = if (t.hour == 0 || t.hour == 12) 12 else t.hour % 12
+        val amPm = if (t.hour < 12) "am" else "pm"
+        val m = t.minute.toString().padStart(2, '0')
+        "$amPm $h:$m ${it.medicationName}"
+    } ?: "오늘은 없어요!"
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
