@@ -18,7 +18,8 @@ data class RoutineUiModel(
     val pillName: String = "",
     val medicationType: MedicationType? = null,
     val startDate: LocalDate = LocalDate.today(),
-    val endDate: LocalDate? = null,
+    // FEATURE_DISABLED: NO_END_DATE - 기존: val endDate: LocalDate? = null
+    val endDate: LocalDate? = LocalDate.today(),
     val intakeCount: Int = 1,
     val intakeDays: List<WeekType> = listOf(
         WeekType.MONDAY,
