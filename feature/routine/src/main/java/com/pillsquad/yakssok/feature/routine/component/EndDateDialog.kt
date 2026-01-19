@@ -23,7 +23,9 @@ internal fun EndDateDialog(
     onConfirm: (LocalDate?) -> Unit,
     onValueChange: (LocalDate?) -> Unit
 ) {
-    var noEndDate by remember { mutableStateOf(false) }
+    // FEATURE_DISABLED: NO_END_DATE - Start
+    // var noEndDate by remember { mutableStateOf(false) }
+    // FEATURE_DISABLED: NO_END_DATE - End
 
     YakssokDialog(
         title = "복용 종료 날짜를 설정해주세요",
@@ -37,10 +39,12 @@ internal fun EndDateDialog(
                     modifier = Modifier.fillMaxWidth(),
                     initialDate = selectedEndDate ?: today,
                     onValueChange = {
-                        noEndDate = false
+                        // FEATURE_DISABLED: NO_END_DATE - noEndDate = false
                         onValueChange(it)
                     }
                 )
+                // FEATURE_DISABLED: NO_END_DATE - Start
+                /*
                 RoutineCheckBox(
                     title = "종료일 없음",
                     isTrued = noEndDate,
@@ -55,11 +59,12 @@ internal fun EndDateDialog(
                         )
                     }
                 )
+                */
+                // FEATURE_DISABLED: NO_END_DATE - End
             }
         },
-        enabled = if (noEndDate) {
-            true
-        } else {
+        // FEATURE_DISABLED: NO_END_DATE - 기존: enabled = if (noEndDate) { true } else { ... }
+        enabled = run {
             val startDate = uiStartDate
             val endDate = selectedEndDate
             if (endDate == null) {
@@ -70,8 +75,8 @@ internal fun EndDateDialog(
         },
         onDismiss = onDismiss,
         onConfirm = {
-            val finalEndDate = if (noEndDate) null else selectedEndDate
-            onConfirm(finalEndDate)
+            // FEATURE_DISABLED: NO_END_DATE - 기존: val finalEndDate = if (noEndDate) null else selectedEndDate
+            onConfirm(selectedEndDate)
         }
     )
 }
